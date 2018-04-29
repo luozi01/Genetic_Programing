@@ -41,9 +41,24 @@ public class Graph implements Chromosome<Graph> {
                 mutate_medium();
                 break;
             case Hard:
+                mutate_hard();
                 break;
         }
     }
+
+    private void mutate_hard() {
+        int CHANGED_SHAPE_INDEX = randEngine.nextInt(ACTUAL_SHAPES - 1);
+
+        polygons.get(CHANGED_SHAPE_INDEX).setR(randEngine.uniform());
+        polygons.get(CHANGED_SHAPE_INDEX).setG(randEngine.uniform());
+        polygons.get(CHANGED_SHAPE_INDEX).setB(randEngine.uniform());
+        polygons.get(CHANGED_SHAPE_INDEX).setA(randEngine.uniform());
+        int CHANGED_POINT_INDEX = randEngine.nextInt(ACTUAL_POINTS - 1);
+
+        polygons.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_WIDTH) * 1.0;
+        polygons.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_HEIGHT) * 1.0;
+    }
+
 
     private void mutate_medium() {
         for (Polygon polygon : polygons) {
