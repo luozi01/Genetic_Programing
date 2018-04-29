@@ -7,7 +7,7 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
     private static final double uniformRate = 0.4;
     private static final double mutationRate = 0.02;
     private static final int tournamentSize = 3;
-    private static final int elitism = 1;
+    private static final int elitism = 2;
     protected final ChromosomesComparator comparator;
     private final List<Interrupt<E>> interrupts = new LinkedList<>();
     protected Population<E> pop;
@@ -30,6 +30,18 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
             }
             pop = evolvePopulation();
             generation = i;
+            for (Interrupt<E> l : interrupts) {
+                l.update(this);
+            }
+        }
+    }
+
+    public void evolve() {
+        terminate = false;
+        generation = 0;
+        while (!terminate) {
+            pop = evolvePopulation();
+            generation++;
             for (Interrupt<E> l : interrupts) {
                 l.update(this);
             }
