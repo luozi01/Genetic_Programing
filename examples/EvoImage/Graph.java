@@ -13,6 +13,7 @@ import lombok.Setter;
 import org.jblas.DoubleMatrix;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ import static EvoImage.EvoSetting.*;
 @Setter
 @Getter
 public class Graph implements Chromosome<Graph> {
-    private List<Polygon> polygons = new LinkedList<>();
+    private List<Shape> shapes = new LinkedList<>();
     private RandEngine randEngine = new Rand();
 
     @Override
@@ -49,46 +50,53 @@ public class Graph implements Chromosome<Graph> {
     private void mutate_hard() {
         int CHANGED_SHAPE_INDEX = randEngine.nextInt(ACTUAL_SHAPES - 1);
 
-        polygons.get(CHANGED_SHAPE_INDEX).setR(randEngine.uniform());
-        polygons.get(CHANGED_SHAPE_INDEX).setG(randEngine.uniform());
-        polygons.get(CHANGED_SHAPE_INDEX).setB(randEngine.uniform());
-        polygons.get(CHANGED_SHAPE_INDEX).setA(randEngine.uniform());
+        shapes.get(CHANGED_SHAPE_INDEX).setR(randEngine.uniform());
+        shapes.get(CHANGED_SHAPE_INDEX).setG(randEngine.uniform());
+        shapes.get(CHANGED_SHAPE_INDEX).setB(randEngine.uniform());
+        shapes.get(CHANGED_SHAPE_INDEX).setA(randEngine.uniform());
         int CHANGED_POINT_INDEX = randEngine.nextInt(ACTUAL_POINTS - 1);
 
-        polygons.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_WIDTH) * 1.0;
-        polygons.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_HEIGHT) * 1.0;
+        shapes.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_WIDTH) * 1.0;
+        shapes.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_HEIGHT) * 1.0;
     }
 
 
     private void mutate_medium() {
-        for (Polygon polygon : polygons) {
-            if (randEngine.uniform() < .3) {
-                double roulette = randEngine.uniform() * 2.0;
-                // mutate color
-                if (roulette < 1) {
-                    if (roulette < 0.25) {
-                        polygon.setR(randEngine.uniform());
-                    } else if (roulette < 0.5) {
-                        polygon.setG(randEngine.uniform());
-                    } else if (roulette < 0.75) {
-                        polygon.setB(randEngine.uniform());
-                    } else if (roulette < 1.0) {
-                        polygon.setA(randEngine.uniform());
-                    }
-                }
-                // mutate shape
-                else {
-                    int CHANGED_POINT_INDEX = randEngine.nextInt(ACTUAL_POINTS - 1);
-                    if (roulette < 1.5) {
-                        polygon.getX_points()[CHANGED_POINT_INDEX] =
-                                randEngine.nextInt(MAX_WIDTH) * 1.0;
-                    } else {
-                        polygon.getY_points()[CHANGED_POINT_INDEX] =
-                                randEngine.nextInt(MAX_HEIGHT) * 1.0;
-                    }
-                }
+//        for (Shape polygon : shapes) {
+//            if (randEngine.uniform() < .3) {
+        int CHANGED_SHAPE_INDEX = randEngine.nextInt(ACTUAL_SHAPES);
+        double roulette = randEngine.uniform() * 2.0;
+        // mutate color
+        if (roulette < 1) {
+            if (roulette < 0.25) {
+                shapes.get(CHANGED_SHAPE_INDEX).setR(randEngine.uniform());
+//                    polygon.setR(randEngine.uniform());
+            } else if (roulette < 0.5) {
+                shapes.get(CHANGED_SHAPE_INDEX).setG(randEngine.uniform());
+//                    polygon.setG(randEngine.uniform());
+            } else if (roulette < 0.75) {
+                shapes.get(CHANGED_SHAPE_INDEX).setB(randEngine.uniform());
+//                    polygon.setB(randEngine.uniform());
+            } else if (roulette < 1.0) {
+                shapes.get(CHANGED_SHAPE_INDEX).setA(randEngine.uniform());
+//                    polygon.setA(randEngine.uniform());
             }
         }
+        // mutate shape
+        else {
+            int CHANGED_POINT_INDEX = randEngine.nextInt(ACTUAL_POINTS);
+            if (roulette < 1.5) {
+                shapes.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] =
+//                    polygon.getX_points()[CHANGED_POINT_INDEX] =
+                        randEngine.nextInt(MAX_WIDTH) * 1.0;
+            } else {
+                shapes.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] =
+//                    polygon.getY_points()[CHANGED_POINT_INDEX] =
+                        randEngine.nextInt(MAX_HEIGHT) * 1.0;
+            }
+        }
+//            }
+//        }
     }
 
     private void mutate_soft() {
@@ -101,17 +109,17 @@ public class Graph implements Chromosome<Graph> {
         // mutate color
         if (roulette < 1) {
             if (roulette < 0.25) {
-                polygons.get(CHANGED_SHAPE_INDEX).setR(
-                        CLAMP(polygons.get(CHANGED_SHAPE_INDEX).getR() + delta, 0, 255));
+                shapes.get(CHANGED_SHAPE_INDEX).setR(
+                        CLAMP(shapes.get(CHANGED_SHAPE_INDEX).getR() + delta, 0, 255));
             } else if (roulette < 0.5) {
-                polygons.get(CHANGED_SHAPE_INDEX).setG(
-                        CLAMP(polygons.get(CHANGED_SHAPE_INDEX).getG() + delta, 0, 255));
+                shapes.get(CHANGED_SHAPE_INDEX).setG(
+                        CLAMP(shapes.get(CHANGED_SHAPE_INDEX).getG() + delta, 0, 255));
             } else if (roulette < 0.75) {
-                polygons.get(CHANGED_SHAPE_INDEX).setB(
-                        CLAMP(polygons.get(CHANGED_SHAPE_INDEX).getB() + delta, 0, 255));
+                shapes.get(CHANGED_SHAPE_INDEX).setB(
+                        CLAMP(shapes.get(CHANGED_SHAPE_INDEX).getB() + delta, 0, 255));
             } else if (roulette < 1.0) {
-                polygons.get(CHANGED_SHAPE_INDEX).setA(
-                        CLAMP(polygons.get(CHANGED_SHAPE_INDEX).getA() + 0.1 * delta, 0.0, 1.0));
+                shapes.get(CHANGED_SHAPE_INDEX).setA(
+                        CLAMP(shapes.get(CHANGED_SHAPE_INDEX).getA() + 0.1 * delta, 0.0, 1.0));
             }
         }
         // mutate shape
@@ -120,14 +128,14 @@ public class Graph implements Chromosome<Graph> {
 
             // x-coordinate
             if (roulette < 1.5) {
-                polygons.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] =
-                        CLAMP(polygons.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] + delta, 0, MAX_WIDTH);
+                shapes.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] =
+                        CLAMP(shapes.get(CHANGED_SHAPE_INDEX).getX_points()[CHANGED_POINT_INDEX] + delta, 0, MAX_WIDTH);
             }
 
             // y-coordinate
             else {
-                polygons.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] =
-                        CLAMP(polygons.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] + delta, 0, MAX_HEIGHT);
+                shapes.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] =
+                        CLAMP(shapes.get(CHANGED_SHAPE_INDEX).getY_points()[CHANGED_POINT_INDEX] + delta, 0, MAX_HEIGHT);
             }
         }
     }
@@ -141,11 +149,10 @@ public class Graph implements Chromosome<Graph> {
 
     DoubleMatrix toImage() {
         Group root = new Group();
-        root.getChildren().clear();
 
         Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Polygon p : polygons) {
+        for (Shape p : shapes) {
             gc.setFill(p.getColor());
             gc.fillPolygon(p.getX_points(), p.getY_points(), p.getN_points());
         }
@@ -155,13 +162,11 @@ public class Graph implements Chromosome<Graph> {
         WritableImage image = scene.snapshot(null);
         BufferedImage bi = SwingFXUtils.fromFXImage(image, null);
 
-        double[][] colors = new double[EvoSetting.colors.rows][EvoSetting.colors.columns];
-        int count = 0;
+        List<Double> colors = new ArrayList<>(EvoSetting.colors.length);
         for (int i = 0; i < MAX_HEIGHT; i++) {
             for (int j = 0; j < MAX_WIDTH; j++) {
                 int pixel = bi.getRGB(j, i);
-                double[] c = pixelARGB(pixel);
-                colors[count++] = c.clone();
+                colors.addAll(pixelARGB(pixel));
             }
         }
         return new DoubleMatrix(colors);
@@ -170,8 +175,8 @@ public class Graph implements Chromosome<Graph> {
     @Override
     public Graph makeCopy() {
         Graph clone = new Graph();
-        for (int i = 0; i < polygons.size(); i++) {
-            clone.polygons.add(polygons.get(i).clone());
+        for (int i = 0; i < shapes.size(); i++) {
+            clone.shapes.add(shapes.get(i).clone());
         }
         return clone;
     }

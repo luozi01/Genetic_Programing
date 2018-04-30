@@ -18,14 +18,24 @@ public class GraphGenerator implements Generator<Graph> {
         for (int index = 0; index < populationSize; index++) {
             Graph p = new Graph();
             for (int i = 0; i < ACTUAL_SHAPES; i++) {
-                Polygon polygon = new Polygon(ACTUAL_POINTS);
+                Shape shape = new Shape(ACTUAL_POINTS);
                 for (int j = 0; j < ACTUAL_POINTS; j++) {
-                    polygon.add(j, randEngine.nextInt(EvoSetting.MAX_WIDTH) * 1.0,
+                    shape.add(j, randEngine.nextInt(EvoSetting.MAX_WIDTH) * 1.0,
                             randEngine.nextInt(EvoSetting.MAX_HEIGHT) * 1.0);
                 }
-                polygon.setColor(randEngine.uniform(), randEngine.uniform(),
-                        randEngine.uniform(), randEngine.nextInt(30, 60) / 255.0);
-                p.getPolygons().add(polygon);
+                switch (choice) {
+                    case BLACK:
+                        shape.setColor(0, 0, 0, 0.001);
+                        break;
+                    case WHITE:
+                        shape.setColor(254, 254, 254, 0.001);
+                        break;
+                    case RANDOM:
+                        shape.setColor(randEngine.uniform(), randEngine.uniform(),
+                                randEngine.uniform(), randEngine.nextInt(30, 60) / 255.0);
+                        break;
+                }
+                p.getShapes().add(shape);
             }
             paints.add(p);
         }

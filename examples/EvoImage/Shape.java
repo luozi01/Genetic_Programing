@@ -9,18 +9,18 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Polygon implements Cloneable {
+public class Shape implements Cloneable {
     private double[] x_points, y_points;
     private int n_points;
     private double r, g, b, a;
 
-    Polygon(int n_points) {
+    Shape(int n_points) {
         this.n_points = n_points;
         x_points = new double[n_points];
         y_points = new double[n_points];
     }
 
-    Polygon(double[] x_points, double[] y_points) {
+    Shape(double[] x_points, double[] y_points) {
         this.x_points = x_points;
         this.y_points = y_points;
         n_points = x_points.length;
@@ -52,10 +52,10 @@ public class Polygon implements Cloneable {
     }
 
     @Override
-    public Polygon clone() {
-        Polygon clone = null;
+    public Shape clone() {
+        Shape clone = null;
         try {
-            clone = (Polygon) super.clone();
+            clone = (Shape) super.clone();
             clone.x_points = x_points.clone();
             clone.y_points = y_points.clone();
             clone.n_points = n_points;

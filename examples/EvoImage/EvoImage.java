@@ -6,7 +6,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
@@ -14,10 +13,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static EvoImage.EvoSetting.toList;
+import static EvoImage.EvoSetting.MAX_HEIGHT;
+import static EvoImage.EvoSetting.MAX_WIDTH;
 
 public class EvoImage extends Application {
-
 
     private Graph run() {
         Population<Graph> pop = new Population<>(new GraphGenerator());
@@ -25,42 +24,43 @@ public class EvoImage extends Application {
         ga.addIterationListener(environment -> {
             Graph bestGene = environment.getBest();
             double bestFit = new ImageFitCalc().calc(bestGene);
-
+            double norm = 100 * (1 - bestFit / (MAX_WIDTH * MAX_HEIGHT * 3.0));
             // log to console
-            System.out.printf("Generation = %s \t fit = %s \n", environment.getIteration(), bestFit);
+            if (environment.getIteration() % 100 == 0)
+                System.out.printf("Generation = %s \t fit = %s \t norm = %s\n",
+                        environment.getIteration(), bestFit, norm);
 
             // halt condition
-            if (bestFit < 5) {
+            if (norm > 90) {
                 environment.terminate();
             }
         });
         System.out.println("start");
-        ga.evolve();
+        ga.evolve(10000);
         return ga.getBest();
     }
 
     @Override
     public void start(Stage stage) {
-
         Graph best = run();
 
+        for (int i = 6000; i < 6090; i += 4) {
+            System.out.printf("Red: %f, Green: %f, Blue: %f, Alpha: %f\n", best.toImage().get(i),
+                    best.toImage().get(i + 1), best.toImage().get(i + 2), best.toImage().get(i + 3));
+        }
         //Creating a Group object
         Group root = new Group();
-        root.getChildren().clear();
 
-        Canvas canvas = new Canvas(EvoSetting.MAX_WIDTH, EvoSetting.MAX_HEIGHT);
+        Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (int i = 0; i < best.getPolygons().size(); i++) {
-            Polygon p = new Polygon();
-            p.getPoints().addAll(best.getPolygons().get(i).getPoints());
-            gc.setFill(best.getPolygons().get(i).getColor());
-            double[][] co = toList(p);
-            gc.fillPolygon(co[0], co[1], co[0].length);
+        for (Shape p : best.getShapes()) {
+            gc.setFill(p.getColor());
+            gc.fillPolygon(p.getX_points(), p.getY_points(), p.getN_points());
         }
 
         root.getChildren().add(canvas);
         //Creating a scene object
-        Scene scene = new Scene(root, EvoSetting.MAX_WIDTH, EvoSetting.MAX_HEIGHT);
+        Scene scene = new Scene(root, MAX_WIDTH, MAX_HEIGHT);
         //Adding scene to the stage
         stage.setScene(scene);
         //Displaying the contents of the stage
@@ -74,7 +74,11 @@ public class EvoImage extends Application {
             img = ImageIO.read(new File("ml.bmp"));
             evoSetting.readImage(img);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+        }
+        for (int i = 6000; i < 6090; i += 4) {
+            System.out.printf("Red: %f, Green: %f, Blue: %f, Alpha: %f\n", EvoSetting.colors.get(i),
+                    EvoSetting.colors.get(i + 1), EvoSetting.colors.get(i + 2), EvoSetting.colors.get(i + 3));
         }
         long start_time = System.currentTimeMillis();
         launch(args);
