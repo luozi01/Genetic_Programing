@@ -1,18 +1,11 @@
 package EvoImage;
 
 import javafx.scene.paint.Color;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Getter
-@Setter
 public class Shape implements Cloneable {
-    private double[] x_points, y_points;
-    private int n_points;
-    private double r, g, b, a;
+    double[] x_points, y_points;
+    int n_points;
+    double r, g, b, a;
 
     Shape(int n_points) {
         this.n_points = n_points;
@@ -26,18 +19,13 @@ public class Shape implements Cloneable {
         n_points = x_points.length;
     }
 
-    List<Double> getPoints() {
-        List<Double> points = new ArrayList<>();
-        for (int i = 0; i < n_points; i++) {
-            points.add(x_points[i]);
-            points.add(y_points[i]);
-        }
-        return points;
-    }
-
     void add(int i, double x, double y) {
         x_points[i] = x;
         y_points[i] = y;
+    }
+
+    Color getColor() {
+        return new Color(r, g, b, a);
     }
 
     void setColor(double... colors) {
@@ -45,10 +33,6 @@ public class Shape implements Cloneable {
         g = colors[1];
         b = colors[2];
         a = colors[3];
-    }
-
-    Color getColor() {
-        return new Color(r, g, b, a);
     }
 
     @Override

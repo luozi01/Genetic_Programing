@@ -24,7 +24,6 @@ public class EvoGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
             e.mutate(0);
             newPopulation.addChromosome(e);
         }
-        
         newPopulation.sort(comparator);
         newPopulation.trim(populationSize);
         return newPopulation;

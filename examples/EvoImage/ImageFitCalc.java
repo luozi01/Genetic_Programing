@@ -3,10 +3,10 @@ package EvoImage;
 import com.zluo.ga.Fitness;
 import org.jblas.DoubleMatrix;
 
-public class ImageFitCalc implements Fitness<Graph> {
+public class ImageFitCalc implements Fitness<Paintings> {
     @Override
-    public double calc(Graph chromosome) {
+    public double calc(Paintings chromosome) {
         DoubleMatrix color = chromosome.toImage();
-        return color.sub(EvoSetting.colors).norm1();
+        return color.sub(EvoSetting.image_colors).norm1();
     }
 }
