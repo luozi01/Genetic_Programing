@@ -2,7 +2,9 @@ package EvoImage;
 
 import com.zluo.ga.Generator;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import static EvoImage.EvoSetting.*;
 
@@ -11,12 +13,12 @@ public class GraphGenerator implements Generator<Paintings> {
     public List<Paintings> generate() {
         Paintings p = new Paintings();
         for (int i = 0; i < MAX_SHAPES; i++) {
-            Shape shape = new Shape(MAX_POINTS);
+            Polygon polygon = new Polygon(MAX_POINTS);
             for (int j = 0; j < MAX_POINTS; j++) {
-                shape.add(j, rand_int(MAX_WIDTH), rand_int(MAX_HEIGHT));
+                polygon.add(j, randEngine.nextInt(MAX_WIDTH), randEngine.nextInt(MAX_HEIGHT));
             }
-            choice.apply(shape);
-            p.getShapes()[i] = shape;
+            choice.apply(polygon);
+            p.getPolygons()[i] = polygon;
         }
         return new LinkedList<Paintings>(Collections.singletonList(p));
     }

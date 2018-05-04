@@ -1,5 +1,6 @@
 package EvoImage;
 
+import com.zluo.ga.utils.RandEngine;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
@@ -25,18 +26,19 @@ public class ImageEvo extends Application {
 
     private int COUNTER_TOTAL = 0;
     private int COUNTER_BENEFIT = 0;
-    private int MAX_SHAPES = 50;    // max capacity
+    private int MAX_SHAPES = 100;    // max capacity
     private int MAX_POINTS = 6;
     private int ACTUAL_SHAPES = MAX_SHAPES; // current size
     private int ACTUAL_POINTS = MAX_POINTS;
-    private Shape[] DNA_BEST = new Shape[MAX_SHAPES];
-    private Shape[] DNA_TEST = new Shape[MAX_SHAPES];
+    private Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
+    private Polygon[] DNA_TEST = new Polygon[MAX_SHAPES];
     private int CHANGED_SHAPE_INDEX = 0;
     private double FITNESS_MAX = Double.MAX_VALUE;
     private double FITNESS_TEST = FITNESS_MAX;
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
     private Mutation method = Mutation.MEDIUM;
+    private RandEngine randEngine = new SimpleRandEngine();
 
     public static void main(String[] args) {
         BufferedImage img;
@@ -54,39 +56,29 @@ public class ImageEvo extends Application {
         System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
     }
 
-    private int rand_int(int maxval) {
-        return (int) (maxval * Math.random());
-    }
-
-    private double rand_float(double maxval) {
-        return maxval * Math.random();
-    }
-
-    private void mutate_medium(Shape[] dna_out) {
-        CHANGED_SHAPE_INDEX = rand_int(ACTUAL_SHAPES - 1);
-
-        double roulette = rand_float(2.0);
+    private void mutate_medium(Polygon[] dna_out) {
+        CHANGED_SHAPE_INDEX = randEngine.nextInt(ACTUAL_SHAPES - 1);
+        double roulette = randEngine.uniform() * 2.0;
 
         // mutate color
         if (roulette < 1) {
             if (roulette < 0.25) {
-                dna_out[CHANGED_SHAPE_INDEX].r = Math.random();
+                dna_out[CHANGED_SHAPE_INDEX].r = randEngine.uniform();
             } else if (roulette < 0.5) {
-                dna_out[CHANGED_SHAPE_INDEX].g = Math.random();
+                dna_out[CHANGED_SHAPE_INDEX].g = randEngine.uniform();
             } else if (roulette < 0.75) {
-                dna_out[CHANGED_SHAPE_INDEX].b = Math.random();
+                dna_out[CHANGED_SHAPE_INDEX].b = randEngine.uniform();
             } else if (roulette < 1.0) {
-                dna_out[CHANGED_SHAPE_INDEX].a = Math.random();
+                dna_out[CHANGED_SHAPE_INDEX].a = randEngine.uniform();
             }
         }
-
         // mutate shape
         else {
-            int CHANGED_POINT_INDEX = rand_int(ACTUAL_POINTS - 1);
+            int CHANGED_POINT_INDEX = randEngine.nextInt(ACTUAL_POINTS - 1);
             if (roulette < 1.5) {
-                dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = rand_int(IWIDTH);
+                dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(IWIDTH);
             } else {
-                dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = rand_int(IHEIGHT);
+                dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(IHEIGHT);
             }
         }
     }
@@ -96,12 +88,12 @@ public class ImageEvo extends Application {
         return color.sub(EvoSetting.image_colors).norm1();
     }
 
-    private DoubleMatrix toImage(Shape[] dna) {
+    private DoubleMatrix toImage(Polygon[] dna) {
         Group root = new Group();
 
         Canvas canvas = new Canvas(IWIDTH, IHEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Shape p : dna) {
+        for (Polygon p : dna) {
             gc.setFill(p.getColor());
             gc.fillPolygon(p.x_points, p.y_points, p.n_points);
         }
@@ -121,7 +113,7 @@ public class ImageEvo extends Application {
         return new DoubleMatrix(colors);
     }
 
-    private void pass_gene_mutation(Shape[] dna_from, Shape[] dna_to, int gene_index) {
+    private void pass_gene_mutation(Polygon[] dna_from, Polygon[] dna_to, int gene_index) {
         dna_to[gene_index].r = dna_from[gene_index].r;
         dna_to[gene_index].g = dna_from[gene_index].g;
         dna_to[gene_index].b = dna_from[gene_index].b;
@@ -133,14 +125,19 @@ public class ImageEvo extends Application {
         }
     }
 
-    private void copyDNA(Shape[] dna_from, Shape[] dna_to) {
+//    private String serialize(){
+//        Gson gson = new Gson();
+//        return gson.toJson(this);
+//    }
+
+    private void copyDNA(Polygon[] dna_from, Polygon[] dna_to) {
         for (int i = 0; i < MAX_SHAPES; i++)
             pass_gene_mutation(dna_from, dna_to, i);
     }
 
     private void evolve() {
         mutate_medium(DNA_TEST);
-//        method.apply(DNA_TEST);
+//        method.apply(DNA_TEST, randEngine);
 
         FITNESS_TEST = compute_fitness();
         if (FITNESS_TEST < FITNESS_BEST) {
@@ -159,14 +156,14 @@ public class ImageEvo extends Application {
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    private void init_dna(Shape[] dna) {
+    private void init_dna(Polygon[] dna) {
         for (int i = 0; i < MAX_SHAPES; i++) {
-            Shape shape = new Shape(MAX_POINTS);
+            Polygon polygon = new Polygon(MAX_POINTS);
             for (int j = 0; j < MAX_POINTS; j++) {
-                shape.add(j, rand_int(IWIDTH), rand_int(IHEIGHT));
+                polygon.add(j, randEngine.nextInt(IWIDTH), randEngine.nextInt(IHEIGHT));
             }
-            shape.setColor(0, 0, 0, 0.001);
-            dna[i] = shape;
+            polygon.setColor(0, 0, 0, 0.001);
+            dna[i] = polygon;
         }
     }
 
@@ -205,7 +202,7 @@ public class ImageEvo extends Application {
 
         Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Shape p : DNA_BEST) {
+        for (Polygon p : DNA_BEST) {
             gc.setFill(p.getColor());
             gc.fillPolygon(p.x_points, p.y_points, p.n_points);
         }

@@ -1,5 +1,7 @@
 package EvoImage;
 
+import com.zluo.ga.utils.RandEngine;
+
 public interface Mutations {
-    void apply(Shape[] shapes);
+    void apply(Polygon[] polygons, RandEngine randEngine);
 }

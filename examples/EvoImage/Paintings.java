@@ -20,7 +20,8 @@ import static EvoImage.EvoSetting.*;
 @Setter
 @Getter
 public class Paintings implements Chromosome<Paintings> {
-    private Shape[] shapes = new Shape[MAX_SHAPES];
+    private Polygon[] polygons = new Polygon[MAX_SHAPES];
+    private double fitness = 0;
 
     @Override
     public List<Paintings> crossover(Paintings chromosome, double uniformRate) {
@@ -29,7 +30,7 @@ public class Paintings implements Chromosome<Paintings> {
 
     @Override
     public void mutate(double mutationRate) {
-        method.apply(shapes);
+        method.apply(polygons, randEngine);
     }
 
     DoubleMatrix toImage() {
@@ -37,7 +38,7 @@ public class Paintings implements Chromosome<Paintings> {
 
         Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Shape p : shapes) {
+        for (Polygon p : polygons) {
             gc.setFill(p.getColor());
             gc.fillPolygon(p.x_points, p.y_points, p.n_points);
         }
@@ -61,7 +62,7 @@ public class Paintings implements Chromosome<Paintings> {
     public Paintings makeCopy() {
         Paintings clone = new Paintings();
         for (int i = 0; i < MAX_SHAPES; i++) {
-            clone.shapes[i] = shapes[i].clone();
+            clone.polygons[i] = polygons[i].clone();
         }
         return clone;
     }

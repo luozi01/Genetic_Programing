@@ -2,18 +2,18 @@ package EvoImage;
 
 import javafx.scene.paint.Color;
 
-public class Shape implements Cloneable {
+public class Polygon implements Cloneable {
     double[] x_points, y_points;
     int n_points;
     double r, g, b, a;
 
-    Shape(int n_points) {
+    Polygon(int n_points) {
         this.n_points = n_points;
         x_points = new double[n_points];
         y_points = new double[n_points];
     }
 
-    Shape(double[] x_points, double[] y_points) {
+    Polygon(double[] x_points, double[] y_points) {
         this.x_points = x_points;
         this.y_points = y_points;
         n_points = x_points.length;
@@ -36,10 +36,10 @@ public class Shape implements Cloneable {
     }
 
     @Override
-    public Shape clone() {
-        Shape clone = null;
+    public Polygon clone() {
+        Polygon clone = null;
         try {
-            clone = (Shape) super.clone();
+            clone = (Polygon) super.clone();
             clone.x_points = x_points.clone();
             clone.y_points = y_points.clone();
             clone.n_points = n_points;

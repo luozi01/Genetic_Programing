@@ -1,5 +1,6 @@
 package EvoImage;
 
+import com.zluo.ga.utils.RandEngine;
 import org.jblas.DoubleMatrix;
 
 import java.awt.image.BufferedImage;
@@ -20,10 +21,7 @@ class EvoSetting {
     static Mutations method = MEDIUM;
     static Colors choice = BLACK;
     static DoubleMatrix image_colors;
-
-    static int rand_int(int val) {
-        return (int) (val * Math.random());
-    }
+    static RandEngine randEngine = new SimpleRandEngine();
 
     static double CLAMP(double val, double min, double max) {
         if (val < min) return min;
