@@ -13,68 +13,71 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static EvoImage.EvoSetting.MAX_HEIGHT;
-import static EvoImage.EvoSetting.MAX_WIDTH;
-
 public class EvoImage extends Application {
-
-    private static double best_fit = Double.MAX_VALUE;
-    private static int effect_generation = 0;
+    private static final double FITNESS_MAX = Double.MAX_VALUE;
+    private double FITNESS_TEST = FITNESS_MAX;
+    private double FITNESS_BEST = FITNESS_MAX;
+    private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
+    private int COUNTER_BENEFIT = 0;
+    private EvoManager manager = new EvoManager();
 
     public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void init() {
         BufferedImage img;
-        EvoSetting evoSetting = new EvoSetting();
         try {
             img = ImageIO.read(new File("ml.bmp"));
-            evoSetting.readImage(img);
+            manager.readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-        long start_time = System.currentTimeMillis();
-        launch(args);
-        System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
     }
 
     private Paintings run() {
-        Population<Paintings> pop = new Population<>(new GraphGenerator());
+        Population<Paintings> pop = new Population<>(new GraphGenerator(manager));
         EvoGA<Paintings> ga = new EvoGA<>(pop, new ImageFitCalc());
         ga.addIterationListener(environment -> {
             Paintings bestGene = environment.getBest();
-            double bestFit = new ImageFitCalc().calc(bestGene);
-            double norm = 100 * (1 - bestFit / (MAX_WIDTH * MAX_HEIGHT * 3.0));
+            FITNESS_TEST = new ImageFitCalc().calc(bestGene);
             // log to console
-            if (bestFit < best_fit) {
-                best_fit = bestFit;
+            if (FITNESS_TEST < FITNESS_BEST) {
+                FITNESS_BEST = FITNESS_TEST;
+                FITNESS_BEST_NORMALIZED = 100 * (1 - FITNESS_BEST / (manager.MAX_WIDTH * manager.MAX_HEIGHT * 3.0));
+
                 System.out.printf("Generation = %s \t fit = %s \t norm = %s\n",
-                        effect_generation++, best_fit, norm);
+                        COUNTER_BENEFIT++, FITNESS_BEST, FITNESS_BEST_NORMALIZED);
             }
 
             // halt condition
-            if (norm > 93) {
+            if (FITNESS_BEST_NORMALIZED > 93) {
                 environment.terminate();
             }
         });
-        System.out.println("start");
         ga.evolve();
         return ga.getBest();
     }
 
     @Override
     public void start(Stage stage) {
+        long start_time = System.currentTimeMillis();
         Paintings best = run();
+        System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
         //Creating a Group object
         Group root = new Group();
 
-        Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
+        Canvas canvas = new Canvas(manager.MAX_WIDTH, manager.MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Polygon p : best.getPolygons()) {
+        for (Polygon p : best.polygons) {
             gc.setFill(p.getColor());
             gc.fillPolygon(p.x_points, p.y_points, p.n_points);
         }
 
         root.getChildren().add(canvas);
         //Creating a scene object
-        Scene scene = new Scene(root, MAX_WIDTH, MAX_HEIGHT);
+        Scene scene = new Scene(root, manager.MAX_WIDTH, manager.MAX_HEIGHT);
         //Adding scene to the stage
         stage.setScene(scene);
         //Displaying the contents of the stage

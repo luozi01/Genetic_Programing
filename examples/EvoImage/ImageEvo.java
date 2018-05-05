@@ -16,9 +16,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import static EvoImage.EvoSetting.*;
 
 public class ImageEvo extends Application {
     private static int IWIDTH = 0;
@@ -37,17 +36,16 @@ public class ImageEvo extends Application {
     private double FITNESS_TEST = FITNESS_MAX;
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
-    private Mutation method = Mutation.MEDIUM;
     private RandEngine randEngine = new SimpleRandEngine();
+    private static DoubleMatrix image_colors;
 
     public static void main(String[] args) {
         BufferedImage img;
-        EvoSetting evoSetting = new EvoSetting();
         try {
             img = ImageIO.read(new File("ml.bmp"));
             IHEIGHT = img.getHeight();
             IWIDTH = img.getWidth();
-            evoSetting.readImage(img);
+            readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
@@ -85,32 +83,7 @@ public class ImageEvo extends Application {
 
     private double compute_fitness() {
         DoubleMatrix color = toImage(DNA_TEST);
-        return color.sub(EvoSetting.image_colors).norm1();
-    }
-
-    private DoubleMatrix toImage(Polygon[] dna) {
-        Group root = new Group();
-
-        Canvas canvas = new Canvas(IWIDTH, IHEIGHT);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Polygon p : dna) {
-            gc.setFill(p.getColor());
-            gc.fillPolygon(p.x_points, p.y_points, p.n_points);
-        }
-        root.getChildren().add(canvas);
-        //Creating a scene object
-        Scene scene = new Scene(root, IWIDTH, IHEIGHT);
-        WritableImage image = scene.snapshot(null);
-        BufferedImage bi = SwingFXUtils.fromFXImage(image, null);
-
-        List<Double> colors = new ArrayList<>(EvoSetting.image_colors.length);
-        for (int i = 0; i < IHEIGHT; i++) {
-            for (int j = 0; j < IWIDTH; j++) {
-                int pixel = bi.getRGB(j, i);
-                colors.addAll(pixelARGB(pixel));
-            }
-        }
-        return new DoubleMatrix(colors);
+        return color.sub(image_colors).norm1();
     }
 
     private void pass_gene_mutation(Polygon[] dna_from, Polygon[] dna_to, int gene_index) {
@@ -125,11 +98,6 @@ public class ImageEvo extends Application {
         }
     }
 
-//    private String serialize(){
-//        Gson gson = new Gson();
-//        return gson.toJson(this);
-//    }
-
     private void copyDNA(Polygon[] dna_from, Polygon[] dna_to) {
         for (int i = 0; i < MAX_SHAPES; i++)
             pass_gene_mutation(dna_from, dna_to, i);
@@ -137,14 +105,13 @@ public class ImageEvo extends Application {
 
     private void evolve() {
         mutate_medium(DNA_TEST);
-//        method.apply(DNA_TEST, randEngine);
 
         FITNESS_TEST = compute_fitness();
         if (FITNESS_TEST < FITNESS_BEST) {
             pass_gene_mutation(DNA_TEST, DNA_BEST, CHANGED_SHAPE_INDEX);
 
             FITNESS_BEST = FITNESS_TEST;
-            FITNESS_BEST_NORMALIZED = 100 * (1 - FITNESS_BEST / (MAX_WIDTH * MAX_HEIGHT * 3.0));
+            FITNESS_BEST_NORMALIZED = 100 * (1 - FITNESS_BEST / (IWIDTH * IHEIGHT * 3.0));
 
             COUNTER_BENEFIT++;
             System.out.printf("Generation = %s \t fit = %s \t norm = %s\n",
@@ -171,6 +138,51 @@ public class ImageEvo extends Application {
         if (val < minval) return minval;
         if (val > maxval) return maxval;
         return val;
+    }
+
+    private static List<Double> pixelARGB(int pixel) {
+        double red = (pixel >> 16) & 0xff;
+        double green = (pixel >> 8) & 0xff;
+        double blue = (pixel) & 0xff;
+        return Arrays.asList(red / 255.0, green / 255.0, blue / 255.0);
+    }
+
+    private static void readImage(BufferedImage image) {
+        IHEIGHT = image.getHeight();
+        IWIDTH = image.getWidth();
+        List<Double> color = new ArrayList<>(IWIDTH * IHEIGHT * 3);
+        for (int i = 0; i < IHEIGHT; i++) {
+            for (int j = 0; j < IWIDTH; j++) {
+                int pixel = image.getRGB(j, i);
+                color.addAll(pixelARGB(pixel));
+            }
+        }
+        image_colors = new DoubleMatrix(color);
+    }
+
+    private DoubleMatrix toImage(Polygon[] polygons) {
+        Group root = new Group();
+
+        Canvas canvas = new Canvas(IWIDTH, IHEIGHT);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        for (Polygon p : polygons) {
+            gc.setFill(p.getColor());
+            gc.fillPolygon(p.x_points, p.y_points, p.n_points);
+        }
+        root.getChildren().add(canvas);
+        //Creating a scene object
+        Scene scene = new Scene(root, IWIDTH, IHEIGHT);
+        WritableImage image = scene.snapshot(null);
+        BufferedImage bi = SwingFXUtils.fromFXImage(image, null);
+
+        List<Double> colors = new ArrayList<>(image_colors.length);
+        for (int i = 0; i < IHEIGHT; i++) {
+            for (int j = 0; j < IWIDTH; j++) {
+                int pixel = bi.getRGB(j, i);
+                colors.addAll(pixelARGB(pixel));
+            }
+        }
+        return new DoubleMatrix(colors);
     }
 
     /**
@@ -200,7 +212,7 @@ public class ImageEvo extends Application {
             evolve();
         }
 
-        Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
+        Canvas canvas = new Canvas(IWIDTH, IHEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         for (Polygon p : DNA_BEST) {
             gc.setFill(p.getColor());
@@ -209,7 +221,7 @@ public class ImageEvo extends Application {
 
         root.getChildren().add(canvas);
         //Creating a scene object
-        Scene scene = new Scene(root, MAX_WIDTH, MAX_HEIGHT);
+        Scene scene = new Scene(root, IWIDTH, IHEIGHT);
         //Adding scene to the stage
         primaryStage.setScene(scene);
         //Displaying the contents of the stage

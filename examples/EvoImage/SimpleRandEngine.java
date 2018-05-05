@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class SimpleRandEngine implements RandEngine {
 
-    private Random random = new Random(19990127);
+    private Random random = new Random(System.currentTimeMillis());
 
     @Override
     public double uniform() {
