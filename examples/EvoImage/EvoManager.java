@@ -21,7 +21,7 @@ class EvoManager {
 
     int MAX_WIDTH;
     int MAX_HEIGHT;
-    int MAX_SHAPES = 100;    // max capacity
+    int MAX_SHAPES = 50;    // max capacity
     int MAX_POINTS = 6;
     int ACTUAL_SHAPES = MAX_SHAPES;
     int ACTUAL_POINTS = MAX_POINTS;

@@ -72,17 +72,6 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
         return clone;
     }
 
-    public List<Instruction> makeEffectiveCopy() {
-        List<Instruction> clone = new LinkedList<>();
-        for (Instruction instruction : instructions) {
-            if (!instruction.isStructuralIntron()) {
-                continue;
-            }
-            clone.add(instruction.makeCopy(registerSet, constantSet, operatorSet));
-        }
-        return clone;
-    }
-
     //Todo
     public void copy(LGPChromosome that, boolean effectiveOnly) {
         for (int i = 0; i < that.registerSet.size(); i++) {

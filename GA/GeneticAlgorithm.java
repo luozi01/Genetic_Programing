@@ -85,7 +85,7 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
         terminate = true;
     }
 
-    public int getIteration() {
+    public int getGeneration() {
         return generation;
     }
 

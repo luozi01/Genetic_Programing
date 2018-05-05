@@ -22,13 +22,13 @@ public enum Mutation implements Mutations {
             if (roulette < 1) {
                 if (roulette < 0.25) {
                     polygons[CHANGED_SHAPE_INDEX].r =
-                            CLAMP(polygons[CHANGED_SHAPE_INDEX].r + delta, 0, 255);
+                            CLAMP(polygons[CHANGED_SHAPE_INDEX].r + 0.1 * delta, 0, 1);
                 } else if (roulette < 0.5) {
                     polygons[CHANGED_SHAPE_INDEX].g =
-                            CLAMP(polygons[CHANGED_SHAPE_INDEX].g + delta, 0, 255);
+                            CLAMP(polygons[CHANGED_SHAPE_INDEX].g + 0.1 * delta, 0, 1);
                 } else if (roulette < 0.75) {
                     polygons[CHANGED_SHAPE_INDEX].b =
-                            CLAMP(polygons[CHANGED_SHAPE_INDEX].b + delta, 0, 255);
+                            CLAMP(polygons[CHANGED_SHAPE_INDEX].b + 0.1 * delta, 0, 1);
                 } else if (roulette < 1.0) {
                     polygons[CHANGED_SHAPE_INDEX].a =
                             CLAMP(polygons[CHANGED_SHAPE_INDEX].a + 0.1 * delta, 0.0, 1.0);
@@ -80,9 +80,9 @@ public enum Mutation implements Mutations {
             else {
                 int CHANGED_POINT_INDEX = randEngine.nextInt(manager.ACTUAL_POINTS - 1);
                 if (roulette < 1.5) {
-                    dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(200);
+                    dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(manager.MAX_WIDTH);
                 } else {
-                    dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(200);
+                    dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(manager.MAX_HEIGHT);
                 }
             }
         }

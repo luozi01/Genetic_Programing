@@ -32,7 +32,7 @@ public class TGPSolver {
     }
 
     public int getIteration() {
-        return environment.getIteration();
+        return environment.getGeneration();
     }
 
     public TGPChromosome getBestGene() {

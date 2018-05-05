@@ -70,13 +70,11 @@ public class TreeNode implements Serializable {
     }
 
     TreeNode getRight() {
-        if (children.size() <= 1) return null;
-        return children.get(1);
+        return children.size() <= 1 ? null : children.get(1);
     }
 
     TreeNode getLeft() {
-        if (children.isEmpty()) return null;
-        return children.get(0);
+        return children.isEmpty() ? null : children.get(0);
     }
 
     @Override

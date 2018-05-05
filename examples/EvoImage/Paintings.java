@@ -1,8 +1,6 @@
 package EvoImage;
 
 import com.zluo.ga.Chromosome;
-import com.zluo.ga.utils.RandEngine;
-
 import java.util.List;
 
 public class Paintings implements Chromosome<Paintings> {
