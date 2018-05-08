@@ -42,26 +42,22 @@ public class LGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
 
             r = randEngine.uniform();
             if (r < manager.getMacroMutationRate()) {
-                gp1.mutate(1);
-                pop.addChromosome(gp1.makeCopy());
+                pop.addChromosome(gp1.mutate(1));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMacroMutationRate()) {
-                gp2.mutate(1);
-                pop.addChromosome(gp1.makeCopy());
+                pop.addChromosome(gp2.mutate(1));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMicroMutationRate()) {
-                gp1.mutate(0);
-                pop.addChromosome(gp1.makeCopy());
+                pop.addChromosome(gp1.mutate(0));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMicroMutationRate()) {
-                gp2.mutate(0);
-                pop.addChromosome(gp2.makeCopy());
+                pop.addChromosome(gp2.mutate(0));
             }
             counter++;
         }

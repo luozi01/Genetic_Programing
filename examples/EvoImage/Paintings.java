@@ -1,6 +1,7 @@
 package EvoImage;
 
 import com.zluo.ga.Chromosome;
+
 import java.util.List;
 
 public class Paintings implements Chromosome<Paintings> {
@@ -18,8 +19,10 @@ public class Paintings implements Chromosome<Paintings> {
     }
 
     @Override
-    public void mutate(double mutationRate) {
-        manager.method.apply(polygons, manager, manager.randEngine);
+    public Paintings mutate(double mutationRate) {
+        Paintings clone = makeCopy();
+        manager.method.apply(clone.polygons, manager, manager.randEngine);
+        return clone;
     }
 
     @Override

@@ -69,16 +69,14 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
 
         // do point mutation
         for (int offspring_index = 0; offspring_index < micro_mutation_count; ++offspring_index) {
-            E child = tournamentSelection().makeCopy();
-            child.mutate(0);
-            newPopulation.addChromosome(child);
+            E child = tournamentSelection();
+            newPopulation.addChromosome(child.mutate(0));
         }
 
         // do subtree mutation
         for (int offspring_index = 0; offspring_index < macro_mutation_count; ++offspring_index) {
-            E child = tournamentSelection().makeCopy();
-            child.mutate(1);
-            newPopulation.addChromosome(child);
+            E child = tournamentSelection();
+            newPopulation.addChromosome(child.mutate(1));
         }
 
         // do reproduction

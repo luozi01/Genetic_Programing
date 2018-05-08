@@ -29,9 +29,11 @@ public class TGPChromosome implements Chromosome<TGPChromosome> {
     }
 
     @Override
-    public void mutate(double mutationRate) {
-        if (mutationRate == 0) MicroMutation.apply(this, manager);
-        else MacroMutation.apply(this, manager);
+    public TGPChromosome mutate(double mutationRate) {
+        TGPChromosome clone = makeCopy();
+        if (mutationRate == 0) MicroMutation.apply(clone, manager);
+        else MacroMutation.apply(clone, manager);
+        return clone;
     }
 
     @Override

@@ -17,13 +17,9 @@ public class EvoGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
 
         for (int i = 0; i < populationSize; i++) {
             newPopulation.addChromosome(pop.getChromosome(i));
+            newPopulation.addChromosome(pop.getChromosome(i).mutate(0));
         }
 
-        for (int i = 0; i < populationSize; i++) {
-            E e = pop.getChromosome(i).makeCopy();
-            e.mutate(0);
-            newPopulation.addChromosome(e);
-        }
         newPopulation.sort(comparator);
         newPopulation.trim(populationSize);
         return newPopulation;

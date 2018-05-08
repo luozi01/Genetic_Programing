@@ -61,16 +61,16 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
         // crossover
         for (int i = elitism; i < pop.size(); i++) {
             E gene1 = tournamentSelection();
+            E mutated = gene1.mutate(mutationRate);
+
             E gene2 = tournamentSelection();
             List<E> newGene = gene1.crossover(gene2, uniformRate);
+
+            newPopulation.addChromosome(mutated);
             for (E c : newGene) {
                 newPopulation.addChromosome(c);
             }
         }
-
-        // Mutate pop
-        for (int i = elitism; i < newPopulation.size(); i++)
-            newPopulation.getChromosome(i).mutate(mutationRate);
 
         newPopulation.sort(comparator);
         newPopulation.trim(populationSize);

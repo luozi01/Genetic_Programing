@@ -17,7 +17,7 @@ public interface Chromosome<E extends Chromosome<E>> {
      *
      * @param mutationRate mutationRate
      */
-    void mutate(double mutationRate);
+    E mutate(double mutationRate);
 
     E makeCopy();
 }

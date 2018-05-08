@@ -20,10 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ImageEvo extends Application {
-    private static int IWIDTH = 0;
-    private static int IHEIGHT = 0;
+    private int MAX_WIDTH = 0;
+    private int MAX_HEIGHT = 0;
 
-    private int COUNTER_TOTAL = 0;
     private int COUNTER_BENEFIT = 0;
     private int MAX_SHAPES = 100;    // max capacity
     private int MAX_POINTS = 6;
@@ -33,25 +32,13 @@ public class ImageEvo extends Application {
     private Polygon[] DNA_TEST = new Polygon[MAX_SHAPES];
     private int CHANGED_SHAPE_INDEX = 0;
     private double FITNESS_MAX = Double.MAX_VALUE;
-    private double FITNESS_TEST = FITNESS_MAX;
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
     private RandEngine randEngine = new SimpleRandEngine();
-    private static DoubleMatrix image_colors;
+    private DoubleMatrix image_colors;
 
     public static void main(String[] args) {
-        BufferedImage img;
-        try {
-            img = ImageIO.read(new File("ml.bmp"));
-            IHEIGHT = img.getHeight();
-            IWIDTH = img.getWidth();
-            readImage(img);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-        long start_time = System.currentTimeMillis();
         launch(args);
-        System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
     }
 
     private void mutate_medium(Polygon[] dna_out) {
@@ -74,9 +61,9 @@ public class ImageEvo extends Application {
         else {
             int CHANGED_POINT_INDEX = randEngine.nextInt(ACTUAL_POINTS - 1);
             if (roulette < 1.5) {
-                dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(IWIDTH);
+                dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_WIDTH);
             } else {
-                dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(IHEIGHT);
+                dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_HEIGHT);
             }
         }
     }
@@ -106,12 +93,12 @@ public class ImageEvo extends Application {
     private void evolve() {
         mutate_medium(DNA_TEST);
 
-        FITNESS_TEST = compute_fitness();
+        double FITNESS_TEST = compute_fitness();
         if (FITNESS_TEST < FITNESS_BEST) {
             pass_gene_mutation(DNA_TEST, DNA_BEST, CHANGED_SHAPE_INDEX);
 
             FITNESS_BEST = FITNESS_TEST;
-            FITNESS_BEST_NORMALIZED = 100 * (1 - FITNESS_BEST / (IWIDTH * IHEIGHT * 3.0));
+            FITNESS_BEST_NORMALIZED = 100 * (1 - FITNESS_BEST / (MAX_WIDTH * MAX_HEIGHT * 3.0));
 
             COUNTER_BENEFIT++;
             System.out.printf("Generation = %s \t fit = %s \t norm = %s\n",
@@ -119,15 +106,13 @@ public class ImageEvo extends Application {
         } else {
             pass_gene_mutation(DNA_BEST, DNA_TEST, CHANGED_SHAPE_INDEX);
         }
-        COUNTER_TOTAL++;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     private void init_dna(Polygon[] dna) {
         for (int i = 0; i < MAX_SHAPES; i++) {
             Polygon polygon = new Polygon(MAX_POINTS);
             for (int j = 0; j < MAX_POINTS; j++) {
-                polygon.add(j, randEngine.nextInt(IWIDTH), randEngine.nextInt(IHEIGHT));
+                polygon.add(j, randEngine.nextInt(MAX_WIDTH), randEngine.nextInt(MAX_HEIGHT));
             }
             polygon.setColor(0, 0, 0, 0.001);
             dna[i] = polygon;
@@ -147,12 +132,12 @@ public class ImageEvo extends Application {
         return Arrays.asList(red / 255.0, green / 255.0, blue / 255.0);
     }
 
-    private static void readImage(BufferedImage image) {
-        IHEIGHT = image.getHeight();
-        IWIDTH = image.getWidth();
-        List<Double> color = new ArrayList<>(IWIDTH * IHEIGHT * 3);
-        for (int i = 0; i < IHEIGHT; i++) {
-            for (int j = 0; j < IWIDTH; j++) {
+    private void readImage(BufferedImage image) {
+        MAX_HEIGHT = image.getHeight();
+        MAX_WIDTH = image.getWidth();
+        List<Double> color = new ArrayList<>(MAX_WIDTH * MAX_HEIGHT * 3);
+        for (int i = 0; i < MAX_HEIGHT; i++) {
+            for (int j = 0; j < MAX_WIDTH; j++) {
                 int pixel = image.getRGB(j, i);
                 color.addAll(pixelARGB(pixel));
             }
@@ -163,7 +148,7 @@ public class ImageEvo extends Application {
     private DoubleMatrix toImage(Polygon[] polygons) {
         Group root = new Group();
 
-        Canvas canvas = new Canvas(IWIDTH, IHEIGHT);
+        Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         for (Polygon p : polygons) {
             gc.setFill(p.getColor());
@@ -171,13 +156,13 @@ public class ImageEvo extends Application {
         }
         root.getChildren().add(canvas);
         //Creating a scene object
-        Scene scene = new Scene(root, IWIDTH, IHEIGHT);
+        Scene scene = new Scene(root, MAX_WIDTH, MAX_HEIGHT);
         WritableImage image = scene.snapshot(null);
         BufferedImage bi = SwingFXUtils.fromFXImage(image, null);
 
         List<Double> colors = new ArrayList<>(image_colors.length);
-        for (int i = 0; i < IHEIGHT; i++) {
-            for (int j = 0; j < IWIDTH; j++) {
+        for (int i = 0; i < MAX_HEIGHT; i++) {
+            for (int j = 0; j < MAX_WIDTH; j++) {
                 int pixel = bi.getRGB(j, i);
                 colors.addAll(pixelARGB(pixel));
             }
@@ -202,17 +187,27 @@ public class ImageEvo extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
+        BufferedImage img;
+        try {
+            img = ImageIO.read(new File("index.jpeg"));
+            readImage(img);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
         //Creating a Group object
         Group root = new Group();
 
         init_dna(DNA_TEST);
         init_dna(DNA_BEST);
         copyDNA(DNA_BEST, DNA_TEST);
+
+        long start_time = System.currentTimeMillis();
         while (FITNESS_BEST_NORMALIZED < 93) {
             evolve();
         }
+        System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
 
-        Canvas canvas = new Canvas(IWIDTH, IHEIGHT);
+        Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         for (Polygon p : DNA_BEST) {
             gc.setFill(p.getColor());
@@ -221,7 +216,7 @@ public class ImageEvo extends Application {
 
         root.getChildren().add(canvas);
         //Creating a scene object
-        Scene scene = new Scene(root, IWIDTH, IHEIGHT);
+        Scene scene = new Scene(root, MAX_WIDTH, MAX_HEIGHT);
         //Adding scene to the stage
         primaryStage.setScene(scene);
         //Displaying the contents of the stage

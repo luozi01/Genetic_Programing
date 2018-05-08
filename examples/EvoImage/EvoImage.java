@@ -29,7 +29,7 @@ public class EvoImage extends Application {
     public void init() {
         BufferedImage img;
         try {
-            img = ImageIO.read(new File("ml.bmp"));
+            img = ImageIO.read(new File("index.jpeg"));
             manager.readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -56,15 +56,15 @@ public class EvoImage extends Application {
                 environment.terminate();
             }
         });
+        long start_time = System.currentTimeMillis();
         ga.evolve();
+        System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
         return ga.getBest();
     }
 
     @Override
     public void start(Stage stage) {
-        long start_time = System.currentTimeMillis();
         Paintings best = run();
-        System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
         //Creating a Group object
         Group root = new Group();
 

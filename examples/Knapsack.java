@@ -137,12 +137,14 @@ public class Knapsack {
         }
 
         @Override
-        public void mutate(double mutationRate) {
-            for (int i = 0; i < genes.length; i++) {
+        public K mutate(double mutationRate) {
+            K clone = makeCopy();
+            for (int i = 0; i < clone.genes.length; i++) {
                 if (Math.random() <= mutationRate) {
-                    genes[i] = (byte) Math.round(Math.random());
+                    clone.genes[i] = (byte) Math.round(Math.random());
                 }
             }
+            return clone;
         }
 
         @Override

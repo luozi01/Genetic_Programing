@@ -21,7 +21,7 @@ class EvoManager {
 
     int MAX_WIDTH;
     int MAX_HEIGHT;
-    int MAX_SHAPES = 50;    // max capacity
+    int MAX_SHAPES = 100;    // max capacity
     int MAX_POINTS = 6;
     int ACTUAL_SHAPES = MAX_SHAPES;
     int ACTUAL_POINTS = MAX_POINTS;
@@ -31,7 +31,7 @@ class EvoManager {
     Colors choice = BLACK;
     RandEngine randEngine = new SimpleRandEngine();
 
-    private List<Double> pixelARGB(int pixel) {
+    private List<Double> pixelRGB(int pixel) {
         double red = (pixel >> 16) & 0xff;
         double green = (pixel >> 8) & 0xff;
         double blue = (pixel) & 0xff;
@@ -45,7 +45,7 @@ class EvoManager {
         for (int i = 0; i < MAX_HEIGHT; i++) {
             for (int j = 0; j < MAX_WIDTH; j++) {
                 int pixel = image.getRGB(j, i);
-                color.addAll(pixelARGB(pixel));
+                color.addAll(pixelRGB(pixel));
             }
         }
         image_colors = new DoubleMatrix(color);
@@ -70,7 +70,7 @@ class EvoManager {
         for (int i = 0; i < MAX_HEIGHT; i++) {
             for (int j = 0; j < MAX_WIDTH; j++) {
                 int pixel = bi.getRGB(j, i);
-                colors.addAll(pixelARGB(pixel));
+                colors.addAll(pixelRGB(pixel));
             }
         }
         return new DoubleMatrix(colors);

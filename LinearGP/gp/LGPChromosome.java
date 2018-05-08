@@ -52,11 +52,13 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
      * @param mutationRate mutationRate
      */
     @Override
-    public void mutate(double mutationRate) {
+    public LGPChromosome mutate(double mutationRate) {
+        LGPChromosome clone = makeCopy();
         if (mutationRate == 1)
-            MacroMutation.apply(this, manager, manager.getRandEngine());
+            MacroMutation.apply(clone, manager, manager.getRandEngine());
         if (mutationRate == 0)
-            MicroMutation.apply(this);
+            MicroMutation.apply(clone);
+        return clone;
     }
 
     //Todo should apply only effective instructions to shorter the execution length
