@@ -24,8 +24,8 @@ public class ImageEvo extends Application {
     private int MAX_HEIGHT = 0;
 
     private int COUNTER_BENEFIT = 0;
-    private int MAX_SHAPES = 100;    // max capacity
-    private int MAX_POINTS = 6;
+    private int MAX_SHAPES = 1000;    // max capacity
+    private int MAX_POINTS = 12;
     private int ACTUAL_SHAPES = MAX_SHAPES; // current size
     private int ACTUAL_POINTS = MAX_POINTS;
     private Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
@@ -189,7 +189,7 @@ public class ImageEvo extends Application {
     public void start(Stage primaryStage) {
         BufferedImage img;
         try {
-            img = ImageIO.read(new File("index.jpeg"));
+            img = ImageIO.read(new File("ml.bmp"));
             readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -202,7 +202,7 @@ public class ImageEvo extends Application {
         copyDNA(DNA_BEST, DNA_TEST);
 
         long start_time = System.currentTimeMillis();
-        while (FITNESS_BEST_NORMALIZED < 93) {
+        while (FITNESS_BEST_NORMALIZED < 98) {
             evolve();
         }
         System.out.println((System.currentTimeMillis() - start_time) / 60000.0);

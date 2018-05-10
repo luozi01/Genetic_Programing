@@ -60,10 +60,10 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
 
         // crossover
         for (int i = elitism; i < pop.size(); i++) {
-            E gene1 = tournamentSelection();
+            E gene1 = tournamentSelection().makeCopy();
             E mutated = gene1.mutate(mutationRate);
 
-            E gene2 = tournamentSelection();
+            E gene2 = tournamentSelection().makeCopy();
             List<E> newGene = gene1.crossover(gene2, uniformRate);
 
             newPopulation.addChromosome(mutated);
