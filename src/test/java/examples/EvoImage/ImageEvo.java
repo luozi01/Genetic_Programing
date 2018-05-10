@@ -24,8 +24,8 @@ public class ImageEvo extends Application {
     private int MAX_HEIGHT = 0;
 
     private int COUNTER_BENEFIT = 0;
-    private int MAX_SHAPES = 1000;    // max capacity
-    private int MAX_POINTS = 12;
+    private int MAX_SHAPES = 50;    // max capacity
+    private int MAX_POINTS = 6;
     private int ACTUAL_SHAPES = MAX_SHAPES; // current size
     private int ACTUAL_POINTS = MAX_POINTS;
     private Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
