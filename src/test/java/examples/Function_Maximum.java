@@ -1,6 +1,7 @@
 package examples;
 
 import ga.*;
+import org.apache.commons.math3.analysis.TrivariateFunction;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,6 +96,8 @@ public class Function_Maximum {
 
     private static class FuncFitness implements Fitness<Solve> {
 
+        TrivariateFunction function = (x, y, z) -> (-x * x + 1000000.0 * x - y * y - 40000.0 * y - z * z);
+
         /**
          * f(x,y,z) = -x^2 + 1000000x - y^2 - 40000y - z^2
          *
@@ -102,7 +105,7 @@ public class Function_Maximum {
          * @return f(x, y, z)
          */
         private double function(int x, int y, int z) {
-            return -Math.pow(x, 2) + 1000000.0 * x - Math.pow(y, 2) - 40000.0 * y + -Math.pow(z, 2);
+            return -function.value(x, y, z);
         }
 
         //Todo fix not getting the optimal output

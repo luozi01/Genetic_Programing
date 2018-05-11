@@ -24,8 +24,8 @@ public class ImageEvo extends Application {
     private int MAX_HEIGHT = 0;
 
     private int COUNTER_BENEFIT = 0;
-    private int MAX_SHAPES = 50;    // max capacity
-    private int MAX_POINTS = 6;
+    private int MAX_SHAPES = 200;    // max capacity
+    private int MAX_POINTS = 12;
     private int ACTUAL_SHAPES = MAX_SHAPES; // current size
     private int ACTUAL_POINTS = MAX_POINTS;
     private Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
@@ -39,6 +39,13 @@ public class ImageEvo extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private List<Double> pixelARGB(int pixel) {
+        double red = (pixel >> 16) & 0xff;
+        double green = (pixel >> 8) & 0xff;
+        double blue = (pixel) & 0xff;
+        return Arrays.asList(red / 255.0, green / 255.0, blue / 255.0);
     }
 
     private void mutate_medium(Polygon[] dna_out) {
@@ -119,17 +126,10 @@ public class ImageEvo extends Application {
         }
     }
 
-    int clamp(int val, int minval, int maxval) {
+    private int clamp(int val, int minval, int maxval) {
         if (val < minval) return minval;
         if (val > maxval) return maxval;
         return val;
-    }
-
-    private static List<Double> pixelARGB(int pixel) {
-        double red = (pixel >> 16) & 0xff;
-        double green = (pixel >> 8) & 0xff;
-        double blue = (pixel) & 0xff;
-        return Arrays.asList(red / 255.0, green / 255.0, blue / 255.0);
     }
 
     private void readImage(BufferedImage image) {
@@ -189,7 +189,7 @@ public class ImageEvo extends Application {
     public void start(Stage primaryStage) {
         BufferedImage img;
         try {
-            img = ImageIO.read(new File("ml.bmp"));
+            img = ImageIO.read(new File("Johannes_Vermeer_1632-1675_-_The_Girl_With_The_Pearl_Earring_1665.jpg"));
             readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -202,7 +202,7 @@ public class ImageEvo extends Application {
         copyDNA(DNA_BEST, DNA_TEST);
 
         long start_time = System.currentTimeMillis();
-        while (FITNESS_BEST_NORMALIZED < 98) {
+        while (FITNESS_BEST_NORMALIZED < 93) {
             evolve();
         }
         System.out.println((System.currentTimeMillis() - start_time) / 60000.0);

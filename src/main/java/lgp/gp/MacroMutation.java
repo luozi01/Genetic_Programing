@@ -58,7 +58,8 @@ class MacroMutation {
                 }
             }
         } else if (chromosome.length() > manager.getMacroMutateMinProgramLength()
-                && ((r > manager.getMacroMutateInsertionRate()) || chromosome.length() == manager.getMacroMutateMaxProgramLength())) {
+                && ((r > manager.getMacroMutateInsertionRate())
+                || chromosome.length() == manager.getMacroMutateMaxProgramLength())) {
             int loc = randEngine.nextInt(instructions.size());
             if (manager.isEffectiveMutation()) {
                 for (int i = 0; i < 10; i++) {

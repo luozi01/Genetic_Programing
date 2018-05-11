@@ -154,7 +154,7 @@ public class SyntaxTreeUtils {
     }
 
     private static Operator randomOperator(TreeGP context, int allowableDepth,
-                                                                        TGPInitializationStrategy method, RandEngine randEngine) {
+                                           TGPInitializationStrategy method, RandEngine randEngine) {
         //Todo fix, right now does not have function without arguments such as rand()
         int terminal_count = context.getTerminal().size();
         int function_count = context.getNonTerminal().size();

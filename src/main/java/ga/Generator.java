@@ -4,9 +4,9 @@ import java.util.List;
 
 public interface Generator<E extends Chromosome<E>> {
     /**
-     * Generate a chromosome
+     * Generate chromosome population
      *
-     * @return new chromosome
+     * @return new chromosome population
      */
     List<E> generate();
 }

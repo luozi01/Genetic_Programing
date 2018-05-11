@@ -19,5 +19,9 @@ public interface Chromosome<E extends Chromosome<E>> {
      */
     E mutate(double mutationRate);
 
+    /**
+     * Clone method
+     * @return cloned copy
+     */
     E makeCopy();
 }

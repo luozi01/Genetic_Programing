@@ -1,5 +1,8 @@
 package treegp.solver;
 
+import ga.utils.RandEngine;
+import lombok.Getter;
+import lombok.Setter;
 import treegp.enums.TGPCrossoverStrategy;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.enums.TGPMutationStrategy;
@@ -7,9 +10,6 @@ import treegp.enums.TGPPopulationReplacementStrategy;
 import treegp.program.Operator;
 import treegp.program.Type;
 import treegp.tools.SimpleRandEngine;
-import ga.utils.RandEngine;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.*;
 

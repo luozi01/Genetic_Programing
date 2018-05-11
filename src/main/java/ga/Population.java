@@ -26,9 +26,9 @@ public class Population<E extends Chromosome<E>> implements Iterable<E> {
         return chromosomes.size();
     }
 
-    public void sort(Comparator<E> chromosomesComparator) {
+    public void sort(Comparator<E> comparator) {
         Collections.shuffle(chromosomes);
-        chromosomes.sort(chromosomesComparator);
+        chromosomes.sort(comparator);
     }
 
     E getLast() {

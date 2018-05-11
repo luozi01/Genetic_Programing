@@ -91,7 +91,7 @@ class Crossover {
         RandEngine randEngine = manager.getRandEngine();
 
         // length(gp1) <= length(gp2)
-        //Todo
+        //Todo not optimal
         if (gp1.length() > gp2.length()) {
             LGPChromosome temp = gp1;
             gp1 = gp2;
@@ -194,7 +194,7 @@ class Crossover {
     }
 
 
-    //    // Xianshun says:
+    //Todo need to optimize
     // this is derived from Algorithm 5.1 of Section 5.7.1 of Linear Genetic Programming
     // this linear crossover can also be considered as two-point crossover
     private static void linearCrossover(LGPChromosome gp1, LGPChromosome gp2, LinearGP manager) {

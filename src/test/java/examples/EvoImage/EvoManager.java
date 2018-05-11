@@ -17,13 +17,12 @@ import java.util.List;
 import static examples.EvoImage.ColorChoice.BLACK;
 import static examples.EvoImage.Mutation.MEDIUM;
 
-
 class EvoManager {
 
     int MAX_WIDTH;
     int MAX_HEIGHT;
-    int MAX_SHAPES = 100;    // max capacity
-    int MAX_POINTS = 6;
+    int MAX_SHAPES = 500;    // max capacity
+    int MAX_POINTS = 12;
     int ACTUAL_SHAPES = MAX_SHAPES;
     int ACTUAL_POINTS = MAX_POINTS;
 
