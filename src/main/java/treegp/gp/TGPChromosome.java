@@ -24,8 +24,10 @@ public class TGPChromosome implements Chromosome<TGPChromosome> {
 
     @Override
     public List<TGPChromosome> crossover(TGPChromosome chromosome, double uniformRate) {
-        Crossover.apply(this, chromosome, manager);
-        return new LinkedList<>(list(this, chromosome));
+        TGPChromosome c1 = makeCopy(), c2 = chromosome.makeCopy();
+
+        Crossover.apply(c1, c2, manager);
+        return new LinkedList<>(list(c1, c2));
     }
 
     @Override

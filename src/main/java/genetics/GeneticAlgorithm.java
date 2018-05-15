@@ -95,14 +95,19 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
 
     /**
      * select chromosome from population
+     *
      * @return best chromosome in the selecting group
      */
     protected E tournamentSelection() {
         Population<E> tournament = new Population<>();
-        for (int i = 0; i < tournamentSize; i++)
-            tournament.addChromosome(pop.getChromosome((int) (Math.random() * pop.size())));
+        List<E> chromosomes = new ArrayList<>(pop.getChromosomes());
+        for (int i = 0; i < tournamentSize; i++) {
+            int rind = (int) (Math.random() * chromosomes.size());
+            tournament.addChromosome(chromosomes.get(rind));
+            chromosomes.remove(rind);
+        }
         tournament.sort(comparator);
-        return tournament.getFirst().makeCopy();
+        return tournament.getFirst();
     }
 
     protected class ChromosomesComparator implements Comparator<E> {

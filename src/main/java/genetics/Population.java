@@ -52,7 +52,7 @@ public class Population<E extends Chromosome<E>> implements Iterable<E> {
     }
 
     public void setChromosomes(List<E> chromosomes) {
-        this.chromosomes.addAll(chromosomes);
+        this.chromosomes = new ArrayList<>(chromosomes);
     }
 
     public void trim(int length) {

@@ -7,10 +7,7 @@ import genetics.Population;
 import genetics.utils.RandEngine;
 import treegp.enums.TGPPopulationReplacementStrategy;
 import treegp.solver.TreeGP;
-import treegp.tools.Pair;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
@@ -58,8 +55,8 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
         //do crossover
         for (int offspring_index = 0; offspring_index < crossover_count; offspring_index += 2) {
 
-            E child1 = tournamentSelection().makeCopy();
-            E child2 = tournamentSelection().makeCopy();
+            E child1 = tournamentSelection();
+            E child2 = tournamentSelection();
 
             List<E> genes = child1.crossover(child2, 0);
             for (E e : genes) {
@@ -81,7 +78,7 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
 
         // do reproduction
         for (int offspring_index = 0; offspring_index < reproduction_count; ++offspring_index) {
-            E child = tournamentSelection().makeCopy();
+            E child = tournamentSelection();
             newPopulation.addChromosome(child);
         }
         newPopulation.sort(comparator);
@@ -89,12 +86,6 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
         return newPopulation;
     }
 
-    /**
-     * Similar to Evolve2, but use offspring solution to replace bad parent,
-     * in a way similar to TinyGP as as specified in "A Field Guide to Genetic Programming"
-     *
-     * @return evolved population
-     */
     private Population<E> tinyGPEvolve(int populationSize) {
 
         double sum_rate = manager.crossoverRate + manager.macroMutationRate + manager.microMutationRate + manager.reproductionRate;
@@ -104,85 +95,31 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
 
         RandEngine randEngine = manager.randEngine;
 
-        Population<E> newPopulation = new Population<>();
-        newPopulation.setChromosomes(pop.getChromosomes());
-
         for (int offspring_index = 0; offspring_index < populationSize; offspring_index += 1) {
             double r = randEngine.uniform();
-            List<E> children = new ArrayList<>();
-
-            List<E> bad_parents = new ArrayList<>();
-
-            Pair<Pair<E>> tournament = tournamentSelection(newPopulation.getChromosomes());
-            Pair<E> tournament_winners = tournament._1();
-            Pair<E> tournament_losers = tournament._2();
-
-            bad_parents.add(tournament_losers._1());
-            bad_parents.add(tournament_losers._2());
 
             if (r <= crossover_disk) {
-                E child1 = tournament_winners._1().makeCopy();
-                E child2 = tournament_winners._2().makeCopy();
+                E child1 = tournamentSelection();
+                E child2 = tournamentSelection();
 
                 List<E> list = child1.crossover(child2, 0);
 
-                children.addAll(list);
+                for (E e : list) {
+                    pop.addChromosome(e);
+                }
             } else if (r <= micro_mutation_disk) {
-                E child = tournament_winners._1().makeCopy();
-                child.mutate(0);
-                children.add(child);
+                E child = tournamentSelection();
+                pop.addChromosome(child.mutate(0));
             } else if (r <= macro_mutation_disk) {
-                E child = tournament_winners._1().makeCopy();
-                child.mutate(1);
-                children.add(child);
+                E child = tournamentSelection();
+                pop.addChromosome(child.mutate(1));
             } else {
-                E child = tournament_winners._1().makeCopy();
-                children.add(child);
+                E child = tournamentSelection();
+                pop.addChromosome(child);
             }
-
-            boolean successfully_replaced = false;
-            for (E child : children) {
-                for (E bad_parent : bad_parents) {
-                    if (comparator.compare(child, bad_parent) < 0) {
-                        successfully_replaced = true;
-                        newPopulation.set(newPopulation.indexOf(bad_parent), child);
-                        break;
-                    }
-                }
-                if (successfully_replaced) {
-                    break;
-                }
-            }
+            pop.sort(comparator);
+            pop.trim(populationSize);
         }
-        return newPopulation;
-    }
-
-    //Todo update
-    private Pair<Pair<E>> tournamentSelection(List<E> population) {
-
-        Collections.shuffle(population);
-
-        E good1, good2;
-        E bad1, bad2;
-        if (comparator.compare(population.get(0), population.get(1)) < 0) {
-            good1 = population.get(0);
-            bad1 = population.get(1);
-        } else {
-            good1 = population.get(1);
-            bad1 = population.get(0);
-        }
-
-        if (comparator.compare(population.get(2), population.get(3)) > 0) {
-            good2 = population.get(2);
-            bad2 = population.get(3);
-        } else {
-            good2 = population.get(3);
-            bad2 = population.get(2);
-        }
-
-        Pair<E> winners = new Pair<>(good1, good2);
-        Pair<E> losers = new Pair<>(bad1, bad2);
-
-        return new Pair<>(winners, losers);
+        return pop;
     }
 }

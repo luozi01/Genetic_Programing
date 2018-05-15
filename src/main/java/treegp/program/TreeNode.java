@@ -53,6 +53,10 @@ public class TreeNode implements Serializable {
         return op.isVariable();
     }
 
+    public boolean isTerminal() {
+        return argumentCount() == 0;
+    }
+
     public int argumentCount() {
         return op.argumentCount();
     }
@@ -158,10 +162,6 @@ public class TreeNode implements Serializable {
         for (TreeNode child : node.getChildren()) {
             collectNodes(child, node, list);
         }
-    }
-
-    public boolean isTerminal() {
-        return argumentCount() == 0;
     }
 
     public int depth2Node(TreeNode node) {
