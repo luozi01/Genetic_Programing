@@ -1,7 +1,7 @@
 package examples.EvoImage;
 
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 
 public enum Mutation implements Mutations {
     GAUSSIAN {

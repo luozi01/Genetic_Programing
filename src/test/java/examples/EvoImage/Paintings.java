@@ -1,6 +1,6 @@
 package examples.EvoImage;
 
-import ga.Chromosome;
+import genetics.Chromosome;
 
 import java.util.List;
 

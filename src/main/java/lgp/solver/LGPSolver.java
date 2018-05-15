@@ -1,7 +1,7 @@
 package lgp.solver;
 
-import ga.Fitness;
-import ga.Population;
+import genetics.Fitness;
+import genetics.Population;
 import lgp.gp.LGA;
 import lgp.gp.LGPChromosome;
 import lgp.gp.LGPGenerator;

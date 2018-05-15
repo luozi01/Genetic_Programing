@@ -1,6 +1,5 @@
 package examples.EvoImage;
 
-import ga.utils.RandEngine;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
@@ -18,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class ImageEvo extends Application {
     private int MAX_WIDTH = 0;
@@ -34,8 +34,8 @@ public class ImageEvo extends Application {
     private double FITNESS_MAX = Double.MAX_VALUE;
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
-    private RandEngine randEngine = new SimpleRandEngine();
     private DoubleMatrix image_colors;
+    private Random random = new Random();
 
     public static void main(String[] args) {
         launch(args);
@@ -49,28 +49,28 @@ public class ImageEvo extends Application {
     }
 
     private void mutate_medium(Polygon[] dna_out) {
-        CHANGED_SHAPE_INDEX = randEngine.nextInt(ACTUAL_SHAPES - 1);
-        double roulette = randEngine.uniform() * 2.0;
+        CHANGED_SHAPE_INDEX = random.nextInt(ACTUAL_SHAPES - 1);
+        double roulette = random.nextDouble() * 2.0;
 
         // mutate color
         if (roulette < 1) {
             if (roulette < 0.25) {
-                dna_out[CHANGED_SHAPE_INDEX].r = randEngine.uniform();
+                dna_out[CHANGED_SHAPE_INDEX].r = random.nextDouble();
             } else if (roulette < 0.5) {
-                dna_out[CHANGED_SHAPE_INDEX].g = randEngine.uniform();
+                dna_out[CHANGED_SHAPE_INDEX].g = random.nextDouble();
             } else if (roulette < 0.75) {
-                dna_out[CHANGED_SHAPE_INDEX].b = randEngine.uniform();
+                dna_out[CHANGED_SHAPE_INDEX].b = random.nextDouble();
             } else if (roulette < 1.0) {
-                dna_out[CHANGED_SHAPE_INDEX].a = randEngine.uniform();
+                dna_out[CHANGED_SHAPE_INDEX].a = random.nextDouble();
             }
         }
         // mutate shape
         else {
-            int CHANGED_POINT_INDEX = randEngine.nextInt(ACTUAL_POINTS - 1);
+            int CHANGED_POINT_INDEX = random.nextInt(ACTUAL_POINTS - 1);
             if (roulette < 1.5) {
-                dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_WIDTH);
+                dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = random.nextInt(MAX_WIDTH);
             } else {
-                dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(MAX_HEIGHT);
+                dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = random.nextInt(MAX_HEIGHT);
             }
         }
     }
@@ -119,7 +119,7 @@ public class ImageEvo extends Application {
         for (int i = 0; i < MAX_SHAPES; i++) {
             Polygon polygon = new Polygon(MAX_POINTS);
             for (int j = 0; j < MAX_POINTS; j++) {
-                polygon.add(j, randEngine.nextInt(MAX_WIDTH), randEngine.nextInt(MAX_HEIGHT));
+                polygon.add(j, random.nextInt(MAX_WIDTH), random.nextInt(MAX_HEIGHT));
             }
             polygon.setColor(0, 0, 0, 0.001);
             dna[i] = polygon;

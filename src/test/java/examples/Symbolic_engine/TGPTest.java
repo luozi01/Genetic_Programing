@@ -1,6 +1,6 @@
 package examples.Symbolic_engine;
 
-import ga.utils.Observation;
+import genetics.utils.Observation;
 import treegp.gp.TGPChromosome;
 import treegp.program.Operator;
 import treegp.solver.FitnessCalc;

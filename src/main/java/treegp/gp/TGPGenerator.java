@@ -1,6 +1,6 @@
 package treegp.gp;
 
-import ga.Generator;
+import genetics.Generator;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.program.SyntaxTreeUtils;
 import treegp.program.TreeNode;

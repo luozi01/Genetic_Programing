@@ -1,6 +1,6 @@
 package treegp.gp;
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.enums.TGPMutationStrategy;
 import treegp.program.SyntaxTreeUtils;

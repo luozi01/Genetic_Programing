@@ -1,11 +1,11 @@
 package lgp.gp;
 
 
-import ga.Chromosome;
-import ga.Fitness;
-import ga.GeneticAlgorithm;
-import ga.Population;
-import ga.utils.RandEngine;
+import genetics.Chromosome;
+import genetics.Fitness;
+import genetics.GeneticAlgorithm;
+import genetics.Population;
+import genetics.utils.RandEngine;
 import lgp.solver.LinearGP;
 
 public class LGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {

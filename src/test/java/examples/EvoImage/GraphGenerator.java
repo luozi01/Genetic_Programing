@@ -1,6 +1,6 @@
 package examples.EvoImage;
 
-import ga.Generator;
+import genetics.Generator;
 
 import java.util.Collections;
 import java.util.List;

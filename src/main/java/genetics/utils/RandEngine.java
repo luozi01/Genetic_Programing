@@ -1,4 +1,4 @@
-package ga.utils;
+package genetics.utils;
 
 public interface RandEngine {
     double uniform();

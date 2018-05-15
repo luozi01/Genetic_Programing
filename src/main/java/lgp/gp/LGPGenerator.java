@@ -1,7 +1,7 @@
 package lgp.gp;
 
 
-import ga.Generator;
+import genetics.Generator;
 import lgp.enums.LGPInitialization;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;

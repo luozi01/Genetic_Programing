@@ -1,6 +1,6 @@
 package examples.EvoImage;
 
-import ga.Population;
+import genetics.Population;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;

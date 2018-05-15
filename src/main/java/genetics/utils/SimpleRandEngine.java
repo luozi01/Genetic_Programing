@@ -1,6 +1,5 @@
-package treegp.tools;
+package genetics.utils;
 
-import ga.utils.RandEngine;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.util.Random;
@@ -19,6 +18,7 @@ public class SimpleRandEngine implements RandEngine {
         NormalDistribution normal = new NormalDistribution(mean, sd);
         return normal.sample();
     }
+
 
     @Override
     public int nextInt(int upper) {

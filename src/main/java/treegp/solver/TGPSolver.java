@@ -1,7 +1,7 @@
 package treegp.solver;
 
-import ga.Fitness;
-import ga.Population;
+import genetics.Fitness;
+import genetics.Population;
 import treegp.gp.TGA;
 import treegp.gp.TGPChromosome;
 import treegp.gp.TGPGenerator;

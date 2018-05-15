@@ -1,6 +1,6 @@
 package treegp.gp;
 
-import ga.Chromosome;
+import genetics.Chromosome;
 import lombok.Getter;
 import lombok.Setter;
 import treegp.program.TreeNode;

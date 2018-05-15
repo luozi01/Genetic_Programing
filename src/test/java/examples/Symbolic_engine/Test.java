@@ -1,6 +1,6 @@
 package examples.Symbolic_engine;
 
-import ga.utils.Observation;
+import genetics.utils.Observation;
 import org.apache.commons.math3.analysis.TrivariateFunction;
 
 import java.util.ArrayList;

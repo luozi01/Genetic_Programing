@@ -1,6 +1,6 @@
 package examples.EvoImage;
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 
 public interface Mutations {
     void apply(Polygon[] polygons, EvoManager manager, RandEngine randEngine);

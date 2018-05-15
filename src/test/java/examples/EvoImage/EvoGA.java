@@ -1,10 +1,10 @@
 package examples.EvoImage;
 
 
-import ga.Chromosome;
-import ga.Fitness;
-import ga.GeneticAlgorithm;
-import ga.Population;
+import genetics.Chromosome;
+import genetics.Fitness;
+import genetics.GeneticAlgorithm;
+import genetics.Population;
 
 public class EvoGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
     EvoGA(Population<E> pop, Fitness<E> fitness) {

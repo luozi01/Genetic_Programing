@@ -1,6 +1,6 @@
 package treegp.program;
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 import lombok.Getter;
 import lombok.Setter;
 import treegp.solver.TreeGP;

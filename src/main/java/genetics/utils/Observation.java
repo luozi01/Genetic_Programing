@@ -1,4 +1,4 @@
-package ga.utils;
+package genetics.utils;
 
 import java.io.Serializable;
 

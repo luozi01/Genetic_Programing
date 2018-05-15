@@ -1,13 +1,13 @@
 package lgp.solver;
 
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
+import genetics.utils.SimpleRandEngine;
 import lgp.enums.LGPCrossover;
 import lgp.enums.LGPInitialization;
 import lgp.enums.LGPSelection;
 import lgp.program.Operator;
 import lgp.program.operators.*;
-import lgp.tools.SimpleRandEngine;
 import lombok.Getter;
 import lombok.Setter;
 

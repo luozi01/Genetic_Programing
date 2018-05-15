@@ -1,6 +1,7 @@
 package examples.EvoImage;
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
+import genetics.utils.SimpleRandEngine;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Group;
 import javafx.scene.Scene;

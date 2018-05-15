@@ -1,6 +1,6 @@
 package lgp.program;
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.gp.LGPChromosome;
 import lombok.Getter;

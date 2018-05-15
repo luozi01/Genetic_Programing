@@ -1,10 +1,10 @@
 package treegp.gp;
 
-import ga.Chromosome;
-import ga.Fitness;
-import ga.GeneticAlgorithm;
-import ga.Population;
-import ga.utils.RandEngine;
+import genetics.Chromosome;
+import genetics.Fitness;
+import genetics.GeneticAlgorithm;
+import genetics.Population;
+import genetics.utils.RandEngine;
 import treegp.enums.TGPPopulationReplacementStrategy;
 import treegp.solver.TreeGP;
 import treegp.tools.Pair;

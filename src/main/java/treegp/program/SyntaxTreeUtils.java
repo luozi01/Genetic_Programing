@@ -1,7 +1,7 @@
 package treegp.program;
 
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.solver.TreeGP;
 

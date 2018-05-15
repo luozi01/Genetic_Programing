@@ -1,6 +1,6 @@
 package lgp.gp;
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 import lgp.enums.LGPCrossover;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;

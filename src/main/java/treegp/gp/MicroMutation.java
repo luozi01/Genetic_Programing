@@ -1,6 +1,6 @@
 package treegp.gp;
 
-import ga.utils.RandEngine;
+import genetics.utils.RandEngine;
 import treegp.program.Operator;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;

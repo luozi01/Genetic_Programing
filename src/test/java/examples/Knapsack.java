@@ -1,6 +1,6 @@
 package examples;
 
-import ga.*;
+import genetics.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

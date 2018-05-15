@@ -1,6 +1,6 @@
 package examples;
 
-import ga.*;
+import genetics.*;
 import org.apache.commons.math3.analysis.TrivariateFunction;
 
 import java.util.ArrayList;

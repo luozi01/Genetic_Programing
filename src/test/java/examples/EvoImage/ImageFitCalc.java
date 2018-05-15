@@ -1,6 +1,6 @@
 package examples.EvoImage;
 
-import ga.Fitness;
+import genetics.Fitness;
 import org.jblas.DoubleMatrix;
 
 public class ImageFitCalc implements Fitness<Paintings> {

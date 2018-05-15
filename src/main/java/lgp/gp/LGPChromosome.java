@@ -1,7 +1,7 @@
 package lgp.gp;
 
-import ga.Chromosome;
-import ga.utils.Observation;
+import genetics.Chromosome;
+import genetics.utils.Observation;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.program.Instruction;
 import lgp.program.Operator;
