@@ -73,6 +73,7 @@ public class LinearGP {
     // BEGIN
     private LGPSelection replacementStrategy = LGPSelection.TOURNAMENT;
     private double replacementProbability = 1.0;
+    private int tournamentSize = 3;
     // END
 
     public static LinearGP defaultConfig() {

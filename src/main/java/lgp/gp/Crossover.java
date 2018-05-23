@@ -193,7 +193,6 @@ class Crossover {
         }
     }
 
-
     //Todo need to optimize
     // this is derived from Algorithm 5.1 of Section 5.7.1 of Linear Genetic Programming
     // this linear crossover can also be considered as two-point crossover
@@ -202,8 +201,9 @@ class Crossover {
 
         // length(gp1) <= length(gp2)
         if (gp1.length() > gp2.length()) {
+            LGPChromosome temp = gp1;
             gp1 = gp2;
-            gp2 = gp1;
+            gp2 = temp;
         }
 
         // select i1 from gp1 and i2 from gp2 such that abs(i1-i2) <= max_crossover_point_distance
@@ -212,51 +212,52 @@ class Crossover {
         int i2 = randEngine.nextInt(gp2.length());
         int cross_point_distance = (i1 > i2) ? (i1 - i2) : (i2 - i1);
 
-        int max_crossover_point_distance;
+        int distance_max;
         if (gp1.length() - 1 > manager.getMaxDistanceOfCrossoverPoints())
-            max_crossover_point_distance = manager.getMaxDistanceOfCrossoverPoints();
-        else max_crossover_point_distance = gp1.length() - 1;
+            distance_max = manager.getMaxDistanceOfCrossoverPoints();
+        else distance_max = gp1.length() - 1;
 
-        while (cross_point_distance > max_crossover_point_distance) {
+        while (cross_point_distance > distance_max) {
             i1 = randEngine.nextInt(gp1.length());
             i2 = randEngine.nextInt(gp2.length());
             cross_point_distance = (i1 > i2) ? (i1 - i2) : (i2 - i1);
         }
 
-        int s1_max;
-        if ((gp1.length() - i1) > manager.getMaxDifferenceOfSegmentLength())
-            s1_max = manager.getMaxDifferenceOfSegmentLength();
-        else s1_max = gp1.length() - i1;
+        //Select an instruction segment sk starting at position ik with length 1 ≤ l(s_k) ≤ min(l(gp_k) − i_k, sl_max).
+        int s1;
+        if ((gp1.length() - i1) > manager.getMaxSegmentLength())
+            s1 = manager.getMaxSegmentLength();
+        else s1 = gp1.length() - i1;
 
-        int s2_max;
-        if ((gp2.length() - i2) > manager.getMaxDifferenceOfSegmentLength())
-            s2_max = manager.getMaxDifferenceOfSegmentLength();
-        else s2_max = gp2.length() - i2;
+        int s2;
+        if ((gp2.length() - i2) > manager.getMaxSegmentLength())
+            s2 = manager.getMaxSegmentLength();
+        else s2 = gp2.length() - i2;
 
         // select s1 from gp1 (start at i1) and s2 from gp2 (start at i2)
         // such that length(s1) <= length(s2)
         // and abs(length(s1) - length(s2)) <= m_max_difference_of_segment_length)
-        int ls1 = 1 + randEngine.nextInt(s1_max);
-        int ls2 = 1 + randEngine.nextInt(s2_max);
-        int lsd = (ls1 > ls2) ? (ls1 - ls2) : (ls2 - ls1);
-        while ((ls1 > ls2) && (lsd > manager.getMaxDifferenceOfSegmentLength())) {
-            ls1 = 1 + randEngine.nextInt(s1_max);
-            ls2 = 1 + randEngine.nextInt(s2_max);
-            lsd = (ls1 > ls2) ? (ls1 - ls2) : (ls2 - ls1);
+        int s1_length = 1 + randEngine.nextInt(s1);
+        int s2_length = 1 + randEngine.nextInt(s2);
+        int segment_length_difference = (s1_length > s2_length) ? (s1_length - s2_length) : (s2_length - s1_length);
+        while (s1_length > s2_length || segment_length_difference > manager.getMaxDifferenceOfSegmentLength()) {
+            s1_length = 1 + randEngine.nextInt(s1);
+            s2_length = 1 + randEngine.nextInt(s2);
+            segment_length_difference = (s1_length > s2_length) ? (s1_length - s2_length) : (s2_length - s1_length);
         }
 
-        if (((gp2.length() - (ls2 - ls1)) < manager.getMinProgramLength() ||
-                ((gp1.length() + (ls2 - ls1)) > manager.getMaxProgramLength()))) {
+        if (((gp2.length() - (s2_length - s1_length)) < manager.getMinProgramLength() ||
+                ((gp1.length() + (s2_length - s1_length)) > manager.getMaxProgramLength()))) {
             if (randEngine.uniform() < 0.5) {
-                ls2 = ls1;
+                s2_length = s1_length;
             } else {
-                ls1 = ls2;
+                s1_length = s2_length;
             }
-            if ((i1 + ls1) > gp1.length()) {
-                ls1 = gp1.length() - i1;
+            if ((i1 + s1_length) > gp1.length()) {
+                s1_length = gp1.length() - i1;
             }
-            if ((i2 + ls2) > gp2.length()) {
-                ls2 = gp2.length() - i2;
+            if ((i2 + s2_length) > gp2.length()) {
+                s2_length = gp2.length() - i2;
             }
         }
 
@@ -275,20 +276,20 @@ class Crossover {
         for (int i = 0; i < i1; ++i) {
             instructions1_1.add(instructions1.get(i));
         }
-        for (int i = i1; i < i1 + ls1; ++i) {
+        for (int i = i1; i < i1 + s1_length; ++i) {
             instructions1_2.add(instructions1.get(i));
         }
-        for (int i = i1 + ls1; i < instructions1.size(); ++i) {
+        for (int i = i1 + s1_length; i < instructions1.size(); ++i) {
             instructions1_3.add(instructions1.get(i));
         }
 
         for (int i = 0; i < i2; ++i) {
             instructions2_1.add(instructions2.get(i));
         }
-        for (int i = i2; i < i2 + ls2; ++i) {
+        for (int i = i2; i < i2 + s2_length; ++i) {
             instructions2_2.add(instructions2.get(i));
         }
-        for (int i = i2 + ls2; i < instructions2.size(); ++i) {
+        for (int i = i2 + s2_length; i < instructions2.size(); ++i) {
             instructions2_3.add(instructions2.get(i));
         }
 
@@ -298,7 +299,7 @@ class Crossover {
         for (int i = 0; i < i1; ++i) {
             instructions1.add(instructions1_1.get(i));
         }
-        for (int i = 0; i < ls2; ++i) {
+        for (int i = 0; i < s2_length; ++i) {
             Instruction clone = instructions2_2.get(i);
             clone.resign(gp1);
             instructions1.add(clone);
@@ -308,7 +309,7 @@ class Crossover {
         for (int i = 0; i < i2; ++i) {
             instructions2.add(instructions2_1.get(i));
         }
-        for (int i = 0; i < ls1; ++i) {
+        for (int i = 0; i < s1_length; ++i) {
             Instruction clone = instructions1_2.get(i);
             clone.resign(gp2);
             instructions2.add(clone);

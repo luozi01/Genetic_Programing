@@ -55,8 +55,8 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
         //do crossover
         for (int offspring_index = 0; offspring_index < crossover_count; offspring_index += 2) {
 
-            E child1 = tournamentSelection();
-            E child2 = tournamentSelection();
+            E child1 = tournamentSelection(manager.tournamentSize);
+            E child2 = tournamentSelection(manager.tournamentSize);
 
             List<E> genes = child1.crossover(child2, 0);
             for (E e : genes) {
@@ -66,19 +66,19 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
 
         // do point mutation
         for (int offspring_index = 0; offspring_index < micro_mutation_count; ++offspring_index) {
-            E child = tournamentSelection();
+            E child = tournamentSelection(manager.tournamentSize);
             newPopulation.addChromosome(child.mutate(0));
         }
 
         // do subtree mutation
         for (int offspring_index = 0; offspring_index < macro_mutation_count; ++offspring_index) {
-            E child = tournamentSelection();
+            E child = tournamentSelection(manager.tournamentSize);
             newPopulation.addChromosome(child.mutate(1));
         }
 
         // do reproduction
         for (int offspring_index = 0; offspring_index < reproduction_count; ++offspring_index) {
-            E child = tournamentSelection();
+            E child = tournamentSelection(manager.tournamentSize);
             newPopulation.addChromosome(child);
         }
         newPopulation.sort(comparator);
@@ -99,8 +99,8 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
             double r = randEngine.uniform();
 
             if (r <= crossover_disk) {
-                E child1 = tournamentSelection();
-                E child2 = tournamentSelection();
+                E child1 = tournamentSelection(manager.tournamentSize);
+                E child2 = tournamentSelection(manager.tournamentSize);
 
                 List<E> list = child1.crossover(child2, 0);
 
@@ -108,13 +108,13 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
                     pop.addChromosome(e);
                 }
             } else if (r <= micro_mutation_disk) {
-                E child = tournamentSelection();
+                E child = tournamentSelection(manager.tournamentSize);
                 pop.addChromosome(child.mutate(0));
             } else if (r <= macro_mutation_disk) {
-                E child = tournamentSelection();
+                E child = tournamentSelection(manager.tournamentSize);
                 pop.addChromosome(child.mutate(1));
             } else {
-                E child = tournamentSelection();
+                E child = tournamentSelection(manager.tournamentSize);
                 pop.addChromosome(child);
             }
             pop.sort(comparator);

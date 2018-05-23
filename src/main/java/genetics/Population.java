@@ -27,36 +27,19 @@ public class Population<E extends Chromosome<E>> implements Iterable<E> {
     }
 
     public void sort(Comparator<E> comparator) {
-        Collections.shuffle(chromosomes);
         chromosomes.sort(comparator);
     }
 
-    E getLast() {
-        return chromosomes.get(chromosomes.size() - 1);
-    }
-
-    E getFirst() {
+    public E getFirst() {
         return chromosomes.get(0);
-    }
-
-    public void set(int index, E e) {
-        chromosomes.set(index, e);
-    }
-
-    public int indexOf(E e) {
-        return chromosomes.indexOf(e);
     }
 
     public List<E> getChromosomes() {
         return chromosomes;
     }
 
-    public void setChromosomes(List<E> chromosomes) {
-        this.chromosomes = new ArrayList<>(chromosomes);
-    }
-
     public void trim(int length) {
-        chromosomes = chromosomes.subList(0, length);
+        chromosomes.subList(length, chromosomes.size()).clear();
     }
 
     @Override

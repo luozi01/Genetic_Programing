@@ -60,10 +60,10 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
 
         // crossover & mutate
         for (int i = elitism; i < pop.size(); i++) {
-            E gene1 = tournamentSelection();
+            E gene1 = tournamentSelection(tournamentSize);
             E mutated = gene1.mutate(mutationRate);
 
-            E gene2 = tournamentSelection();
+            E gene2 = tournamentSelection(tournamentSize);
             List<E> newGene = gene1.crossover(gene2, uniformRate);
 
             newPopulation.addChromosome(mutated);
@@ -98,16 +98,17 @@ public class GeneticAlgorithm<E extends Chromosome<E>> {
      *
      * @return best chromosome in the selecting group
      */
-    protected E tournamentSelection() {
-        Population<E> tournament = new Population<>();
+    protected E tournamentSelection(int tournamentSize) {
+        assert tournamentSize < pop.size();
+        List<E> selection = new ArrayList<>();
         List<E> chromosomes = new ArrayList<>(pop.getChromosomes());
         for (int i = 0; i < tournamentSize; i++) {
             int rind = (int) (Math.random() * chromosomes.size());
-            tournament.addChromosome(chromosomes.get(rind));
+            selection.add(chromosomes.get(rind));
             chromosomes.remove(rind);
         }
-        tournament.sort(comparator);
-        return tournament.getFirst();
+        selection.sort(comparator);
+        return selection.get(0);
     }
 
     protected class ChromosomesComparator implements Comparator<E> {

@@ -11,6 +11,7 @@ import java.util.List;
 
 class Crossover {
 
+    //Todo simplify
     /**
      * Method that implements the subtree crossover described in Section 2.4 of "A Field Guide to Genetic Programming"
      *
@@ -100,11 +101,11 @@ class Crossover {
             List<TreeNode> children2 = new ArrayList<>(point2.getChildren());
             point1.getChildren().clear();
             point2.getChildren().clear();
-            for (TreeNode aChildren1 : children1) {
-                point2.getChildren().add(aChildren1.copy());
+            for (TreeNode node : children1) {
+                point2.getChildren().add(node);
             }
-            for (TreeNode aChildren2 : children2) {
-                point1.getChildren().add(aChildren2.copy());
+            for (TreeNode node : children2) {
+                point1.getChildren().add(node);
             }
             return new Pair<>(cutPoint1, cutPoint2);
         } else {

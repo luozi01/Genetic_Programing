@@ -31,8 +31,8 @@ public class LGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
         int counter = 0;
         while (program_count < iPopSize && counter < computationBudget) {
 
-            E gp1 = tournamentSelection().makeCopy();
-            E gp2 = tournamentSelection().makeCopy();
+            E gp1 = tournamentSelection(manager.getTournamentSize());
+            E gp2 = tournamentSelection(manager.getTournamentSize());
 
             double r = randEngine.uniform();
             if (r < manager.getCrossoverRate()) {

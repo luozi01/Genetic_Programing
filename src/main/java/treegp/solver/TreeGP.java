@@ -19,7 +19,7 @@ public class TreeGP {
     public TGPInitializationStrategy popInitStrategy = TGPInitializationStrategy.INITIALIZATION_METHOD_FULL;
     public TGPCrossoverStrategy crossoverStrategy = TGPCrossoverStrategy.CROSSOVER_SUBTREE_BIAS;
     public TGPMutationStrategy mutationStrategy = TGPMutationStrategy.MUTATION_SHRINK;
-    public TGPPopulationReplacementStrategy replacementStrategy = TGPPopulationReplacementStrategy.TINY_GP;
+    public TGPPopulationReplacementStrategy replacementStrategy = TGPPopulationReplacementStrategy.MU_PLUS_LAMBDA;
 
     public RandEngine randEngine = new SimpleRandEngine();
     public int populationSize = 500;
@@ -31,6 +31,7 @@ public class TreeGP {
     public double crossoverRate = 0.3;
     public double reproductionRate = 0.0;
     public double elitismRatio = .4;
+    public int tournamentSize = 3;
 
     private List<Operator> terminal = new ArrayList<>(); // variables | numbers
     private List<Operator> nonTerminal = new ArrayList<>(); // operators
