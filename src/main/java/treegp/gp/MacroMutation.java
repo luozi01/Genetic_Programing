@@ -1,22 +1,30 @@
 package treegp.gp;
 
 import genetics.utils.RandEngine;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.enums.TGPMutationStrategy;
 import treegp.program.SyntaxTreeUtils;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;
 
-class MacroMutation {
+public class MacroMutation implements MutationPolicy {
+
+
+    private TreeGP manager;
+
+    public MacroMutation(TreeGP manager) {
+        this.manager = manager;
+    }
 
     /**
      * Method that implements the subtree mutation or "headless chicken" crossover
      * described in Section 2.4 of "A Field Guide to Genetic Programming"
      *
      * @param treeNode node
-     * @param manager  gp data
      */
-    static void apply(TGPChromosome treeNode, TreeGP manager) {
+    private Chromosome apply(TGPChromosome treeNode) {
         int iMaxProgramDepth = manager.maxProgramDepth;
         TGPMutationStrategy method = manager.mutationStrategy;
         RandEngine randEngine = manager.randEngine;
@@ -66,5 +74,14 @@ class MacroMutation {
             if (node.isVariable()) node.setVariable(manager.getRandomVar());
             if (node.isNumber()) node.setValue(manager.getRandomValue());
         }
+        return treeNode;
+    }
+
+    @Override
+    public Chromosome mutate(Chromosome chromosome) {
+        if (!(chromosome instanceof TGPChromosome)) {
+            throw new IllegalArgumentException("Chromosome should be TGPChromosome");
+        }
+        return apply(((TGPChromosome) chromosome).makeCopy());
     }
 }

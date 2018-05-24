@@ -1,6 +1,6 @@
 package lgp.gp;
 
-import genetics.Chromosome;
+import genetics.AbstractListChromosome;
 import genetics.utils.Observation;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.program.Instruction;
@@ -14,51 +14,22 @@ import java.util.*;
 
 @Getter
 @Setter
-public class LGPChromosome implements Chromosome<LGPChromosome> {
+public class LGPChromosome extends AbstractListChromosome<Instruction> {
 
     private List<Register> registerSet = new ArrayList<>(); //variable
     private List<Register> constantSet = new ArrayList<>(); //numbers
     private List<Operator> operatorSet = new ArrayList<>(); //operators
-    private List<Instruction> instructions = new ArrayList<>(); //instructions
     private Map<String, Double> variables = new HashMap<>();
     private int index = 0;
-    private Random random = new Random();
     private LinearGP manager;
 
-    LGPChromosome(LinearGP manager) {
+    LGPChromosome(List<Instruction> instructions, LinearGP manager) {
+        super(instructions);
         this.manager = manager;
     }
 
     public int length() {
-        return instructions.size();
-    }
-
-    /**
-     * Crossover function for genetic algorithm
-     *
-     * @param chromosome  chromosome to crossover with
-     * @param uniformRate uniformRate
-     * @return new chromosome after crossover
-     */
-    @Override
-    public List<LGPChromosome> crossover(LGPChromosome chromosome, double uniformRate) {
-        Crossover.apply(this, chromosome, manager);
-        return new LinkedList<>(list(this, chromosome));
-    }
-
-    /**
-     * Mutate given chromosome with given mutationRate
-     *
-     * @param mutationRate mutationRate
-     */
-    @Override
-    public LGPChromosome mutate(double mutationRate) {
-        LGPChromosome clone = makeCopy();
-        if (mutationRate == 1)
-            MacroMutation.apply(clone, manager, manager.getRandEngine());
-        if (mutationRate == 0)
-            MicroMutation.apply(clone);
-        return clone;
+        return getLength();
     }
 
     //Todo should apply only effective instructions to shorter the execution length
@@ -67,39 +38,12 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
         execute(observation);
     }
 
-    @Override
+    public List<Instruction> getInstructions() {
+        return getRepresentation();
+    }
+
     public LGPChromosome makeCopy() {
-        LGPChromosome clone = new LGPChromosome(manager);
-        clone.copy(this, false);
-        return clone;
-    }
-
-    //Todo
-    public void copy(LGPChromosome that, boolean effectiveOnly) {
-        for (int i = 0; i < that.registerSet.size(); i++) {
-            registerSet.add(that.registerSet.get(i).makeCopy());
-        }
-        for (int i = 0; i < that.constantSet.size(); i++) {
-            constantSet.add(that.constantSet.get(i).makeCopy());
-        }
-        for (int i = 0; i < that.operatorSet.size(); i++) {
-            operatorSet.add(that.operatorSet.get(i).makeCopy());
-        }
-
-        instructions.clear();
-        for (int i = 0; i < that.instructions.size(); ++i) {
-            if (effectiveOnly && !that.instructions.get(i).isStructuralIntron()) {
-                continue;
-            }
-            instructions.add(that.instructions.get(i).makeCopy(registerSet, constantSet, operatorSet));
-        }
-    }
-
-    @SafeVarargs
-    private final <T> List<T> list(T... items) {
-        List<T> list = new LinkedList<>();
-        Collections.addAll(list, items);
-        return list;
+        return (LGPChromosome) newCopy(getRepresentation());
     }
 
     void addConstant(List<Double> constant) {
@@ -141,18 +85,18 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
     }
 
     public Register getRandomConstant() {
-        return constantSet.get(random.nextInt(constantSet.size()));
+        return constantSet.get(manager.getRandEngine().nextInt(constantSet.size()));
     }
 
     public Register getRandomRegister() {
-        return registerSet.get(random.nextInt(registerSet.size()));
+        return registerSet.get(manager.getRandEngine().nextInt(registerSet.size()));
     }
 
     private void markStructuralIntrons(LinearGP manager) {
 
-        int instruction_count = instructions.size();
+        int instruction_count = getLength();
         for (int i = instruction_count - 1; i >= 0; i--) {
-            instructions.get(i).setStructuralIntron(true);
+            getRepresentation().get(i).setStructuralIntron(true);
         }
 
         Set<Integer> eff = new HashSet<>();
@@ -166,7 +110,7 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
 
         for (int i = instruction_count - 1; i >= 0; i--) {
             prev_instruction = current_instruction;
-            current_instruction = instructions.get(i);
+            current_instruction = getRepresentation().get(i);
             // prev_instruction is not an structural intron and the current_instruction
             // is a conditional construct then, the current_instruction is not structural intron either
             // this directly follows from Step 3 of Algorithm 3.1
@@ -217,9 +161,9 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
 
         Set<Integer> effective_register = new HashSet<>();
 
-        int instruction_count = instructions.size();
+        int instruction_count = getLength();
         for (int i = instruction_count - 1; i > stop_point; i--) {
-            instructions.get(i).setStructuralIntron(true);
+            getRepresentation().get(i).setStructuralIntron(true);
         }
 
         effective_register.clear();
@@ -232,7 +176,7 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
         Instruction prev_instruction;
         for (int i = instruction_count - 1; i > stop_point; i--) {
             prev_instruction = current_instruction;
-            current_instruction = instructions.get(i);
+            current_instruction = getRepresentation().get(i);
 
             //if current instruction is an if statement and it has contents to operate,
             // then it's content is not an intron, it is not an intron
@@ -264,7 +208,7 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
         OperatorExecutionStatus command = OperatorExecutionStatus.LGP_EXECUTE_NEXT_INSTRUCTION;
         Instruction current_effective_instruction = null;
         Instruction prev_effective_instruction;
-        for (Instruction instruction : instructions) {
+        for (Instruction instruction : getRepresentation()) {
             if (instruction.isStructuralIntron()) {
                 continue;
             }
@@ -294,9 +238,38 @@ public class LGPChromosome implements Chromosome<LGPChromosome> {
         sb.append("\n").append(registerSet);
         sb.append("\noperators:");
         sb.append("\n").append(operatorSet);
-        for (int i = 0; i < instructions.size(); ++i) {
-            sb.append("\ninstruction[").append(i).append("]: ").append(instructions.get(i)).append("\n");
+        for (int i = 0; i < getLength(); ++i) {
+            sb.append("\ninstruction[").append(i).append("]: ").append(getRepresentation().get(i)).append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public double fitness() {
+        double diff = 0;
+        for (Observation o : manager.getTargets()) {
+            eval(o);
+            diff += Math.pow(o.getOutput(0) - o.getPredictedOutput(0), 2);
+        }
+        return diff;
+    }
+
+    @Override
+    protected void checkValidity(List<Instruction> representation) {
+    }
+
+    @Override
+    public AbstractListChromosome<Instruction> newCopy(List<Instruction> list) {
+        LGPChromosome clone = new LGPChromosome(list, manager);
+        for (int i = 0; i < registerSet.size(); i++) {
+            clone.registerSet.add(registerSet.get(i).makeCopy());
+        }
+        for (int i = 0; i < constantSet.size(); i++) {
+            clone.constantSet.add(constantSet.get(i).makeCopy());
+        }
+        for (int i = 0; i < operatorSet.size(); i++) {
+            clone.operatorSet.add(operatorSet.get(i).makeCopy());
+        }
+        return clone;
     }
 }

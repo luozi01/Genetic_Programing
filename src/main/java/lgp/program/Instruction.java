@@ -3,6 +3,7 @@ package lgp.program;
 import genetics.utils.RandEngine;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.gp.LGPChromosome;
+import lgp.solver.LinearGP;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,21 +1,16 @@
 package treegp.solver;
 
-import genetics.Fitness;
 import genetics.Population;
-import treegp.gp.TGA;
-import treegp.gp.TGPChromosome;
-import treegp.gp.TGPGenerator;
+import org.apache.commons.math3.genetics.Chromosome;
+import treegp.gp.*;
 
 public class TGPSolver {
-    private TGA<TGPChromosome> environment;
-    private FitnessCalc fitnessCalc;
+    private TGA environment;
 
-    public TGPSolver(TreeGP manager, FitnessCalc fitnessCalc) {
-        this.fitnessCalc = fitnessCalc;
-        TGPFitness TGPFitness = new TGPFitness(fitnessCalc);
-        Population<TGPChromosome> population = new Population<>(new TGPGenerator(manager));
-        environment = new TGA<>(population, TGPFitness);
-        environment.setManager(manager);
+    public TGPSolver(TreeGP manager) {
+        Population population = new Population(new TGPGenerator(manager));
+        environment = new TGA(population, new Crossover(manager),
+                new MicroMutation(manager), new MacroMutation(manager), manager);
     }
 
     public void addIterationListener(final TGPListener listener) {
@@ -27,6 +22,10 @@ public class TGPSolver {
         environment.evolve(iteration);
     }
 
+    public void evolve() {
+        environment.evolve();
+    }
+
     public void terminate() {
         environment.terminate();
     }
@@ -36,27 +35,14 @@ public class TGPSolver {
     }
 
     public TGPChromosome getBestGene() {
-        return environment.getBest();
+        return (TGPChromosome) environment.getBest();
     }
 
-    public double fitness(TGPChromosome chromosome) {
-        return fitnessCalc.fitness(chromosome);
+    public double fitness(Chromosome chromosome) {
+        return chromosome.getFitness();
     }
 
     public interface TGPListener {
         void update(TGPSolver solver);
-    }
-
-    private class TGPFitness implements Fitness<TGPChromosome> {
-        private FitnessCalc fitnessCalc;
-
-        TGPFitness(FitnessCalc fitnessCalc) {
-            this.fitnessCalc = fitnessCalc;
-        }
-
-        @Override
-        public double calc(TGPChromosome chromosome) {
-            return fitnessCalc.fitness(chromosome);
-        }
     }
 }

@@ -1,24 +1,25 @@
 package examples.EvoImage;
 
 
-import genetics.Chromosome;
-import genetics.Fitness;
-import genetics.GeneticAlgorithm;
-import genetics.Population;
+import genetics.*;
+import org.apache.commons.math3.genetics.MutationPolicy;
 
-public class EvoGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
-    EvoGA(Population<E> pop, Fitness<E> fitness) {
-        super(pop, fitness);
+public class EvoGA extends GeneticAlgorithm {
+    private final MutationPolicy mutate;
+
+    EvoGA(Population pop,final  MutationPolicy mutate) {
+        super(pop);
+        this.mutate = mutate;
     }
 
     @Override
-    protected Population<E> evolvePopulation() {
+    protected Population evolvePopulation() {
         int populationSize = pop.size();
-        Population<E> newPopulation = new Population<>();
+        Population newPopulation = new Population();
 
         for (int i = 0; i < populationSize; i++) {
             newPopulation.addChromosome(pop.getChromosome(i));
-            newPopulation.addChromosome(pop.getChromosome(i).mutate(0));
+            newPopulation.addChromosome(mutate.mutate(pop.getChromosome(i)));
         }
 
         newPopulation.sort(comparator);

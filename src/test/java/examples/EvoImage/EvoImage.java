@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
+import org.apache.commons.math3.genetics.Chromosome;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -29,7 +30,7 @@ public class EvoImage extends Application {
     public void init() {
         BufferedImage img;
         try {
-            img = ImageIO.read(new File("index.jpeg"));
+            img = ImageIO.read(new File("ml.bmp"));
             manager.readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -37,11 +38,11 @@ public class EvoImage extends Application {
     }
 
     private Paintings run() {
-        Population<Paintings> pop = new Population<>(new GraphGenerator(manager));
-        EvoGA<Paintings> ga = new EvoGA<>(pop, new ImageFitCalc());
+        Population pop = new Population(new GraphGenerator(manager));
+        EvoGA ga = new EvoGA(pop, manager.method);
         ga.addIterationListener(environment -> {
-            Paintings bestGene = environment.getBest();
-            FITNESS_TEST = new ImageFitCalc().calc(bestGene);
+            Chromosome bestGene = environment.getBest();
+            FITNESS_TEST = bestGene.getFitness();
             // log to console
             if (FITNESS_TEST < FITNESS_BEST) {
                 FITNESS_BEST = FITNESS_TEST;
@@ -59,7 +60,7 @@ public class EvoImage extends Application {
         long start_time = System.currentTimeMillis();
         ga.evolve();
         System.out.println((System.currentTimeMillis() - start_time) / 60000.0);
-        return ga.getBest();
+        return (Paintings) ga.getBest();
     }
 
     @Override
@@ -70,7 +71,7 @@ public class EvoImage extends Application {
 
         Canvas canvas = new Canvas(manager.MAX_WIDTH, manager.MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Polygon p : best.polygons) {
+        for (Polygon p : best.getPolygons()) {
             gc.setFill(p.getColor());
             gc.fillPolygon(p.x_points, p.y_points, p.n_points);
         }

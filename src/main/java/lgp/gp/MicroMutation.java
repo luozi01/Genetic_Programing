@@ -3,10 +3,18 @@ package lgp.gp;
 import genetics.utils.RandEngine;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
 
 import java.util.List;
 
-class MicroMutation {
+public class MicroMutation implements MutationPolicy {
+
+    private LinearGP manager;
+
+    public MicroMutation(LinearGP manager) {
+        this.manager = manager;
+    }
 
     /// <summary>
     /// the micro-mutation is derived from Linear Genetic Programming 2004 chapter 6 section 6.2.2
@@ -22,7 +30,7 @@ class MicroMutation {
     /// 3. if micro-mutate-constant type is selected, then randomly pick an effective instruction with a constant as one
     /// of its register value, mutate the constant to c+$N(0, \omega_{\mu}$
     /// </summary>
-    static void apply(LGPChromosome chromosome) {
+    private Chromosome apply(LGPChromosome chromosome) {
         double mutateOperatorRate = chromosome.getManager().getMicroMutateOperatorRate();
         double mutateRegisterRate = chromosome.getManager().getMicroMutateRegisterRate();
         double mutateConstantRate = chromosome.getManager().getMicroMutateConstantRate();
@@ -35,14 +43,16 @@ class MicroMutation {
         double operator_sector = mutateOperatorRate;
         double register_sector = operator_sector + mutateRegisterRate;
 
-        double r = chromosome.getManager().getRandEngine().uniform();
+        double r = manager.getRandEngine().uniform();
         if (r < operator_sector) {
-            mutateInstructionOperator(chromosome, chromosome.getManager().getRandEngine());
+            mutateInstructionOperator(chromosome, manager.getRandEngine());
         } else if (r < register_sector) {
-            mutateInstructionRegister(chromosome, chromosome.getManager().getRandEngine());
+            mutateInstructionRegister(chromosome, manager.getRandEngine());
         } else {
-            mutateInstructionConstant(chromosome, chromosome.getManager());
+            mutateInstructionConstant(chromosome);
         }
+
+        return chromosome;
     }
 
     /**
@@ -51,9 +61,8 @@ class MicroMutation {
      * c:=c + normal(mean:=0, standard_deviation)
      *
      * @param chromosome chromosome
-     * @param manager    manager
      */
-    private static void mutateInstructionConstant(LGPChromosome chromosome, LinearGP manager) {
+    private void mutateInstructionConstant(LGPChromosome chromosome) {
         Instruction selected = null;
         for (Instruction instruction : chromosome.getInstructions()) {
             if (!instruction.isStructuralIntron() &&
@@ -67,7 +76,7 @@ class MicroMutation {
         }
     }
 
-    private static void mutateInstructionRegister(LGPChromosome chromosome, RandEngine randEngine) {
+    private void mutateInstructionRegister(LGPChromosome chromosome, RandEngine randEngine) {
         final List<Instruction> instructions = chromosome.getInstructions();
         final int instructionCount = instructions.size();
         Instruction selected_instruction = instructions.get(randEngine.nextInt(instructionCount));
@@ -81,10 +90,18 @@ class MicroMutation {
         selected_instruction.mutateRegister(chromosome, randEngine, p_const);
     }
 
-    private static void mutateInstructionOperator(LGPChromosome chromosome, RandEngine randEngine) {
+    private void mutateInstructionOperator(LGPChromosome chromosome, RandEngine randEngine) {
         final List<Instruction> instructions = chromosome.getInstructions();
         final int instructionCount = instructions.size();
         Instruction instruction = instructions.get(randEngine.nextInt(instructionCount));
         instruction.setOperator(chromosome.getRandomOperator());
+    }
+
+    @Override
+    public Chromosome mutate(Chromosome chromosome) {
+        if (!(chromosome instanceof LGPChromosome)) {
+            throw new IllegalArgumentException("Chromosome should be TGPChromosome");
+        }
+        return apply(((LGPChromosome) chromosome).makeCopy());
     }
 }

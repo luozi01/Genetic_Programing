@@ -1,25 +1,42 @@
 package treegp.gp;
 
+import genetics.CrossoverPolicy;
 import genetics.utils.RandEngine;
+import org.apache.commons.math3.genetics.Chromosome;
 import treegp.enums.TGPCrossoverStrategy;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;
 import treegp.tools.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-class Crossover {
+public class Crossover implements CrossoverPolicy {
+
+    private TreeGP manager;
+
+    public Crossover(TreeGP manager) {
+        this.manager = manager;
+    }
+
+    @Override
+    public List<Chromosome> crossover(Chromosome c1, Chromosome c2) {
+        if (!(c1 instanceof TGPChromosome && c2 instanceof TGPChromosome)) {
+            throw new IllegalArgumentException("Both chromosome should be TGPChromosome");
+        }
+        return apply(((TGPChromosome) c1).makeCopy(), ((TGPChromosome) c2).makeCopy());
+    }
 
     //Todo simplify
+
     /**
      * Method that implements the subtree crossover described in Section 2.4 of "A Field Guide to Genetic Programming"
      *
      * @param chromosome1 One tree to be crossover with
      * @param chromosome2 Another tree to be crossover with
-     * @param manager     GP data
      */
-    static void apply(TGPChromosome chromosome1, TGPChromosome chromosome2, TreeGP manager) {
+    private List<Chromosome> apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
         int iMaxDepthForCrossover = manager.maxDepthForCrossover;
         TGPCrossoverStrategy method = manager.crossoverStrategy;
 
@@ -76,9 +93,10 @@ class Crossover {
                 swap(pCutPoint1, pCutPoint2);
             }
         }
+        return Arrays.asList(chromosome1, chromosome2);
     }
 
-    private static Pair<Pair<TreeNode>> swap(Pair<TreeNode> cutPoint1, Pair<TreeNode> cutPoint2) {
+    private Pair<Pair<TreeNode>> swap(Pair<TreeNode> cutPoint1, Pair<TreeNode> cutPoint2) {
         TreeNode parent1 = cutPoint1._2();
         TreeNode parent2 = cutPoint2._2();
 

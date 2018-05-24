@@ -5,11 +5,12 @@ import genetics.Generator;
 import lgp.enums.LGPInitialization;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
+import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LGPGenerator implements Generator<LGPChromosome> {
+public class LGPGenerator implements Generator {
 
     private LinearGP manager;
 
@@ -18,8 +19,8 @@ public class LGPGenerator implements Generator<LGPChromosome> {
     }
 
     @Override
-    public List<LGPChromosome> generate() {
-        List<LGPChromosome> pop = new ArrayList<>();
+    public List<Chromosome> generate() {
+        List<Chromosome> pop = new ArrayList<>();
         if (manager.getInitialization() == LGPInitialization.CONSTANT_LENGTH) {
             pop = initializeWithConstantLength();
         } else if (manager.getInitialization() == LGPInitialization.VARIABLE_LENGTH) {
@@ -28,8 +29,8 @@ public class LGPGenerator implements Generator<LGPChromosome> {
         return pop;
     }
 
-    private List<LGPChromosome> initializeWithVariableLength() {
-        List<LGPChromosome> list = new ArrayList<>();
+    private List<Chromosome> initializeWithVariableLength() {
+        List<Chromosome> list = new ArrayList<>();
         for (int i = 0; i < manager.getPopulationSize(); ++i) {
             int length = manager.getRandEngine().nextInt(manager.getPopInitMinProgramLength(),
                     manager.getPopInitMaxProgramLength());
@@ -38,16 +39,16 @@ public class LGPGenerator implements Generator<LGPChromosome> {
         return list;
     }
 
-    private List<LGPChromosome> initializeWithConstantLength() {
-        List<LGPChromosome> list = new ArrayList<>();
+    private List<Chromosome> initializeWithConstantLength() {
+        List<Chromosome> list = new ArrayList<>();
         for (int i = 0; i < manager.getPopulationSize(); ++i) {
             list.add(initialize(manager.getPopInitConstantProgramLength()));
         }
         return list;
     }
 
-    private LGPChromosome initialize(int instructionCount) {
-        LGPChromosome chromosome = new LGPChromosome(manager);
+    private Chromosome initialize(int instructionCount) {
+        LGPChromosome chromosome = new LGPChromosome(new ArrayList<>(), manager);
         chromosome.addConstant(manager.getConstantSet());
 
         final int registerCount = manager.getRegisterCount();
@@ -55,11 +56,12 @@ public class LGPGenerator implements Generator<LGPChromosome> {
 
         chromosome.addOperators(manager.getOperatorSet());
 
+        List<Instruction> instructions = new ArrayList<>();
         for (int i = 0; i < instructionCount; ++i) {
             Instruction newInst = new Instruction();
             newInst.initialize(chromosome, manager.getRandEngine());
-            chromosome.getInstructions().add(newInst);
+            instructions.add(newInst);
         }
-        return chromosome;
+        return chromosome.newCopy(instructions);
     }
 }

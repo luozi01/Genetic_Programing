@@ -1,6 +1,8 @@
 package treegp.gp;
 
 import genetics.utils.RandEngine;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
 import treegp.program.Operator;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;
@@ -8,7 +10,14 @@ import treegp.solver.TreeGP;
 import java.util.ArrayList;
 import java.util.List;
 
-class MicroMutation {
+public class MicroMutation implements MutationPolicy {
+
+    private TreeGP manager;
+
+    public MicroMutation(TreeGP manager) {
+        this.manager = manager;
+    }
+
     /**
      * Method that implements the "Point Mutation" described in
      * Section 2.4 of "A Field Guide to Genetic Programming"
@@ -16,9 +25,8 @@ class MicroMutation {
      * this is also described as node replacement mutation
      *
      * @param treeNode tree node
-     * @param manager  gp related data
      */
-    static void apply(TGPChromosome treeNode, TreeGP manager) {
+    private Chromosome apply(TGPChromosome treeNode) {
         RandEngine randEngine = manager.randEngine;
         TreeNode node = treeNode.getRoot().anyNode(randEngine)._1();
 
@@ -43,5 +51,14 @@ class MicroMutation {
             }
             if (!candidates.isEmpty()) node.setOp(candidates.get(randEngine.nextInt(candidates.size())));
         }
+        return treeNode;
+    }
+
+    @Override
+    public Chromosome mutate(Chromosome chromosome) {
+        if (!(chromosome instanceof TGPChromosome)) {
+            throw new IllegalArgumentException("Chromosome should be TGPChromosome");
+        }
+        return apply(((TGPChromosome) chromosome).makeCopy());
     }
 }

@@ -1,36 +1,35 @@
 package examples.EvoImage;
 
-import genetics.Chromosome;
+import genetics.AbstractListChromosome;
+import org.jblas.DoubleMatrix;
 
 import java.util.List;
 
-public class Paintings implements Chromosome<Paintings> {
+public class Paintings extends AbstractListChromosome<Polygon> {
+
     EvoManager manager;
-    Polygon[] polygons;
 
-    Paintings(EvoManager manager) {
+    Paintings(List<Polygon> polygons, EvoManager manager) {
+        super(polygons);
         this.manager = manager;
-        polygons = new Polygon[manager.MAX_SHAPES];
+    }
+
+    public List<Polygon> getPolygons() {
+        return getRepresentation();
     }
 
     @Override
-    public List<Paintings> crossover(Paintings chromosome, double uniformRate) {
-        return null;
+    protected void checkValidity(List<Polygon> representation) {
     }
 
     @Override
-    public Paintings mutate(double mutationRate) {
-        Paintings clone = makeCopy();
-        manager.method.apply(clone.polygons, manager, manager.randEngine);
-        return clone;
+    public AbstractListChromosome<Polygon> newCopy(List<Polygon> list) {
+        return new Paintings(list, manager);
     }
 
     @Override
-    public Paintings makeCopy() {
-        Paintings clone = new Paintings(manager);
-        for (int i = 0; i < manager.MAX_SHAPES; i++) {
-            clone.polygons[i] = polygons[i].clone();
-        }
-        return clone;
+    public double fitness() {
+        DoubleMatrix color = manager.toImage(getRepresentation());
+        return color.sub(manager.image_colors).norm1();
     }
 }

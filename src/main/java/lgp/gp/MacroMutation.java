@@ -3,11 +3,21 @@ package lgp.gp;
 import genetics.utils.RandEngine;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-class MacroMutation {
+public class MacroMutation implements MutationPolicy {
+
+    private LinearGP manager;
+
+    public MacroMutation(LinearGP manager) {
+        this.manager = manager;
+    }
+
     // This is derived from Algorithm 6.1 (Section 6.2.1) of Linear Genetic Programming
     // Macro instruction mutations either insert or delete a single instruction.
     // In doing so, they change absolute program length with minimum step size on the
@@ -20,14 +30,14 @@ class MacroMutation {
     // and an insertion at the same time. A further, but important argument against
     // substitution of single instructions is that these do not vary program length. If
     // single instruction would only be exchanged there would be no code growth.
-    static void apply(LGPChromosome chromosome, LinearGP manager, RandEngine randEngine) {
+    private Chromosome apply(LGPChromosome chromosome, RandEngine randEngine) {
         double r = randEngine.uniform();
-        List<Instruction> instructions = chromosome.getInstructions();
+        List<Instruction> instructions = new ArrayList<>(chromosome.getInstructions());
         if (chromosome.getInstructions().size() < manager.getMacroMutateMaxProgramLength() &&
                 (r < manager.getMacroMutateInsertionRate() ||
                         chromosome.getInstructions().size() == manager.getMacroMutateMinProgramLength())) {
             Instruction inserted_instruction = new Instruction();
-            inserted_instruction.initialize(chromosome, chromosome.getManager().getRandEngine());
+            inserted_instruction.initialize(chromosome, randEngine);
             int loc = randEngine.nextInt(chromosome.getInstructions().size());
 
             if (loc == chromosome.getInstructions().size() - 1) { // if random pos at last, add last directly
@@ -71,5 +81,15 @@ class MacroMutation {
             }
             instructions.remove(loc);
         }
+
+        return chromosome.newCopy(instructions);
+    }
+
+    @Override
+    public Chromosome mutate(Chromosome chromosome) {
+        if (!(chromosome instanceof LGPChromosome)) {
+            throw new IllegalArgumentException("Chromosome should be TGPChromosome");
+        }
+        return apply(((LGPChromosome) chromosome).makeCopy(), manager.getRandEngine());
     }
 }

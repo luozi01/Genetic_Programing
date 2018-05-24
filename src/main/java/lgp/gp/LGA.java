@@ -1,64 +1,71 @@
 package lgp.gp;
 
 
-import genetics.Chromosome;
-import genetics.Fitness;
-import genetics.GeneticAlgorithm;
-import genetics.Population;
+import genetics.*;
 import genetics.utils.RandEngine;
 import lgp.solver.LinearGP;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
 
-public class LGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
+import java.util.List;
 
-    private LinearGP manager = new LinearGP();
+public class LGA extends GeneticAlgorithm {
 
-    public LGA(Population<E> pop, Fitness<E> fitness) {
-        super(pop, fitness);
-    }
+    private final CrossoverPolicy crossoverPolicy;
+    private final MutationPolicy micro, macro;
+    private final LinearGP manager;
 
-    public void setManager(LinearGP manager) {
+    public LGA(Population pop, final CrossoverPolicy crossoverPolicy,
+               final MutationPolicy micro, final MutationPolicy macro, final LinearGP manager) {
+        super(pop);
+        this.crossoverPolicy = crossoverPolicy;
+        this.micro = micro;
+        this.macro = macro;
         this.manager = manager;
     }
 
     @Override
-    protected Population<E> evolvePopulation() {
+    protected Population evolvePopulation() {
         RandEngine randEngine = manager.getRandEngine();
-        Population<E> pop = new Population<>();
+        Population pop = new Population();
         int iPopSize = manager.getPopulationSize();
         int program_count = 0;
+
+        //Todo keep elite
 
         int computationBudget = iPopSize * 8;
         int counter = 0;
         while (program_count < iPopSize && counter < computationBudget) {
 
-            E gp1 = tournamentSelection(manager.getTournamentSize());
-            E gp2 = tournamentSelection(manager.getTournamentSize());
+            Chromosome gp1 = tournamentSelection(manager.getTournamentSize());
+            Chromosome gp2 = tournamentSelection(manager.getTournamentSize());
 
             double r = randEngine.uniform();
             if (r < manager.getCrossoverRate()) {
-                for (E e : gp1.crossover(gp2, 0)) {
-                    pop.addChromosome(e.makeCopy());
+                List<Chromosome> list = crossoverPolicy.crossover(gp1, gp2);
+                for (Chromosome e : list) {
+                    pop.addChromosome(e);
                 }
             }
 
             r = randEngine.uniform();
             if (r < manager.getMacroMutationRate()) {
-                pop.addChromosome(gp1.mutate(1));
+                pop.addChromosome(macro.mutate(gp1));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMacroMutationRate()) {
-                pop.addChromosome(gp2.mutate(1));
+                pop.addChromosome(macro.mutate(gp2));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMicroMutationRate()) {
-                pop.addChromosome(gp1.mutate(0));
+                pop.addChromosome(micro.mutate(gp1));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMicroMutationRate()) {
-                pop.addChromosome(gp2.mutate(0));
+                pop.addChromosome(micro.mutate(gp2));
             }
             counter++;
         }

@@ -1,6 +1,7 @@
 package lgp.solver;
 
 
+import genetics.utils.Observation;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import lgp.enums.LGPCrossover;
@@ -12,15 +13,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 @Getter
 @Setter
 public class LinearGP {
-    private double regPosInf = 10000000;
-    private double regNegInf = -10000000;
     private RandEngine randEngine = new SimpleRandEngine();
 
     private int populationSize = 500;
@@ -76,18 +75,17 @@ public class LinearGP {
     private int tournamentSize = 3;
     // END
 
+    private List<Observation> targets = new LinkedList<>();
+
     public static LinearGP defaultConfig() {
         LinearGP lgp = new LinearGP();
-        lgp.getOperatorSet().addAll(list(new ADD(), new SUB(), new DIV(), new MUL(), new POW(), new IFGREATERTHAN()));
+        lgp.getOperatorSet().addAll(Arrays.asList(new ADD(), new SUB(), new DIV(), new MUL(), new POW(), new IFGREATERTHAN()));
         lgp.addConstants(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0);
         return lgp;
     }
 
-    @SafeVarargs
-    private static <T> List<T> list(T... items) {
-        List<T> list = new LinkedList<>();
-        Collections.addAll(list, items);
-        return list;
+    public void addObservations(List<Observation> targets) {
+        this.targets.addAll(targets);
     }
 
     private void addConstants(double... constants) {
@@ -95,4 +93,5 @@ public class LinearGP {
             constantSet.add(constant);
         }
     }
+
 }

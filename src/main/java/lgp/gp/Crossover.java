@@ -1,30 +1,50 @@
 package lgp.gp;
 
+import genetics.CrossoverPolicy;
 import genetics.utils.RandEngine;
 import lgp.enums.LGPCrossover;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
+import org.apache.commons.math3.genetics.Chromosome;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-class Crossover {
-    static void apply(LGPChromosome gp1, LGPChromosome gp2, LinearGP manager) {
+public class Crossover implements CrossoverPolicy {
+
+    private LinearGP manager;
+
+    public Crossover(LinearGP manager) {
+        this.manager = manager;
+    }
+
+    @Override
+    public List<Chromosome> crossover(Chromosome c1, Chromosome c2) {
+        if (!(c1 instanceof LGPChromosome && c2 instanceof LGPChromosome)) {
+            throw new IllegalArgumentException("Both chromosome should be TGPChromosome");
+        }
+        return apply(((LGPChromosome) c1).makeCopy(), ((LGPChromosome) c2).makeCopy());
+    }
+
+    private List<Chromosome> apply(LGPChromosome gp1, LGPChromosome gp2) {
         LGPCrossover crossoverType = manager.getCrossoverStrategy();
+        List<Chromosome> chromosome;
         switch (crossoverType) {
             case LINEAR:
-                linearCrossover(gp1, gp2, manager);
+                chromosome = linearCrossover(gp1, gp2);
                 break;
             case ONE_POINT:
-                onePointCrossover(gp1, gp2, manager);
+                chromosome = onePointCrossover(gp1, gp2);
                 break;
             case ONE_SEGMENT:
-                oneSegmentCrossover(gp1, gp2, manager);
+                chromosome = oneSegmentCrossover(gp1, gp2);
                 break;
             default:
                 throw new NotImplementedException();
         }
+        return chromosome;
     }
 
     /* Xianshun says: (From Section 5.7.3 of Linear Genetic Programming
@@ -41,7 +61,7 @@ class Crossover {
 
        Standard linear crossover may also be referred to as two-segment recompilations, in these terms.
     */
-    private static void oneSegmentCrossover(LGPChromosome gp1, LGPChromosome gp2, LinearGP manager) {
+    private List<Chromosome> oneSegmentCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
         double prob_r = randEngine.uniform();
         if (gp1.length() < manager.getMaxProgramLength() &&
@@ -82,12 +102,13 @@ class Crossover {
                 gp1.getInstructions().remove(j);
             }
         }
+        return Arrays.asList(gp1, gp2);
     }
 
     /*
     This operator is derived from Algorithm 5.2 in Section 5.7.2 of Linear Genetic Programming
     */
-    private static void onePointCrossover(LGPChromosome gp1, LGPChromosome gp2, LinearGP manager) {
+    private List<Chromosome> onePointCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
 
         // length(gp1) <= length(gp2)
@@ -191,12 +212,13 @@ class Crossover {
             i.resign(gp2);
             instructions2.add(i);
         }
+        return Arrays.asList(gp1.newCopy(instructions1), gp2.newCopy(instructions2));
     }
 
     //Todo need to optimize
     // this is derived from Algorithm 5.1 of Section 5.7.1 of Linear Genetic Programming
     // this linear crossover can also be considered as two-point crossover
-    private static void linearCrossover(LGPChromosome gp1, LGPChromosome gp2, LinearGP manager) {
+    private List<Chromosome> linearCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
 
         // length(gp1) <= length(gp2)
@@ -246,19 +268,15 @@ class Crossover {
             segment_length_difference = (s1_length > s2_length) ? (s1_length - s2_length) : (s2_length - s1_length);
         }
 
-        if (((gp2.length() - (s2_length - s1_length)) < manager.getMinProgramLength() ||
-                ((gp1.length() + (s2_length - s1_length)) > manager.getMaxProgramLength()))) {
+        if (gp2.length() - (s2_length - s1_length) < manager.getMinProgramLength() ||
+                ((gp1.length() + (s2_length - s1_length)) > manager.getMaxProgramLength())) {
             if (randEngine.uniform() < 0.5) {
                 s2_length = s1_length;
             } else {
                 s1_length = s2_length;
             }
-            if ((i1 + s1_length) > gp1.length()) {
-                s1_length = gp1.length() - i1;
-            }
-            if ((i2 + s2_length) > gp2.length()) {
-                s2_length = gp2.length() - i2;
-            }
+            if (i1 + s1_length > gp1.length()) s1_length = gp1.length() - i1;
+            if (i2 + s2_length > gp2.length()) s2_length = gp2.length() - i2;
         }
 
 
@@ -293,8 +311,8 @@ class Crossover {
             instructions2_3.add(instructions2.get(i));
         }
 
-        instructions1.clear();
-        instructions2.clear();
+        instructions1 = new ArrayList<>();
+        instructions2 = new ArrayList<>();
 
         for (int i = 0; i < i1; ++i) {
             instructions1.add(instructions1_1.get(i));
@@ -315,5 +333,6 @@ class Crossover {
             instructions2.add(clone);
         }
         instructions2.addAll(instructions2_3);
+        return Arrays.asList(gp1.newCopy(instructions1), gp2.newCopy(instructions2));
     }
 }

@@ -1,13 +1,13 @@
 package examples.Symbolic_engine;
 
 import genetics.utils.Observation;
-import treegp.gp.TGPChromosome;
+import org.apache.commons.math3.genetics.Chromosome;
 import treegp.program.Operator;
-import treegp.solver.FitnessCalc;
 import treegp.solver.TGPSolver;
 import treegp.solver.TreeGP;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static treegp.program.Type.*;
 
@@ -22,14 +22,12 @@ public class TGPTest {
         List<Observation> testing = list.subList(split_point, list.size());
         System.out.printf("Training: %d\t Testing: %d\t\n", training.size(), testing.size());
 
-        TabulatedFunctionFitness fitnessFunction = new TabulatedFunctionFitness(training);
-        List<Operator> func = new ArrayList<>(
-                Arrays.asList(ADD, SUB, MUL, VARIABLE, CONSTANT));
-        TreeGP env = new TreeGP(func, list("x", "y", "z"));
-        TGPSolver solver = new TGPSolver(env, fitnessFunction);
+        List<Operator> func = Arrays.asList(ADD, SUB, MUL, VARIABLE, CONSTANT);
+        TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"), training);
+        TGPSolver solver = new TGPSolver(env);
         addListener(solver);
         Long startTime = System.currentTimeMillis();
-        solver.evolve(100000);
+        solver.evolve();
         System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
 
         test(solver, testing, false);
@@ -53,7 +51,7 @@ public class TGPTest {
     private static void addListener(TGPSolver engine) {
         engine.addIterationListener(engine1 -> {
 
-            TGPChromosome bestGene = engine1.getBestGene();
+            Chromosome bestGene = engine1.getBestGene();
 
             double bestFit = engine1.fitness(bestGene);
 
@@ -67,37 +65,6 @@ public class TGPTest {
                 System.out.printf("Function: %s\n", bestGene);
             }
         });
-    }
-
-    @SafeVarargs
-    private static <T> List<T> list(T... items) {
-        List<T> list = new LinkedList<>();
-        Collections.addAll(list, items);
-        return list;
-    }
-
-    private static class TabulatedFunctionFitness implements FitnessCalc {
-
-        private List<Observation> targets = new LinkedList<>();
-
-        TabulatedFunctionFitness(List<Observation> targets) {
-            this.targets.addAll(targets);
-        }
-
-        @Override
-        public double fitness(TGPChromosome expression) {
-            double diff = 0;
-
-            for (Observation o : this.targets) {
-                for (int i = 0; i < o.inputCount(); i++) {
-                    expression.getManager().setVariable(o.getTextInput(i), o.getInput(i));
-                }
-                double targetValue = o.getOutput(0);
-                double calculatedValue = expression.eval();
-                diff += Math.pow(targetValue - calculatedValue, 2);
-            }
-            return diff;
-        }
     }
 }
 

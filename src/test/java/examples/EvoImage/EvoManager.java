@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
+import org.apache.commons.math3.genetics.MutationPolicy;
 import org.jblas.DoubleMatrix;
 
 import java.awt.image.BufferedImage;
@@ -22,13 +23,13 @@ class EvoManager {
 
     int MAX_WIDTH;
     int MAX_HEIGHT;
-    int MAX_SHAPES = 500;    // max capacity
-    int MAX_POINTS = 12;
+    int MAX_SHAPES = 50;    // max capacity
+    int MAX_POINTS = 6;
     int ACTUAL_SHAPES = MAX_SHAPES;
     int ACTUAL_POINTS = MAX_POINTS;
 
     DoubleMatrix image_colors;
-    Mutations method = MEDIUM;
+    MutationPolicy method = MEDIUM;
     Colors choice = BLACK;
     RandEngine randEngine = new SimpleRandEngine();
 
@@ -52,7 +53,7 @@ class EvoManager {
         image_colors = new DoubleMatrix(color);
     }
 
-    DoubleMatrix toImage(Polygon[] polygons) {
+    DoubleMatrix toImage(List<Polygon> polygons) {
         Group root = new Group();
 
         Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);

@@ -1,6 +1,7 @@
 package treegp.gp;
 
 import genetics.Generator;
+import org.apache.commons.math3.genetics.Chromosome;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.program.SyntaxTreeUtils;
 import treegp.program.TreeNode;
@@ -9,7 +10,7 @@ import treegp.solver.TreeGP;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TGPGenerator implements Generator<TGPChromosome> {
+public class TGPGenerator implements Generator {
 
     private TreeGP manager;
 
@@ -18,8 +19,8 @@ public class TGPGenerator implements Generator<TGPChromosome> {
     }
 
     @Override
-    public List<TGPChromosome> generate() {
-        List<TGPChromosome> pop = new ArrayList<>();
+    public List<Chromosome> generate() {
+        List<Chromosome> pop = new ArrayList<>();
         TGPInitializationStrategy initializationStrategy = manager.popInitStrategy;
         if (initializationStrategy == TGPInitializationStrategy.INITIALIZATION_METHOD_FULL
                 || initializationStrategy == TGPInitializationStrategy.INITIALIZATION_METHOD_GROW
@@ -35,7 +36,7 @@ public class TGPGenerator implements Generator<TGPChromosome> {
         return pop;
     }
 
-    private List<TGPChromosome> initializeRampedHalfHalf(int populationSize) {
+    private List<Chromosome> initializeRampedHalfHalf(int populationSize) {
         int maxDepthForCreation = manager.maxDepthForCreation;
         int part_count = maxDepthForCreation - 1;
 
@@ -43,7 +44,7 @@ public class TGPGenerator implements Generator<TGPChromosome> {
         int interval2 = interval / 2;
 
 
-        List<TGPChromosome> pop = new ArrayList<>();
+        List<Chromosome> pop = new ArrayList<>();
         for (int i = 0; i < part_count; i++) {
             for (int j = 0; j < interval2; ++j) {
                 TreeNode node = SyntaxTreeUtils.createWithDepth(manager, i + 2,
@@ -67,8 +68,8 @@ public class TGPGenerator implements Generator<TGPChromosome> {
         return pop;
     }
 
-    private List<TGPChromosome> initializeRamped(int populationSize) {
-        List<TGPChromosome> pop = new ArrayList<>();
+    private List<Chromosome> initializeRamped(int populationSize) {
+        List<Chromosome> pop = new ArrayList<>();
         int maxDepthForCreation = manager.maxDepthForCreation;
         int part_count = maxDepthForCreation - 1;
 
@@ -99,8 +100,8 @@ public class TGPGenerator implements Generator<TGPChromosome> {
         return pop;
     }
 
-    private List<TGPChromosome> initializeNotRamped(int populationSize) {
-        List<TGPChromosome> pop = new ArrayList<>();
+    private List<Chromosome> initializeNotRamped(int populationSize) {
+        List<Chromosome> pop = new ArrayList<>();
         for (int i = 0; i < populationSize; i++) {
             TreeNode node = SyntaxTreeUtils.createWithDepth(manager, manager.maxProgramDepth,
                     manager, manager.popInitStrategy);

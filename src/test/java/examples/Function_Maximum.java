@@ -2,18 +2,22 @@ package examples;
 
 import genetics.*;
 import org.apache.commons.math3.analysis.TrivariateFunction;
+import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Function_Maximum {
+
+    private static final TrivariateFunction function = (x, y, z) -> (-x * x + 1000000.0 * x - y * y - 40000.0 * y - z * z);
+
     public static void main(String[] args) {
-        Population<Solve> population = new Population<>(new SolveGenerate(100));
-        GeneticAlgorithm<Solve> ga = new GeneticAlgorithm<>(population, new FuncFitness());
+        Population population = new Population(new SolveGenerate(100));
+        GeneticAlgorithm ga = new GeneticAlgorithm(population, new UniformCrossover<>(.4),
+                .4, new BinaryMutation(), .02, 3, 1);
         ga.evolve(1000);
         String output = ga.getBest().toString();
-        System.out.println(output);
+        System.out.println(ga.getBest().getFitness());
         System.out.println(output.substring(0, 32) + " " +
                 (int) Long.parseLong(output.substring(0, 32), 2));
         System.out.println(output.substring(32, 64) + " " +
@@ -22,57 +26,45 @@ public class Function_Maximum {
                 (int) Long.parseLong(output.substring(64, 96), 2));
     }
 
-    static class Solve implements Chromosome<Solve> {
+    static class Solve extends BinaryChromosome {
 
-        private byte[] genes = new byte[96];
-
-        @Override
-        public List<Solve> crossover(Solve chromosome, double uniformRate) {
-            Solve gene1 = new Solve();
-            Solve gene2 = new Solve();
-            // Loop through genes
-            for (int i = 0; i < genes.length; i++) {
-                // Crossover
-                if (Math.random() <= uniformRate) {
-                    gene1.genes[i] = genes[i];
-                    gene2.genes[i] = chromosome.genes[i];
-                } else {
-                    gene1.genes[i] = chromosome.genes[i];
-                    gene1.genes[i] = genes[i];
-                }
-            }
-            return new ArrayList<>(Arrays.asList(gene1, gene2));
+        Solve(List<Integer> representation) {
+            super(representation);
         }
 
-        @Override
-        public Solve mutate(double mutationRate) {
-            Solve clone = makeCopy();
-            for (int i = 0; i < clone.genes.length; i++) {
-                if (Math.random() <= mutationRate) {
-                    clone.genes[i] = (byte) Math.round(Math.random());
-                }
-            }
-            return clone;
-        }
-
-        @Override
-        public Solve makeCopy() {
-            Solve copy = new Solve();
-            copy.genes = genes.clone();
-            return copy;
+        Solve() {
+            super(BinaryChromosome.randomBinaryRepresentation(96));
         }
 
         @Override
         public String toString() {
             StringBuilder geneString = new StringBuilder();
-            for (byte gene : genes) {
+            for (Integer gene : getRepresentation()) {
                 geneString.append(gene);
             }
             return geneString.toString();
         }
+
+        @Override
+        public AbstractListChromosome<Integer> newCopy(List<Integer> list) {
+            return new Solve(list);
+        }
+
+        @Override
+        public double fitness() {
+            int length = getLength();
+            String gene = toString();
+            return -function((int) Long.parseLong(gene.substring(0, length / 3), 2),
+                    (int) Long.parseLong(gene.substring(length / 3, length * 2 / 3), 2),
+                    (int) Long.parseLong(gene.substring(length * 2 / 3, length), 2));
+        }
+
+        private double function(int x, int y, int z) {
+            return function.value(x, y, z);
+        }
     }
 
-    static class SolveGenerate implements Generator<Solve> {
+    static class SolveGenerate implements Generator {
 
         private int populationSize;
 
@@ -81,41 +73,13 @@ public class Function_Maximum {
         }
 
         @Override
-        public List<Solve> generate() {
-            List<Solve> list = new ArrayList<>();
+        public List<Chromosome> generate() {
+            List<Chromosome> list = new ArrayList<>();
             for (int i = 0; i < populationSize; i++) {
                 Solve solve = new Solve();
-                for (int j = 0; j < solve.genes.length; j++) {
-                    solve.genes[j] = (byte) Math.round(Math.random());
-                }
                 list.add(solve);
             }
             return list;
-        }
-    }
-
-    private static class FuncFitness implements Fitness<Solve> {
-
-        TrivariateFunction function = (x, y, z) -> (-x * x + 1000000.0 * x - y * y - 40000.0 * y - z * z);
-
-        /**
-         * f(x,y,z) = -x^2 + 1000000x - y^2 - 40000y - z^2
-         *
-         * @param x x
-         * @return f(x, y, z)
-         */
-        private double function(int x, int y, int z) {
-            return -function.value(x, y, z);
-        }
-
-        //Todo fix not getting the optimal output
-        @Override
-        public double calc(Solve chromosome) {
-            int length = chromosome.genes.length;
-            String gene = chromosome.toString();
-            return -function((int) Long.parseLong(gene.substring(0, length / 3), 2),
-                    (int) Long.parseLong(gene.substring(length / 3, length * 2 / 3), 2),
-                    (int) Long.parseLong(gene.substring(length * 2 / 3, length), 2));
         }
     }
 }

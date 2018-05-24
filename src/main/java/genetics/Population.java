@@ -1,12 +1,17 @@
 package genetics;
 
-import java.util.*;
+import org.apache.commons.math3.genetics.Chromosome;
 
-public class Population<E extends Chromosome<E>> implements Iterable<E> {
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
-    private List<E> chromosomes;
+public class Population implements Iterable<Chromosome> {
 
-    public Population(Generator<E> generator) {
+    private List<Chromosome> chromosomes;
+
+    public Population(Generator generator) {
         chromosomes = generator.generate();
     }
 
@@ -14,11 +19,11 @@ public class Population<E extends Chromosome<E>> implements Iterable<E> {
         chromosomes = new ArrayList<>();
     }
 
-    public E getChromosome(int index) {
+    public Chromosome getChromosome(int index) {
         return chromosomes.get(index);
     }
 
-    public void addChromosome(E chromosome) {
+    public void addChromosome(Chromosome chromosome) {
         chromosomes.add(chromosome);
     }
 
@@ -26,15 +31,15 @@ public class Population<E extends Chromosome<E>> implements Iterable<E> {
         return chromosomes.size();
     }
 
-    public void sort(Comparator<E> comparator) {
+    public void sort(Comparator<Chromosome> comparator) {
         chromosomes.sort(comparator);
     }
 
-    public E getFirst() {
+    public Chromosome getFirst() {
         return chromosomes.get(0);
     }
 
-    public List<E> getChromosomes() {
+    public List<Chromosome> getChromosomes() {
         return chromosomes;
     }
 
@@ -43,7 +48,7 @@ public class Population<E extends Chromosome<E>> implements Iterable<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
+    public Iterator<Chromosome> iterator() {
         return chromosomes.iterator();
     }
 }

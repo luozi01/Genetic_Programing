@@ -1,41 +1,43 @@
 package treegp.gp;
 
-import genetics.Chromosome;
-import genetics.Fitness;
-import genetics.GeneticAlgorithm;
-import genetics.Population;
+import genetics.*;
 import genetics.utils.RandEngine;
-import treegp.enums.TGPPopulationReplacementStrategy;
+import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.MutationPolicy;
+import treegp.enums.TGPEvolveStrategy;
 import treegp.solver.TreeGP;
 
 import java.util.List;
 
-public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
+public class TGA extends GeneticAlgorithm {
 
-    private TreeGP manager;
+    private final CrossoverPolicy crossoverPolicy;
+    private final MutationPolicy micro, macro;
+    private final TreeGP manager;
 
-    public TGA(Population<E> pop, Fitness<E> fitness) {
-        super(pop, fitness);
-    }
-
-    public void setManager(TreeGP manager) {
+    public TGA(Population pop, final CrossoverPolicy crossoverPolicy,
+               final MutationPolicy micro, final MutationPolicy macro, final TreeGP manager) {
+        super(pop);
+        this.crossoverPolicy = crossoverPolicy;
+        this.micro = micro;
+        this.macro = macro;
         this.manager = manager;
     }
 
     @Override
-    protected Population<E> evolvePopulation() {
-        Population<E> newPop = new Population<>();
-        TGPPopulationReplacementStrategy populationReplacement = manager.replacementStrategy;
-        if (populationReplacement == TGPPopulationReplacementStrategy.MU_PLUS_LAMBDA) {
+    protected Population evolvePopulation() {
+        Population newPop = new Population();
+        TGPEvolveStrategy populationReplacement = manager.replacementStrategy;
+        if (populationReplacement == TGPEvolveStrategy.MU_PLUS_LAMBDA) {
             newPop = muPlusLambdaEvolve(manager.populationSize);
-        } else if (populationReplacement == TGPPopulationReplacementStrategy.TINY_GP) {
+        } else if (populationReplacement == TGPEvolveStrategy.TINY_GP) {
             newPop = tinyGPEvolve(manager.populationSize);
         }
         return newPop;
     }
 
-    private Population<E> muPlusLambdaEvolve(int populationSize) {
-        Population<E> newPopulation = new Population<>();
+    private Population muPlusLambdaEvolve(int populationSize) {
+        Population newPopulation = new Population();
 
         int elite_count = (int) (manager.elitismRatio * populationSize);
 
@@ -55,30 +57,30 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
         //do crossover
         for (int offspring_index = 0; offspring_index < crossover_count; offspring_index += 2) {
 
-            E child1 = tournamentSelection(manager.tournamentSize);
-            E child2 = tournamentSelection(manager.tournamentSize);
+            Chromosome child1 = tournamentSelection(manager.tournamentSize);
+            Chromosome child2 = tournamentSelection(manager.tournamentSize);
 
-            List<E> genes = child1.crossover(child2, 0);
-            for (E e : genes) {
+            List<Chromosome> genes = crossoverPolicy.crossover(child1, child2);
+            for (Chromosome e : genes) {
                 newPopulation.addChromosome(e);
             }
         }
 
         // do point mutation
         for (int offspring_index = 0; offspring_index < micro_mutation_count; ++offspring_index) {
-            E child = tournamentSelection(manager.tournamentSize);
-            newPopulation.addChromosome(child.mutate(0));
+            Chromosome child = tournamentSelection(manager.tournamentSize);
+            newPopulation.addChromosome(micro.mutate(child));
         }
 
         // do subtree mutation
         for (int offspring_index = 0; offspring_index < macro_mutation_count; ++offspring_index) {
-            E child = tournamentSelection(manager.tournamentSize);
-            newPopulation.addChromosome(child.mutate(1));
+            Chromosome child = tournamentSelection(manager.tournamentSize);
+            newPopulation.addChromosome(macro.mutate(child));
         }
 
         // do reproduction
         for (int offspring_index = 0; offspring_index < reproduction_count; ++offspring_index) {
-            E child = tournamentSelection(manager.tournamentSize);
+            Chromosome child = tournamentSelection(manager.tournamentSize);
             newPopulation.addChromosome(child);
         }
         newPopulation.sort(comparator);
@@ -86,7 +88,7 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
         return newPopulation;
     }
 
-    private Population<E> tinyGPEvolve(int populationSize) {
+    private Population tinyGPEvolve(int populationSize) {
 
         double sum_rate = manager.crossoverRate + manager.macroMutationRate + manager.microMutationRate + manager.reproductionRate;
         double crossover_disk = manager.crossoverRate / sum_rate;
@@ -99,22 +101,22 @@ public class TGA<E extends Chromosome<E>> extends GeneticAlgorithm<E> {
             double r = randEngine.uniform();
 
             if (r <= crossover_disk) {
-                E child1 = tournamentSelection(manager.tournamentSize);
-                E child2 = tournamentSelection(manager.tournamentSize);
+                Chromosome child1 = tournamentSelection(manager.tournamentSize);
+                Chromosome child2 = tournamentSelection(manager.tournamentSize);
 
-                List<E> list = child1.crossover(child2, 0);
+                List<Chromosome> list = crossoverPolicy.crossover(child1, child2);
 
-                for (E e : list) {
+                for (Chromosome e : list) {
                     pop.addChromosome(e);
                 }
             } else if (r <= micro_mutation_disk) {
-                E child = tournamentSelection(manager.tournamentSize);
-                pop.addChromosome(child.mutate(0));
+                Chromosome child = tournamentSelection(manager.tournamentSize);
+                pop.addChromosome(micro.mutate(child));
             } else if (r <= macro_mutation_disk) {
-                E child = tournamentSelection(manager.tournamentSize);
-                pop.addChromosome(child.mutate(1));
+                Chromosome child = tournamentSelection(manager.tournamentSize);
+                pop.addChromosome(macro.mutate(child));
             } else {
-                E child = tournamentSelection(manager.tournamentSize);
+                Chromosome child = tournamentSelection(manager.tournamentSize);
                 pop.addChromosome(child);
             }
             pop.sort(comparator);
