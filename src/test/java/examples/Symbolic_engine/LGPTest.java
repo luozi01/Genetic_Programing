@@ -25,7 +25,7 @@ public class LGPTest {
         LGPSolver solver = new LGPSolver(gp);
         addListener(solver);
         Long startTime = System.currentTimeMillis();
-        solver.evolve(10000);
+        solver.evolve();
         System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
 
         test(solver, testing, false);

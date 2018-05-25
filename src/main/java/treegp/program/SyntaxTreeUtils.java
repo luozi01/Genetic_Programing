@@ -67,8 +67,7 @@ public class SyntaxTreeUtils {
         // Two fast tree-creation algorithms for genetic programming.
         // IEEE Transactions in Evolutionary Computation, 4(3), 2000b."
         else if (method == TGPInitializationStrategy.INITIALIZATION_METHOD_PTC1) {
-            // TODO: Change this one later back to use tag
-            int expectedTreeSize = 20; //Convert.ToInt32(tag);
+            int expectedTreeSize = 20;
 
             int b_n_sum = 0;
             for (Operator anOperatorSet : operatorSet) {
@@ -155,7 +154,6 @@ public class SyntaxTreeUtils {
 
     private static Operator randomOperator(TreeGP context, int allowableDepth,
                                            TGPInitializationStrategy method, RandEngine randEngine) {
-        //Todo fix, right now does not have function without arguments such as rand()
         int terminal_count = context.getTerminal().size();
         int function_count = context.getNonTerminal().size();
 

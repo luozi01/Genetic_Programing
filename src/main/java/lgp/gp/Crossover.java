@@ -1,15 +1,15 @@
 package lgp.gp;
 
-import genetics.CrossoverPolicy;
 import genetics.utils.RandEngine;
 import lgp.enums.LGPCrossover;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
 import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.ChromosomePair;
+import org.apache.commons.math3.genetics.CrossoverPolicy;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Crossover implements CrossoverPolicy {
@@ -21,16 +21,16 @@ public class Crossover implements CrossoverPolicy {
     }
 
     @Override
-    public List<Chromosome> crossover(Chromosome c1, Chromosome c2) {
+    public ChromosomePair crossover(Chromosome c1, Chromosome c2) {
         if (!(c1 instanceof LGPChromosome && c2 instanceof LGPChromosome)) {
-            throw new IllegalArgumentException("Both chromosome should be TGPChromosome");
+            throw new IllegalArgumentException("Both chromosome should be LGPChromosome");
         }
         return apply(((LGPChromosome) c1).makeCopy(), ((LGPChromosome) c2).makeCopy());
     }
 
-    private List<Chromosome> apply(LGPChromosome gp1, LGPChromosome gp2) {
+    private ChromosomePair apply(LGPChromosome gp1, LGPChromosome gp2) {
         LGPCrossover crossoverType = manager.getCrossoverStrategy();
-        List<Chromosome> chromosome;
+        ChromosomePair chromosome;
         switch (crossoverType) {
             case LINEAR:
                 chromosome = linearCrossover(gp1, gp2);
@@ -61,7 +61,7 @@ public class Crossover implements CrossoverPolicy {
 
        Standard linear crossover may also be referred to as two-segment recompilations, in these terms.
     */
-    private List<Chromosome> oneSegmentCrossover(LGPChromosome gp1, LGPChromosome gp2) {
+    private ChromosomePair oneSegmentCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
         double prob_r = randEngine.uniform();
         if (gp1.length() < manager.getMaxProgramLength() &&
@@ -102,17 +102,16 @@ public class Crossover implements CrossoverPolicy {
                 gp1.getInstructions().remove(j);
             }
         }
-        return Arrays.asList(gp1, gp2);
+        return new ChromosomePair(gp1, gp2);
     }
 
     /*
     This operator is derived from Algorithm 5.2 in Section 5.7.2 of Linear Genetic Programming
     */
-    private List<Chromosome> onePointCrossover(LGPChromosome gp1, LGPChromosome gp2) {
+    private ChromosomePair onePointCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
 
         // length(gp1) <= length(gp2)
-        //Todo not optimal
         if (gp1.length() > gp2.length()) {
             LGPChromosome temp = gp1;
             gp1 = gp2;
@@ -171,8 +170,8 @@ public class Crossover implements CrossoverPolicy {
             count++;
         }
 
-        List<Instruction> instructions1 = gp1.getInstructions();
-        List<Instruction> instructions2 = gp2.getInstructions();
+        List<Instruction> instructions1 = new ArrayList<>(gp1.getInstructions());
+        List<Instruction> instructions2 = new ArrayList<>(gp2.getInstructions());
 
         List<Instruction> instructions1_1 = new ArrayList<>();
         List<Instruction> instructions1_2 = new ArrayList<>();
@@ -212,13 +211,13 @@ public class Crossover implements CrossoverPolicy {
             i.resign(gp2);
             instructions2.add(i);
         }
-        return Arrays.asList(gp1.newCopy(instructions1), gp2.newCopy(instructions2));
+        return new ChromosomePair(gp1, gp2);
     }
 
     //Todo need to optimize
     // this is derived from Algorithm 5.1 of Section 5.7.1 of Linear Genetic Programming
     // this linear crossover can also be considered as two-point crossover
-    private List<Chromosome> linearCrossover(LGPChromosome gp1, LGPChromosome gp2) {
+    private ChromosomePair linearCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
 
         // length(gp1) <= length(gp2)
@@ -311,8 +310,8 @@ public class Crossover implements CrossoverPolicy {
             instructions2_3.add(instructions2.get(i));
         }
 
-        instructions1 = new ArrayList<>();
-        instructions2 = new ArrayList<>();
+        instructions1.clear();
+        instructions2.clear();
 
         for (int i = 0; i < i1; ++i) {
             instructions1.add(instructions1_1.get(i));
@@ -333,6 +332,7 @@ public class Crossover implements CrossoverPolicy {
             instructions2.add(clone);
         }
         instructions2.addAll(instructions2_3);
-        return Arrays.asList(gp1.newCopy(instructions1), gp2.newCopy(instructions2));
+
+        return new ChromosomePair(gp1, gp2);
     }
 }

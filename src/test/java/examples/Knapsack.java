@@ -1,12 +1,15 @@
 package examples;
 
-import genetics.*;
-import org.apache.commons.math3.genetics.Chromosome;
+import genetics.Generator;
+import genetics.GeneticAlgorithm;
+import genetics.Population;
+import genetics.utils.RandEngine;
+import genetics.utils.SimpleRandEngine;
+import org.apache.commons.math3.genetics.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Mike on 2016/11/3.
@@ -75,12 +78,12 @@ public class Knapsack {
 //        defaultGeneLength = itemsValue.length;
         int capacity = 10 * 40;
         int defaultGeneLength = 40;
-        Random random = new Random();
+        RandEngine randEngine = new SimpleRandEngine();
         int[] itemsValue = new int[defaultGeneLength];
         int[] itemsWeight = new int[defaultGeneLength];
         for (int i = 0; i < defaultGeneLength; i++) {
-            itemsValue[i] = random.nextInt(15) + 1;
-            itemsWeight[i] = random.nextInt(20) + 1;
+            itemsValue[i] = randEngine.nextInt(15) + 1;
+            itemsWeight[i] = randEngine.nextInt(20) + 1;
         }
         System.out.println("Capacity: " + capacity);
         System.out.println("Values: \t" + Arrays.toString(itemsValue));
@@ -91,8 +94,7 @@ public class Knapsack {
         GeneticAlgorithm ga = new GeneticAlgorithm(
                 new Population(new KGenerator(100, itemsWeight, itemsValue, capacity, defaultGeneLength)),
                 new UniformCrossover<K>(.5), .4,
-                new BinaryMutation(), .02,
-                3, 1);
+                new BinaryMutation(), .02, 3, 1);
         ga.evolve(1000);
         Chromosome k = ga.getBest();
         System.out.println("Fittest: " + k.getFitness());
@@ -121,7 +123,7 @@ public class Knapsack {
         }
 
         @Override
-        public AbstractListChromosome<Integer> newCopy(List<Integer> list) {
+        public AbstractListChromosome<Integer> newFixedLengthChromosome(List<Integer> list) {
             K k = new K(list);
             k.itemsWeight = itemsWeight;
             k.itemsValue = itemsValue;

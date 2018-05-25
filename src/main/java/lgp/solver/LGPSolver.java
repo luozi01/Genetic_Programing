@@ -22,6 +22,10 @@ public class LGPSolver {
         environment.evolve(iteration);
     }
 
+    public void evolve() {
+        environment.evolve();
+    }
+
     public void terminate() {
         environment.terminate();
     }

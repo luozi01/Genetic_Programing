@@ -3,23 +3,27 @@ package genetics;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.ChromosomePair;
+import org.apache.commons.math3.genetics.CrossoverPolicy;
 import org.apache.commons.math3.genetics.MutationPolicy;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GeneticAlgorithm {
 
-    protected static final RandEngine randEngine = new SimpleRandEngine();
-    protected final ChromosomesComparator comparator;
-    private final CrossoverPolicy crossoverPolicy;
-    //    private final SelectionPolicy selectionPolicy;
-    private final MutationPolicy mutationPolicy;
-    private final double uniformRate;
-    private final double mutationRate;
-    private final int tournamentSize;
-    private final int elitism;
+    private final RandEngine randEngine = new SimpleRandEngine();
     private final List<Interrupt> interrupts = new LinkedList<>();
+    protected ChromosomesComparator comparator;
     protected Population pop;
+    private CrossoverPolicy crossoverPolicy;
+    private MutationPolicy mutationPolicy;
+    private double uniformRate;
+    private double mutationRate;
+    private int tournamentSize;
+    private int elitism;
     private boolean terminate;
     private int generation;
 
@@ -37,20 +41,12 @@ public class GeneticAlgorithm {
         this.mutationRate = mutationRate;
         this.tournamentSize = tournamentSize;
         this.elitism = elitism;
-//        this.selectionPolicy = selectionPolicy;
         comparator = new ChromosomesComparator();
         pop.sort(comparator);
     }
 
     public GeneticAlgorithm(Population pop) {
         this.pop = pop;
-        this.crossoverPolicy = null;
-        this.mutationPolicy = null;
-        this.uniformRate = 0;
-        this.mutationRate = 0;
-        this.tournamentSize = 0;
-        this.elitism = 0;
-//        this.selectionPolicy = selectionPolicy;
         comparator = new ChromosomesComparator();
         pop.sort(comparator);
     }
@@ -94,16 +90,18 @@ public class GeneticAlgorithm {
         for (int i = elitism; i < pop.size(); i++) {
             Chromosome c1 = tournamentSelection(tournamentSize);
             Chromosome c2 = tournamentSelection(tournamentSize);
-            List<Chromosome> pair = Arrays.asList(c1, c2);
+            ChromosomePair pair = new ChromosomePair(c1, c2);
             if (randEngine.uniform() < uniformRate) {
-                pair = crossoverPolicy.crossover(pair.get(0), pair.get(1));
+                pair = crossoverPolicy.crossover(pair.getFirst(), pair.getSecond());
             }
 
             if (randEngine.uniform() < mutationRate) {
-                pair = Arrays.asList(
-                        mutationPolicy.mutate(pair.get(0)), mutationPolicy.mutate(pair.get(1)));
+                pair = new ChromosomePair(
+                        mutationPolicy.mutate(pair.getFirst()),
+                        mutationPolicy.mutate(pair.getSecond()));
             }
-            pair.forEach(newPopulation::addChromosome);
+            newPopulation.addChromosome(pair.getFirst());
+            newPopulation.addChromosome(pair.getSecond());
         }
         newPopulation.sort(comparator);
         newPopulation.trim(populationSize);
@@ -136,7 +134,7 @@ public class GeneticAlgorithm {
         List<Chromosome> selection = new ArrayList<>();
         List<Chromosome> chromosomes = new ArrayList<>(pop.getChromosomes());
         for (int i = 0; i < tournamentSize; i++) {
-            int rind = (int) (Math.random() * chromosomes.size());
+            int rind = randEngine.nextInt(chromosomes.size());
             selection.add(chromosomes.get(rind));
             chromosomes.remove(rind);
         }

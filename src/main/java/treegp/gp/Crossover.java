@@ -1,8 +1,9 @@
 package treegp.gp;
 
-import genetics.CrossoverPolicy;
 import genetics.utils.RandEngine;
 import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.ChromosomePair;
+import org.apache.commons.math3.genetics.CrossoverPolicy;
 import treegp.enums.TGPCrossoverStrategy;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;
@@ -21,7 +22,7 @@ public class Crossover implements CrossoverPolicy {
     }
 
     @Override
-    public List<Chromosome> crossover(Chromosome c1, Chromosome c2) {
+    public ChromosomePair crossover(Chromosome c1, Chromosome c2) {
         if (!(c1 instanceof TGPChromosome && c2 instanceof TGPChromosome)) {
             throw new IllegalArgumentException("Both chromosome should be TGPChromosome");
         }
@@ -36,7 +37,7 @@ public class Crossover implements CrossoverPolicy {
      * @param chromosome1 One tree to be crossover with
      * @param chromosome2 Another tree to be crossover with
      */
-    private List<Chromosome> apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
+    private ChromosomePair apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
         int iMaxDepthForCrossover = manager.maxDepthForCrossover;
         TGPCrossoverStrategy method = manager.crossoverStrategy;
 
@@ -93,7 +94,7 @@ public class Crossover implements CrossoverPolicy {
                 swap(pCutPoint1, pCutPoint2);
             }
         }
-        return Arrays.asList(chromosome1, chromosome2);
+        return new ChromosomePair(chromosome1, chromosome2);
     }
 
     private Pair<Pair<TreeNode>> swap(Pair<TreeNode> cutPoint1, Pair<TreeNode> cutPoint2) {

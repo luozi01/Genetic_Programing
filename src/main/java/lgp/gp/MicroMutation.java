@@ -16,20 +16,15 @@ public class MicroMutation implements MutationPolicy {
         this.manager = manager;
     }
 
-    /// <summary>
-    /// the micro-mutation is derived from Linear Genetic Programming 2004 chapter 6 section 6.2.2
-    /// three type selection probability are first determined and roulette wheel is used to decide which
-    /// mutation type is to be performed
-    /// 1. if micro-mutate-operator type is selected, then randomly pick an instruction and
-    /// randomly select an instruction and mutate its operator to some other operator from the operator set
-    /// 2. if micro-mutate-register type is selected, then randomly pick an instruction and
-    /// randomly select one of the two operands, then
-    /// 2.1 with a constant selection probability p_{const}, a randomly selected constant register is assigned to the selected operand
-    /// 2.2 with probability 1-p_{const}, a randomly selected variable register is assigned to the selected operand
-    /// p_{const} is the proportion of instruction that holds a constant value.
-    /// 3. if micro-mutate-constant type is selected, then randomly pick an effective instruction with a constant as one
-    /// of its register value, mutate the constant to c+$N(0, \omega_{\mu}$
-    /// </summary>
+
+    @Override
+    public Chromosome mutate(Chromosome chromosome) {
+        if (!(chromosome instanceof LGPChromosome)) {
+            throw new IllegalArgumentException("Chromosome should be LGPChromosome");
+        }
+        return apply(((LGPChromosome) chromosome).makeCopy());
+    }
+
     private Chromosome apply(LGPChromosome chromosome) {
         double mutateOperatorRate = chromosome.getManager().getMicroMutateOperatorRate();
         double mutateRegisterRate = chromosome.getManager().getMicroMutateRegisterRate();
@@ -44,15 +39,15 @@ public class MicroMutation implements MutationPolicy {
         double register_sector = operator_sector + mutateRegisterRate;
 
         double r = manager.getRandEngine().uniform();
+        Chromosome clone;
         if (r < operator_sector) {
-            mutateInstructionOperator(chromosome, manager.getRandEngine());
+            clone = mutateInstructionOperator(chromosome, manager.getRandEngine());
         } else if (r < register_sector) {
-            mutateInstructionRegister(chromosome, manager.getRandEngine());
+            clone = mutateInstructionRegister(chromosome, manager.getRandEngine());
         } else {
-            mutateInstructionConstant(chromosome);
+            clone = mutateInstructionConstant(chromosome);
         }
-
-        return chromosome;
+        return clone;
     }
 
     /**
@@ -62,7 +57,7 @@ public class MicroMutation implements MutationPolicy {
      *
      * @param chromosome chromosome
      */
-    private void mutateInstructionConstant(LGPChromosome chromosome) {
+    private Chromosome mutateInstructionConstant(LGPChromosome chromosome) {
         Instruction selected = null;
         for (Instruction instruction : chromosome.getInstructions()) {
             if (!instruction.isStructuralIntron() &&
@@ -74,9 +69,21 @@ public class MicroMutation implements MutationPolicy {
         if (selected != null) {
             selected.mutateConstant(manager.getRandEngine(), manager.getMicroMutateConstantStandardDeviation());
         }
+        return chromosome;
     }
 
-    private void mutateInstructionRegister(LGPChromosome chromosome, RandEngine randEngine) {
+    /**
+     * if micro-mutate-register type is selected, then randomly pick an instruction and
+     * randomly select one of the two operands, then
+     * 1. with a constant selection probability p_{const}, a randomly selected
+     * constant register is assigned to the selected operand
+     * 2. with probability 1-p_{const}, a randomly selected variable register is assigned to the selected operand
+     * p_{const} is the proportion of instruction that holds a constant value.
+     *
+     * @param chromosome chromosome
+     * @param randEngine random engine
+     */
+    private Chromosome mutateInstructionRegister(LGPChromosome chromosome, RandEngine randEngine) {
         final List<Instruction> instructions = chromosome.getInstructions();
         final int instructionCount = instructions.size();
         Instruction selected_instruction = instructions.get(randEngine.nextInt(instructionCount));
@@ -88,20 +95,21 @@ public class MicroMutation implements MutationPolicy {
         }
         p_const /= instructionCount;
         selected_instruction.mutateRegister(chromosome, randEngine, p_const);
+        return chromosome;
     }
 
-    private void mutateInstructionOperator(LGPChromosome chromosome, RandEngine randEngine) {
+    /**
+     * if micro-mutate-operator type is selected, then randomly pick an instruction and
+     * randomly select an instruction and mutate its operator to some other operator from the operator set
+     *
+     * @param chromosome chromosome
+     * @param randEngine random engine
+     */
+    private Chromosome mutateInstructionOperator(LGPChromosome chromosome, RandEngine randEngine) {
         final List<Instruction> instructions = chromosome.getInstructions();
         final int instructionCount = instructions.size();
         Instruction instruction = instructions.get(randEngine.nextInt(instructionCount));
         instruction.setOperator(chromosome.getRandomOperator());
-    }
-
-    @Override
-    public Chromosome mutate(Chromosome chromosome) {
-        if (!(chromosome instanceof LGPChromosome)) {
-            throw new IllegalArgumentException("Chromosome should be TGPChromosome");
-        }
-        return apply(((LGPChromosome) chromosome).makeCopy());
+        return chromosome;
     }
 }

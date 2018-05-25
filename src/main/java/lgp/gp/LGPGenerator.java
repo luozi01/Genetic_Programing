@@ -47,8 +47,8 @@ public class LGPGenerator implements Generator {
         return list;
     }
 
-    private Chromosome initialize(int instructionCount) {
-        LGPChromosome chromosome = new LGPChromosome(new ArrayList<>(), manager);
+    private LGPChromosome initialize(int instructionCount) {
+        LGPChromosome chromosome = new LGPChromosome(manager);
         chromosome.addConstant(manager.getConstantSet());
 
         final int registerCount = manager.getRegisterCount();
@@ -56,12 +56,11 @@ public class LGPGenerator implements Generator {
 
         chromosome.addOperators(manager.getOperatorSet());
 
-        List<Instruction> instructions = new ArrayList<>();
         for (int i = 0; i < instructionCount; ++i) {
             Instruction newInst = new Instruction();
             newInst.initialize(chromosome, manager.getRandEngine());
-            instructions.add(newInst);
+            chromosome.getInstructions().add(newInst);
         }
-        return chromosome.newCopy(instructions);
+        return chromosome;
     }
 }

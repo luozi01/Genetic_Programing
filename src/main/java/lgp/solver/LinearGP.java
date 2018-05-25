@@ -6,7 +6,6 @@ import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import lgp.enums.LGPCrossover;
 import lgp.enums.LGPInitialization;
-import lgp.enums.LGPSelection;
 import lgp.program.Operator;
 import lgp.program.operators.*;
 import lombok.Getter;
@@ -28,6 +27,7 @@ public class LinearGP {
     private int registerCount;
     private List<Double> constantSet = new ArrayList<>();
     private List<Operator> operatorSet = new ArrayList<>();
+    private List<Observation> targets = new LinkedList<>();
 
     // SEC: parameters for population initialization
     // BEGIN
@@ -70,28 +70,17 @@ public class LinearGP {
 
     // SEC: parameters for replacement
     // BEGIN
-    private LGPSelection replacementStrategy = LGPSelection.TOURNAMENT;
-    private double replacementProbability = 1.0;
     private int tournamentSize = 3;
     // END
-
-    private List<Observation> targets = new LinkedList<>();
 
     public static LinearGP defaultConfig() {
         LinearGP lgp = new LinearGP();
         lgp.getOperatorSet().addAll(Arrays.asList(new ADD(), new SUB(), new DIV(), new MUL(), new POW(), new IFGREATERTHAN()));
-        lgp.addConstants(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0);
+        lgp.getConstantSet().addAll(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0));
         return lgp;
     }
 
     public void addObservations(List<Observation> targets) {
         this.targets.addAll(targets);
     }
-
-    private void addConstants(double... constants) {
-        for (double constant : constants) {
-            constantSet.add(constant);
-        }
-    }
-
 }

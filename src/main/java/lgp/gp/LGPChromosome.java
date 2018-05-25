@@ -1,6 +1,5 @@
 package lgp.gp;
 
-import genetics.AbstractListChromosome;
 import genetics.utils.Observation;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.program.Instruction;
@@ -9,41 +8,24 @@ import lgp.program.Register;
 import lgp.solver.LinearGP;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.*;
 
 @Getter
 @Setter
-public class LGPChromosome extends AbstractListChromosome<Instruction> {
+public class LGPChromosome extends Chromosome {
 
     private List<Register> registerSet = new ArrayList<>(); //variable
     private List<Register> constantSet = new ArrayList<>(); //numbers
     private List<Operator> operatorSet = new ArrayList<>(); //operators
+    private List<Instruction> instructions = new ArrayList<>(); //instructions
     private Map<String, Double> variables = new HashMap<>();
     private int index = 0;
     private LinearGP manager;
 
-    LGPChromosome(List<Instruction> instructions, LinearGP manager) {
-        super(instructions);
+    LGPChromosome(LinearGP manager) {
         this.manager = manager;
-    }
-
-    public int length() {
-        return getLength();
-    }
-
-    //Todo should apply only effective instructions to shorter the execution length
-    public void eval(Observation observation) {
-        markStructuralIntrons(manager);
-        execute(observation);
-    }
-
-    public List<Instruction> getInstructions() {
-        return getRepresentation();
-    }
-
-    public LGPChromosome makeCopy() {
-        return (LGPChromosome) newCopy(getRepresentation());
     }
 
     void addConstant(List<Double> constant) {
@@ -56,19 +38,19 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
         }
     }
 
+    void addOperators(List<Operator> operators) {
+        for (Operator op : operators) {
+            op.setIndex(operatorSet.size());
+            operatorSet.add(op);
+        }
+    }
+
     void addRegister(int registerCount) {
         for (int i = 0; i < registerCount; i++) {
             Register register = new Register();
             register.setIndex(registerSet.size());
             register.setConstant(false);
             registerSet.add(register);
-        }
-    }
-
-    void addOperators(List<Operator> operators) {
-        for (Operator op : operators) {
-            op.setIndex(operatorSet.size());
-            operatorSet.add(op);
         }
     }
 
@@ -94,9 +76,9 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
 
     private void markStructuralIntrons(LinearGP manager) {
 
-        int instruction_count = getLength();
+        int instruction_count = length();
         for (int i = instruction_count - 1; i >= 0; i--) {
-            getRepresentation().get(i).setStructuralIntron(true);
+            instructions.get(i).setStructuralIntron(true);
         }
 
         Set<Integer> eff = new HashSet<>();
@@ -110,7 +92,7 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
 
         for (int i = instruction_count - 1; i >= 0; i--) {
             prev_instruction = current_instruction;
-            current_instruction = getRepresentation().get(i);
+            current_instruction = instructions.get(i);
             // prev_instruction is not an structural intron and the current_instruction
             // is a conditional construct then, the current_instruction is not structural intron either
             // this directly follows from Step 3 of Algorithm 3.1
@@ -161,9 +143,9 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
 
         Set<Integer> effective_register = new HashSet<>();
 
-        int instruction_count = getLength();
+        int instruction_count = length();
         for (int i = instruction_count - 1; i > stop_point; i--) {
-            getRepresentation().get(i).setStructuralIntron(true);
+            instructions.get(i).setStructuralIntron(true);
         }
 
         effective_register.clear();
@@ -176,7 +158,7 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
         Instruction prev_instruction;
         for (int i = instruction_count - 1; i > stop_point; i--) {
             prev_instruction = current_instruction;
-            current_instruction = getRepresentation().get(i);
+            current_instruction = instructions.get(i);
 
             //if current instruction is an if statement and it has contents to operate,
             // then it's content is not an intron, it is not an intron
@@ -208,7 +190,7 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
         OperatorExecutionStatus command = OperatorExecutionStatus.LGP_EXECUTE_NEXT_INSTRUCTION;
         Instruction current_effective_instruction = null;
         Instruction prev_effective_instruction;
-        for (Instruction instruction : getRepresentation()) {
+        for (Instruction instruction : instructions) {
             if (instruction.isStructuralIntron()) {
                 continue;
             }
@@ -216,10 +198,8 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
             current_effective_instruction = instruction;
             if (command == OperatorExecutionStatus.LGP_EXECUTE_NEXT_INSTRUCTION) {
                 command = current_effective_instruction.execute();
-            } else {
-                if (prev_effective_instruction.getOperator().isConditional()) {
-                    command = OperatorExecutionStatus.LGP_EXECUTE_NEXT_INSTRUCTION;
-                }
+            } else if (prev_effective_instruction.getOperator().isConditional()) {
+                command = OperatorExecutionStatus.LGP_EXECUTE_NEXT_INSTRUCTION;
             }
         }
 
@@ -238,10 +218,46 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
         sb.append("\n").append(registerSet);
         sb.append("\noperators:");
         sb.append("\n").append(operatorSet);
-        for (int i = 0; i < getLength(); ++i) {
-            sb.append("\ninstruction[").append(i).append("]: ").append(getRepresentation().get(i)).append("\n");
+        for (int i = 0; i < instructions.size(); ++i) {
+            sb.append("\ninstruction[").append(i).append("]: ").append(instructions.get(i)).append("\n");
         }
         return sb.toString();
+    }
+
+    public int length() {
+        return instructions.size();
+    }
+
+    public void eval(Observation observation) {
+        markStructuralIntrons(manager);
+        execute(observation);
+    }
+
+    //Todo
+    public void copy(LGPChromosome that, boolean effectiveOnly) {
+        for (int i = 0; i < that.registerSet.size(); i++) {
+            registerSet.add(that.registerSet.get(i).makeCopy());
+        }
+        for (int i = 0; i < that.constantSet.size(); i++) {
+            constantSet.add(that.constantSet.get(i).makeCopy());
+        }
+        for (int i = 0; i < that.operatorSet.size(); i++) {
+            operatorSet.add(that.operatorSet.get(i).makeCopy());
+        }
+
+        instructions.clear();
+        for (int i = 0; i < that.instructions.size(); ++i) {
+            if (effectiveOnly && !that.instructions.get(i).isStructuralIntron()) {
+                continue;
+            }
+            instructions.add(that.instructions.get(i).makeCopy(registerSet, constantSet, operatorSet));
+        }
+    }
+
+    public LGPChromosome makeCopy() {
+        LGPChromosome clone = new LGPChromosome(manager);
+        clone.copy(this, false);
+        return clone;
     }
 
     @Override
@@ -252,24 +268,5 @@ public class LGPChromosome extends AbstractListChromosome<Instruction> {
             diff += Math.pow(o.getOutput(0) - o.getPredictedOutput(0), 2);
         }
         return diff;
-    }
-
-    @Override
-    protected void checkValidity(List<Instruction> representation) {
-    }
-
-    @Override
-    public AbstractListChromosome<Instruction> newCopy(List<Instruction> list) {
-        LGPChromosome clone = new LGPChromosome(list, manager);
-        for (int i = 0; i < registerSet.size(); i++) {
-            clone.registerSet.add(registerSet.get(i).makeCopy());
-        }
-        for (int i = 0; i < constantSet.size(); i++) {
-            clone.constantSet.add(constantSet.get(i).makeCopy());
-        }
-        for (int i = 0; i < operatorSet.size(); i++) {
-            clone.operatorSet.add(operatorSet.get(i).makeCopy());
-        }
-        return clone;
     }
 }

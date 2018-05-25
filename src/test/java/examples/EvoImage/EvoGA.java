@@ -1,13 +1,14 @@
 package examples.EvoImage;
 
 
-import genetics.*;
+import genetics.GeneticAlgorithm;
+import genetics.Population;
 import org.apache.commons.math3.genetics.MutationPolicy;
 
 public class EvoGA extends GeneticAlgorithm {
     private final MutationPolicy mutate;
 
-    EvoGA(Population pop,final  MutationPolicy mutate) {
+    EvoGA(Population pop, final MutationPolicy mutate) {
         super(pop);
         this.mutate = mutate;
     }

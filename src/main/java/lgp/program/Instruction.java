@@ -3,7 +3,6 @@ package lgp.program;
 import genetics.utils.RandEngine;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.gp.LGPChromosome;
-import lgp.solver.LinearGP;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,15 +25,15 @@ public class Instruction {
         }
     }
 
-    public void mutateRegister(LGPChromosome Context, RandEngine randEngine) {
-        mutateRegister(Context, randEngine, 0.5);
+    public void mutateRegister(LGPChromosome gp, RandEngine randEngine) {
+        mutateRegister(gp, randEngine, 0.5);
     }
 
-    public void mutateRegister(LGPChromosome context, RandEngine randEngine, double p_const) {
+    public void mutateRegister(LGPChromosome gp, RandEngine randEngine, double p_const) {
         if (randEngine.uniform() < 0.5) {
-            Register other = context.getRandomRegister();
+            Register other = gp.getRandomRegister();
             while (other.equals(targetOperand)) {
-                other = context.getRandomRegister();
+                other = gp.getRandomRegister();
             }
             targetOperand = other;
         } else {
@@ -42,72 +41,52 @@ public class Instruction {
             arg2 = randEngine.uniform() < 0.5 ? r2 : r1;
 
             if (arg2.isConstant()) {
-                arg1 = context.getRandomRegister();
+                arg1 = gp.getRandomRegister();
             } else {
-                arg1 = randEngine.uniform() < p_const ? context.getRandomConstant() : context.getRandomRegister();
+                arg1 = randEngine.uniform() < p_const ? gp.getRandomConstant() : gp.getRandomRegister();
             }
             r1 = arg1;
             r2 = arg2;
         }
     }
 
-    public void initialize(LGPChromosome context, RandEngine randEngine) {
-        operator = context.getRandomOperator();
+    public void initialize(LGPChromosome gp, RandEngine randEngine) {
+        operator = gp.getRandomOperator();
 
         double p_const = 0.5;
         double r = randEngine.uniform();
-        r1 = r < p_const ? context.getRandomConstant() : context.getRandomRegister();
+        r1 = r < p_const ? gp.getRandomConstant() : gp.getRandomRegister();
 
         if (r1.isConstant()) {
-            r2 = context.getRandomRegister();
+            r2 = gp.getRandomRegister();
         } else {
             r = randEngine.uniform();
-            if (r < p_const) {
-                r2 = context.getRandomConstant();
-            } else {
-                r2 = context.getRandomRegister();
-            }
+            r2 = r < p_const ? gp.getRandomConstant() : gp.getRandomRegister();
         }
-        targetOperand = context.getRandomRegister();
+        targetOperand = gp.getRandomRegister();
     }
 
-    public void resign(LGPChromosome context) {
-        operator = context.getOperatorSet().get(operator.getIndex());
-        if (r1.isConstant()) {
-            r1 = context.getConstantSet().get(r1.getIndex());
-        } else {
-            r1 = context.getRegisterSet().get(r1.getIndex());
-        }
+    public void resign(LGPChromosome gp) {
+        operator = gp.getOperatorSet().get(operator.getIndex());
+        r1 = r1.isConstant() ? gp.getConstantSet().get(r1.getIndex()) :
+                gp.getRegisterSet().get(r1.getIndex());
 
-        if (r2.isConstant()) {
-            r2 = context.getConstantSet().get(r2.getIndex());
-        } else {
-            r2 = context.getRegisterSet().get(r2.getIndex());
-        }
-    }
-
-    public Instruction makeCopy(List<Register> registerSet, List<Register> constantSet, List<Operator> operatorSet) {
-        Instruction clone = new Instruction();
-        if (r1.isConstant()) {
-            clone.r1 = constantSet.get(r1.getIndex());
-        } else {
-            clone.r1 = registerSet.get(r1.getIndex());
-        }
-
-        if (r2.isConstant()) {
-            clone.r2 = constantSet.get(r2.getIndex());
-        } else {
-            clone.r2 = registerSet.get(r2.getIndex());
-        }
-
-        clone.operator = operatorSet.get(operator.getIndex());
-        clone.targetOperand = registerSet.get(targetOperand.getIndex());
-
-        return clone;
+        r2 = r2.isConstant() ? gp.getConstantSet().get(r2.getIndex()) :
+                gp.getRegisterSet().get(r2.getIndex());
     }
 
     public OperatorExecutionStatus execute() {
         return operator.eval(r1, r2, targetOperand);
+    }
+
+    public Instruction makeCopy(List<Register> registerSet, List<Register> constantSet, List<Operator> operatorSet) {
+        Instruction clone = new Instruction();
+        clone.r1 = r1.isConstant() ? constantSet.get(r1.getIndex()) : registerSet.get(r1.getIndex());
+        clone.r2 = r2.isConstant() ? constantSet.get(r2.getIndex()) : registerSet.get(r2.getIndex());
+
+        clone.operator = operatorSet.get(operator.getIndex());
+        clone.targetOperand = registerSet.get(targetOperand.getIndex());
+        return clone;
     }
 
     public Instruction makeCopy() {

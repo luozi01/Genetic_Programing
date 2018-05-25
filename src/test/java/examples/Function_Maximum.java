@@ -1,8 +1,10 @@
 package examples;
 
-import genetics.*;
+import genetics.Generator;
+import genetics.GeneticAlgorithm;
+import genetics.Population;
 import org.apache.commons.math3.analysis.TrivariateFunction;
-import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class Function_Maximum {
                 (int) Long.parseLong(output.substring(64, 96), 2));
     }
 
-    static class Solve extends BinaryChromosome {
+    private static class Solve extends BinaryChromosome {
 
         Solve(List<Integer> representation) {
             super(representation);
@@ -37,17 +39,17 @@ public class Function_Maximum {
         }
 
         @Override
+        public AbstractListChromosome<Integer> newFixedLengthChromosome(List<Integer> list) {
+            return new Solve(list);
+        }
+
+        @Override
         public String toString() {
             StringBuilder geneString = new StringBuilder();
             for (Integer gene : getRepresentation()) {
                 geneString.append(gene);
             }
             return geneString.toString();
-        }
-
-        @Override
-        public AbstractListChromosome<Integer> newCopy(List<Integer> list) {
-            return new Solve(list);
         }
 
         @Override
@@ -64,7 +66,7 @@ public class Function_Maximum {
         }
     }
 
-    static class SolveGenerate implements Generator {
+    private static class SolveGenerate implements Generator {
 
         private int populationSize;
 

@@ -29,7 +29,7 @@ class EvoManager {
     int ACTUAL_POINTS = MAX_POINTS;
 
     DoubleMatrix image_colors;
-    MutationPolicy method = MEDIUM;
+    MutationPolicy method = Mutation.MEDIUM;
     Colors choice = BLACK;
     RandEngine randEngine = new SimpleRandEngine();
 
@@ -53,7 +53,7 @@ class EvoManager {
         image_colors = new DoubleMatrix(color);
     }
 
-    DoubleMatrix toImage(List<Polygon> polygons) {
+    DoubleMatrix toImage(Polygon[] polygons) {
         Group root = new Group();
 
         Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);

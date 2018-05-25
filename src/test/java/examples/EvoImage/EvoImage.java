@@ -71,7 +71,7 @@ public class EvoImage extends Application {
 
         Canvas canvas = new Canvas(manager.MAX_WIDTH, manager.MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        for (Polygon p : best.getPolygons()) {
+        for (Polygon p : best.polygons) {
             gc.setFill(p.getColor());
             gc.fillPolygon(p.x_points, p.y_points, p.n_points);
         }

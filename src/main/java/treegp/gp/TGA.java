@@ -1,13 +1,14 @@
 package treegp.gp;
 
-import genetics.*;
+import genetics.GeneticAlgorithm;
+import genetics.Population;
 import genetics.utils.RandEngine;
 import org.apache.commons.math3.genetics.Chromosome;
+import org.apache.commons.math3.genetics.ChromosomePair;
+import org.apache.commons.math3.genetics.CrossoverPolicy;
 import org.apache.commons.math3.genetics.MutationPolicy;
 import treegp.enums.TGPEvolveStrategy;
 import treegp.solver.TreeGP;
-
-import java.util.List;
 
 public class TGA extends GeneticAlgorithm {
 
@@ -60,10 +61,9 @@ public class TGA extends GeneticAlgorithm {
             Chromosome child1 = tournamentSelection(manager.tournamentSize);
             Chromosome child2 = tournamentSelection(manager.tournamentSize);
 
-            List<Chromosome> genes = crossoverPolicy.crossover(child1, child2);
-            for (Chromosome e : genes) {
-                newPopulation.addChromosome(e);
-            }
+            ChromosomePair genes = crossoverPolicy.crossover(child1, child2);
+            newPopulation.addChromosome(genes.getFirst());
+            newPopulation.addChromosome(genes.getSecond());
         }
 
         // do point mutation
@@ -104,11 +104,9 @@ public class TGA extends GeneticAlgorithm {
                 Chromosome child1 = tournamentSelection(manager.tournamentSize);
                 Chromosome child2 = tournamentSelection(manager.tournamentSize);
 
-                List<Chromosome> list = crossoverPolicy.crossover(child1, child2);
-
-                for (Chromosome e : list) {
-                    pop.addChromosome(e);
-                }
+                ChromosomePair pair = crossoverPolicy.crossover(child1, child2);
+                pop.addChromosome(pair.getFirst());
+                pop.addChromosome(pair.getSecond());
             } else if (r <= micro_mutation_disk) {
                 Chromosome child = tournamentSelection(manager.tournamentSize);
                 pop.addChromosome(micro.mutate(child));
