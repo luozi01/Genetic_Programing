@@ -28,7 +28,6 @@ public class LGA extends GeneticAlgorithm {
     @Override
     protected Population evolvePopulation() {
         RandEngine randEngine = manager.getRandEngine();
-//        Population pop = new Population();
         int iPopSize = manager.getPopulationSize();
         int program_count = 0;
 
