@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static examples.EvoImage.ColorChoice.BLACK;
-import static examples.EvoImage.Mutation.MEDIUM;
-
 class EvoManager {
 
     int MAX_WIDTH;
@@ -30,7 +27,7 @@ class EvoManager {
 
     DoubleMatrix image_colors;
     MutationPolicy method = Mutation.MEDIUM;
-    Colors choice = BLACK;
+    Colors choice = ColorChoice.BLACK;
     RandEngine randEngine = new SimpleRandEngine();
 
     private List<Double> pixelRGB(int pixel) {
