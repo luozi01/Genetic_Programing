@@ -30,7 +30,7 @@ public class EvoImage extends Application {
     public void init() {
         BufferedImage img;
         try {
-            img = ImageIO.read(new File("ml.bmp"));
+            img = ImageIO.read(new File("Image_input/ml.bmp"));
             manager.readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());

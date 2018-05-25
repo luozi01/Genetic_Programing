@@ -20,7 +20,7 @@ public enum Mutation implements MutationPolicy {
             return apply(((Paintings) chromosome).makeCopy());
         }
 
-        public Chromosome apply(Paintings paintings) {
+        private Chromosome apply(Paintings paintings) {
             EvoManager manager = paintings.manager;
             RandEngine randEngine = manager.randEngine;
             Polygon[] polygons = paintings.polygons;

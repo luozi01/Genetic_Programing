@@ -189,7 +189,7 @@ public class ImageEvo extends Application {
     public void start(Stage primaryStage) {
         BufferedImage img;
         try {
-            img = ImageIO.read(new File("ml.bmp"));
+            img = ImageIO.read(new File("Image_Input/ml.bmp"));
             readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
