@@ -10,12 +10,11 @@ import treegp.solver.TreeGP;
 import treegp.tools.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Crossover implements CrossoverPolicy {
 
-    private TreeGP manager;
+    private final TreeGP manager;
 
     public Crossover(TreeGP manager) {
         this.manager = manager;

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class GraphGenerator implements Generator {
 
-    private EvoManager manager;
+    private final EvoManager manager;
 
     GraphGenerator(EvoManager manager) {
         this.manager = manager;

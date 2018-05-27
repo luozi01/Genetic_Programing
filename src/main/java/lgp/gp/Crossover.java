@@ -14,7 +14,7 @@ import java.util.List;
 
 public class Crossover implements CrossoverPolicy {
 
-    private LinearGP manager;
+    private final LinearGP manager;
 
     public Crossover(LinearGP manager) {
         this.manager = manager;

@@ -20,15 +20,15 @@ class EvoManager {
 
     int MAX_WIDTH;
     int MAX_HEIGHT;
-    int MAX_SHAPES = 50;    // max capacity
-    int MAX_POINTS = 6;
-    int ACTUAL_SHAPES = MAX_SHAPES;
-    int ACTUAL_POINTS = MAX_POINTS;
+    final int MAX_SHAPES = 50;    // max capacity
+    final int MAX_POINTS = 6;
+    final int ACTUAL_SHAPES = MAX_SHAPES;
+    final int ACTUAL_POINTS = MAX_POINTS;
 
     DoubleMatrix image_colors;
-    MutationPolicy method = Mutation.MEDIUM;
-    Colors choice = ColorChoice.BLACK;
-    RandEngine randEngine = new SimpleRandEngine();
+    final MutationPolicy method = Mutation.MEDIUM;
+    final Colors choice = ColorChoice.BLACK;
+    final RandEngine randEngine = new SimpleRandEngine();
 
     private List<Double> pixelRGB(int pixel) {
         double red = (pixel >> 16) & 0xff;

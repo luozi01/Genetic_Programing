@@ -5,8 +5,8 @@ import org.jblas.DoubleMatrix;
 
 public class Paintings extends Chromosome {
 
-    EvoManager manager;
-    Polygon[] polygons;
+    final EvoManager manager;
+    final Polygon[] polygons;
 
     Paintings(EvoManager manager) {
         polygons = new Polygon[manager.MAX_SHAPES];

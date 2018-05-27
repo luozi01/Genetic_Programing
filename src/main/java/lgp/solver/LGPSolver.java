@@ -5,7 +5,7 @@ import lgp.gp.*;
 import org.apache.commons.math3.genetics.Chromosome;
 
 public class LGPSolver {
-    private LGA environment;
+    private final LGA environment;
 
     public LGPSolver(LinearGP manager) {
         Population population = new Population(new LGPGenerator(manager));

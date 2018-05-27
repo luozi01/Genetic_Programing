@@ -12,7 +12,7 @@ import java.util.List;
 
 public class LGPGenerator implements Generator {
 
-    private LinearGP manager;
+    private final LinearGP manager;
 
     public LGPGenerator(LinearGP manager) {
         this.manager = manager;

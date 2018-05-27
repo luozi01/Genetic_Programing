@@ -14,9 +14,9 @@ import java.util.List;
 
 public class GeneticAlgorithm {
 
+    protected final ChromosomesComparator comparator;
     private final RandEngine randEngine = new SimpleRandEngine();
     private final List<Interrupt> interrupts = new LinkedList<>();
-    protected ChromosomesComparator comparator;
     protected Population pop;
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
@@ -45,7 +45,7 @@ public class GeneticAlgorithm {
         pop.sort(comparator);
     }
 
-    public GeneticAlgorithm(Population pop) {
+    protected GeneticAlgorithm(Population pop) {
         this.pop = pop;
         comparator = new ChromosomesComparator();
         pop.sort(comparator);

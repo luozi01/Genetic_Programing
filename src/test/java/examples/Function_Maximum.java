@@ -15,7 +15,7 @@ public class Function_Maximum {
 
     public static void main(String[] args) {
         Population population = new Population(new SolveGenerate(100));
-        GeneticAlgorithm ga = new GeneticAlgorithm(population, new UniformCrossover<>(.4),
+        GeneticAlgorithm ga = new GeneticAlgorithm(population, new UniformCrossover<>(.5),
                 .4, new BinaryMutation(), .02, 3, 1);
         ga.evolve(1000);
         String output = ga.getBest().toString();
@@ -68,7 +68,7 @@ public class Function_Maximum {
 
     private static class SolveGenerate implements Generator {
 
-        private int populationSize;
+        private final int populationSize;
 
         SolveGenerate(int populationSize) {
             this.populationSize = populationSize;

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MicroMutation implements MutationPolicy {
 
-    private LinearGP manager;
+    private final LinearGP manager;
 
     public MicroMutation(LinearGP manager) {
         this.manager = manager;

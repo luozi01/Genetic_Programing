@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class MacroMutation implements MutationPolicy {
 
-    private LinearGP manager;
+    private final LinearGP manager;
 
     public MacroMutation(LinearGP manager) {
         this.manager = manager;

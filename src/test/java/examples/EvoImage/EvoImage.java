@@ -20,7 +20,7 @@ public class EvoImage extends Application {
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
     private int COUNTER_BENEFIT = 0;
-    private EvoManager manager = new EvoManager();
+    private final EvoManager manager = new EvoManager();
 
     public static void main(String[] args) {
         launch(args);

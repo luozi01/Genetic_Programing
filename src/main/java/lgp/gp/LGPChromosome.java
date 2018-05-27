@@ -228,13 +228,14 @@ public class LGPChromosome extends Chromosome {
         return instructions.size();
     }
 
+    //Todo efficient improve
     public void eval(Observation observation) {
         markStructuralIntrons(manager);
         execute(observation);
     }
 
     //Todo
-    public void copy(LGPChromosome that, boolean effectiveOnly) {
+    private void copy(LGPChromosome that, boolean effectiveOnly) {
         for (int i = 0; i < that.registerSet.size(); i++) {
             registerSet.add(that.registerSet.get(i).makeCopy());
         }

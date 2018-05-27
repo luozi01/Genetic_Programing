@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MicroMutation implements MutationPolicy {
 
-    private TreeGP manager;
+    private final TreeGP manager;
 
     public MicroMutation(TreeGP manager) {
         this.manager = manager;

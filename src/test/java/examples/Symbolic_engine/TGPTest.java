@@ -12,7 +12,7 @@ import java.util.List;
 import static treegp.program.Type.*;
 
 
-public class TGPTest {
+class TGPTest {
 
     public static void main(String[] args) {
         List<Observation> list = Test.function();

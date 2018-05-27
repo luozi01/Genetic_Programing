@@ -1,5 +1,5 @@
 package examples.EvoImage;
 
-public interface Colors {
+interface Colors {
     void apply(Polygon polygon);
 }

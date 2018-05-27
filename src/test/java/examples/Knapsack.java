@@ -162,9 +162,11 @@ public class Knapsack {
 
     static class KGenerator implements Generator {
 
-        private int populationSize;
-        private int[] itemsWeight, itemsValue;
-        private int capacity, defaultGeneLength;
+        private final int populationSize;
+        private final int[] itemsWeight;
+        private final int[] itemsValue;
+        private final int capacity;
+        private final int defaultGeneLength;
 
         KGenerator(int populationSize, int[] itemsWeight, int[] itemsValue, int capacity, int defaultGeneLength) {
             this.populationSize = populationSize;

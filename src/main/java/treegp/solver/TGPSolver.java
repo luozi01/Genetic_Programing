@@ -5,7 +5,7 @@ import org.apache.commons.math3.genetics.Chromosome;
 import treegp.gp.*;
 
 public class TGPSolver {
-    private TGA environment;
+    private final TGA environment;
 
     public TGPSolver(TreeGP manager) {
         Population population = new Population(new TGPGenerator(manager));

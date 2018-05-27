@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Population implements Iterable<Chromosome> {
 
-    private List<Chromosome> chromosomes;
+    private final List<Chromosome> chromosomes;
 
     public Population(Generator generator) {
         chromosomes = generator.generate();

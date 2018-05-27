@@ -24,18 +24,18 @@ public class ImageEvo extends Application {
     private int MAX_HEIGHT = 0;
 
     private int COUNTER_BENEFIT = 0;
-    private int MAX_SHAPES = 50;    // max capacity
-    private int MAX_POINTS = 6;
-    private int ACTUAL_SHAPES = MAX_SHAPES; // current size
-    private int ACTUAL_POINTS = MAX_POINTS;
-    private Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
-    private Polygon[] DNA_TEST = new Polygon[MAX_SHAPES];
+    private final int MAX_SHAPES = 50;    // max capacity
+    private final int MAX_POINTS = 6;
+    private final int ACTUAL_SHAPES = MAX_SHAPES; // current size
+    private final int ACTUAL_POINTS = MAX_POINTS;
+    private final Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
+    private final Polygon[] DNA_TEST = new Polygon[MAX_SHAPES];
     private int CHANGED_SHAPE_INDEX = 0;
-    private double FITNESS_MAX = Double.MAX_VALUE;
+    private final double FITNESS_MAX = Double.MAX_VALUE;
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
     private DoubleMatrix image_colors;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public static void main(String[] args) {
         launch(args);

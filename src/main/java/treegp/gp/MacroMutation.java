@@ -12,7 +12,7 @@ import treegp.solver.TreeGP;
 public class MacroMutation implements MutationPolicy {
 
 
-    private TreeGP manager;
+    private final TreeGP manager;
 
     public MacroMutation(TreeGP manager) {
         this.manager = manager;
