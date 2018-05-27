@@ -10,7 +10,7 @@ import org.apache.commons.math3.genetics.MutationPolicy;
 public class CGA extends GeneticAlgorithm {
 
     private final CartesianGP manager;
-    private MutationPolicy mutationPolicy;
+    private final MutationPolicy mutationPolicy;
 
     public CGA(Population pop, MutationPolicy mutationPolicy, CartesianGP manager) {
         super(pop);

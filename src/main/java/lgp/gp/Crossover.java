@@ -47,8 +47,7 @@ public class Crossover implements CrossoverPolicy {
         return chromosome;
     }
 
-    /* Xianshun says: (From Section 5.7.3 of Linear Genetic Programming
-       Crossover requires, by definition, that information is exchanged between individual programs.
+    /* Crossover requires, by definition, that information is exchanged between individual programs.
        However, an exchange always includes two operations on an individual, the deletion and
        the insertion of a subprogram. The imperative program representation allows instructions to be
        deleted without replacement since instruction operands, e.g. register pointers, are always defined.

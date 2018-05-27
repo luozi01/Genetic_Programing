@@ -26,8 +26,6 @@ public class ImageEvo extends Application {
     private int COUNTER_BENEFIT = 0;
     private final int MAX_SHAPES = 50;    // max capacity
     private final int MAX_POINTS = 6;
-    private final int ACTUAL_SHAPES = MAX_SHAPES; // current size
-    private final int ACTUAL_POINTS = MAX_POINTS;
     private final Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
     private final Polygon[] DNA_TEST = new Polygon[MAX_SHAPES];
     private int CHANGED_SHAPE_INDEX = 0;
@@ -49,7 +47,8 @@ public class ImageEvo extends Application {
     }
 
     private void mutate_medium(Polygon[] dna_out) {
-        CHANGED_SHAPE_INDEX = random.nextInt(ACTUAL_SHAPES - 1);
+        // current size
+        CHANGED_SHAPE_INDEX = random.nextInt(MAX_SHAPES - 1);
         double roulette = random.nextDouble() * 2.0;
 
         // mutate color
@@ -66,7 +65,7 @@ public class ImageEvo extends Application {
         }
         // mutate shape
         else {
-            int CHANGED_POINT_INDEX = random.nextInt(ACTUAL_POINTS - 1);
+            int CHANGED_POINT_INDEX = random.nextInt(MAX_POINTS - 1);
             if (roulette < 1.5) {
                 dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = random.nextInt(MAX_WIDTH);
             } else {
