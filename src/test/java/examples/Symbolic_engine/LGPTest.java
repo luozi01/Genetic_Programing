@@ -4,12 +4,10 @@ import genetics.utils.Observation;
 import lgp.gp.LGPChromosome;
 import lgp.solver.LGPSolver;
 import lgp.solver.LinearGP;
-import lombok.Setter;
 
 import java.util.List;
 
-@Setter
-public class LGPTest {
+class LGPTest {
 
     public static void main(String[] args) {
         List<Observation> list = Test.function();
