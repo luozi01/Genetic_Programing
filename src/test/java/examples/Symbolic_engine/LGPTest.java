@@ -17,9 +17,7 @@ class LGPTest {
         List<Observation> testing = list.subList(split_point, list.size());
         System.out.printf("Training: %d\t Testing: %d\t\n", training.size(), testing.size());
 
-        LinearGP gp = LinearGP.defaultConfig();
-        gp.addObservations(training);
-        gp.setRegisterCount(3);
+        LinearGP gp = LinearGP.defaultConfig(training, 3);
         LGPSolver solver = new LGPSolver(gp);
         addListener(solver);
         Long startTime = System.currentTimeMillis();

@@ -74,48 +74,6 @@ public class LGPChromosome extends Chromosome {
         return registerSet.get(manager.getRandEngine().nextInt(registerSet.size()));
     }
 
-    private void markStructuralIntrons(LinearGP manager) {
-
-        int instruction_count = length();
-        for (int i = instruction_count - 1; i >= 0; i--) {
-            instructions.get(i).setStructuralIntron(true);
-        }
-
-        Set<Integer> eff = new HashSet<>();
-        int io_register_count = manager.getRegisterCount();
-        for (int i = 0; i < io_register_count; ++i) {
-            eff.add(i);
-        }
-
-        Instruction current_instruction = null;
-        Instruction prev_instruction;  // prev_instruction is the last visited instruction from bottom up of the program
-
-        for (int i = instruction_count - 1; i >= 0; i--) {
-            prev_instruction = current_instruction;
-            current_instruction = instructions.get(i);
-            // prev_instruction is not an structural intron and the current_instruction
-            // is a conditional construct then, the current_instruction is not structural intron either
-            // this directly follows from Step 3 of Algorithm 3.1
-            if (current_instruction.getOperator().isConditional() && prev_instruction != null) {
-                if (!prev_instruction.isStructuralIntron()) {
-                    current_instruction.setStructuralIntron(false);
-                }
-            } else {
-                if (eff.contains(current_instruction.getTargetOperand().getIndex())) {
-                    current_instruction.setStructuralIntron(false);
-                    eff.remove(current_instruction.getTargetOperand().getIndex());
-
-                    if (!current_instruction.getR1().isConstant()) {
-                        eff.add(current_instruction.getR1().getIndex());
-                    }
-                    if (!current_instruction.getR2().isConstant()) {
-                        eff.add(current_instruction.getR2().getIndex());
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Structural or data flow introns denote single noneffective instructions that
      * emerge in a linear program from manipulating noneffective registers.
@@ -228,13 +186,11 @@ public class LGPChromosome extends Chromosome {
         return instructions.size();
     }
 
-    //Todo efficient improve
     public void eval(Observation observation) {
-        markStructuralIntrons(manager);
+        markStructuralIntrons(0, manager);
         execute(observation);
     }
 
-    //Todo
     private void copy(LGPChromosome that, boolean effectiveOnly) {
         for (int i = 0; i < that.registerSet.size(); i++) {
             registerSet.add(that.registerSet.get(i).makeCopy());

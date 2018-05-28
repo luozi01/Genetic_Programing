@@ -30,10 +30,10 @@ class TGPTest {
         solver.evolve();
         System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
 
-        test(solver, testing, false);
+        test(solver, testing);
     }
 
-    private static void test(TGPSolver solver, List<Observation> observations, boolean silent) {
+    private static void test(TGPSolver solver, List<Observation> observations) {
         for (Observation o : observations) {
             for (int i = 0; i < o.inputCount(); i++) {
                 solver.getBestGene().getManager().setVariable(o.getTextInput(i), o.getInput(i));
@@ -41,10 +41,8 @@ class TGPTest {
             double predicted = solver.getBestGene().eval();
             double actual = o.getOutput(0);
 
-            if (!silent) {
-                System.out.printf("predicted: %f\t actual: %f\t difference: %f\t\n",
-                        predicted, actual, Math.abs(predicted - actual));
-            }
+            System.out.printf("predicted: %f\t actual: %f\t difference: %f\t\n",
+                    predicted, actual, Math.abs(predicted - actual));
         }
     }
 

@@ -73,14 +73,12 @@ public class LinearGP {
     private int tournamentSize = 3;
     // END
 
-    public static LinearGP defaultConfig() {
+    public static LinearGP defaultConfig(List<Observation> targets, int registerCount) {
         LinearGP lgp = new LinearGP();
         lgp.getOperatorSet().addAll(Arrays.asList(new ADD(), new SUB(), new DIV(), new MUL(), new POW(), new IFGREATERTHAN()));
         lgp.getConstantSet().addAll(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0));
+        lgp.targets.addAll(targets);
+        lgp.setRegisterCount(registerCount);
         return lgp;
-    }
-
-    public void addObservations(List<Observation> targets) {
-        this.targets.addAll(targets);
     }
 }

@@ -26,7 +26,7 @@ class CGPTest {
         solver.evolve();
         System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
 
-//        test(solver, testing);
+        test(solver, testing);
     }
 
     private static void test(CGPSolver solver, List<Observation> observations) {
