@@ -1,5 +1,6 @@
 package treegp.gp;
 
+import com.google.gson.Gson;
 import genetics.utils.Observation;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +15,7 @@ public class TGPChromosome extends Chromosome {
     private TreeNode root;
     private TreeGP manager;
 
-    TGPChromosome(TreeNode root, TreeGP manager) {
+    public TGPChromosome(TreeNode root, TreeGP manager) {
         this.root = root;
         this.manager = manager;
     }
@@ -30,6 +31,14 @@ public class TGPChromosome extends Chromosome {
 
     public double eval() {
         return root.eval();
+    }
+
+    public String serialization() {
+        return new Gson().toJson(this);
+    }
+
+    public TGPChromosome deserialization(String json) {
+        return new Gson().fromJson(json, TGPChromosome.class);
     }
 
     @Override

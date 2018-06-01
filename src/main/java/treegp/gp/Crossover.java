@@ -37,10 +37,10 @@ public class Crossover implements CrossoverPolicy {
      * @param chromosome2 Another tree to be crossover with
      */
     private ChromosomePair apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
-        int iMaxDepthForCrossover = manager.maxDepthForCrossover;
-        TGPCrossoverStrategy method = manager.crossoverStrategy;
+        int iMaxDepthForCrossover = manager.getMaxDepthForCrossover();
+        TGPCrossoverStrategy method = manager.getCrossoverStrategy();
 
-        RandEngine randEngine = manager.randEngine;
+        RandEngine randEngine = manager.getRandEngine();
         boolean bias = (method == TGPCrossoverStrategy.CROSSOVER_SUBTREE_BIAS);
 
         int iMaxDepth1 = chromosome1.getRoot().depth();

@@ -27,7 +27,7 @@ public class MicroMutation implements MutationPolicy {
      * @param treeNode tree node
      */
     private Chromosome apply(TGPChromosome treeNode) {
-        RandEngine randEngine = manager.randEngine;
+        RandEngine randEngine = manager.getRandEngine();
         TreeNode node = treeNode.getRoot().anyNode(randEngine)._1();
 
         if (node.isTerminal()) {

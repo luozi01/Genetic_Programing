@@ -45,7 +45,7 @@ public class SyntaxTreeUtils {
      */
     public static TreeNode createWithDepth(TreeGP context, int allowableDepth, TreeGP manager, TGPInitializationStrategy method) {
         List<Operator> operatorSet = context.getNonTerminal();
-        RandEngine randEngine = manager.randEngine;
+        RandEngine randEngine = manager.getRandEngine();
 
         TreeNode root;
         // Population Initialization method following the "RandomBranch" method described in

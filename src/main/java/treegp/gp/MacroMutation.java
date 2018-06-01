@@ -25,9 +25,9 @@ public class MacroMutation implements MutationPolicy {
      * @param treeNode node
      */
     private Chromosome apply(TGPChromosome treeNode) {
-        int iMaxProgramDepth = manager.maxProgramDepth;
-        TGPMutationStrategy method = manager.mutationStrategy;
-        RandEngine randEngine = manager.randEngine;
+        int iMaxProgramDepth = manager.getMaxProgramDepth();
+        TGPMutationStrategy method = manager.getMutationStrategy();
+        RandEngine randEngine = manager.getRandEngine();
 
         TreeNode node = treeNode.getRoot().anyNode(randEngine)._1();
         if (method == TGPMutationStrategy.MUTATION_SUBTREE || method == TGPMutationStrategy.MUTATION_SUBTREE_KINNEAR) {

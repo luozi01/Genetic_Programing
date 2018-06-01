@@ -21,7 +21,7 @@ public class TGPGenerator implements Generator {
     @Override
     public List<Chromosome> generate() {
         List<Chromosome> pop = new ArrayList<>();
-        TGPInitializationStrategy initializationStrategy = manager.popInitStrategy;
+        TGPInitializationStrategy initializationStrategy = manager.getPopInitStrategy();
         if (initializationStrategy == TGPInitializationStrategy.INITIALIZATION_METHOD_FULL
                 || initializationStrategy == TGPInitializationStrategy.INITIALIZATION_METHOD_GROW
                 || initializationStrategy == TGPInitializationStrategy.INITIALIZATION_METHOD_PTC1
@@ -37,7 +37,7 @@ public class TGPGenerator implements Generator {
     }
 
     private List<Chromosome> initializeRampedHalfHalf(int populationSize) {
-        int maxDepthForCreation = manager.maxDepthForCreation;
+        int maxDepthForCreation = manager.getMaxDepthForCreation();
         int part_count = maxDepthForCreation - 1;
 
         int interval = populationSize / part_count;
@@ -70,12 +70,12 @@ public class TGPGenerator implements Generator {
 
     private List<Chromosome> initializeRamped(int populationSize) {
         List<Chromosome> pop = new ArrayList<>();
-        int maxDepthForCreation = manager.maxDepthForCreation;
+        int maxDepthForCreation = manager.getMaxDepthForCreation();
         int part_count = maxDepthForCreation - 1;
 
         int interval = populationSize / part_count;
 
-        TGPInitializationStrategy method = manager.popInitStrategy;
+        TGPInitializationStrategy method = manager.getPopInitStrategy();
         if (method == TGPInitializationStrategy.INITIALIZATION_METHOD_RAMPED_FULL) {
             method = TGPInitializationStrategy.INITIALIZATION_METHOD_FULL;
         } else if (method == TGPInitializationStrategy.INITIALIZATION_METHOD_RAMPED_GROW) {
@@ -103,8 +103,8 @@ public class TGPGenerator implements Generator {
     private List<Chromosome> initializeNotRamped(int populationSize) {
         List<Chromosome> pop = new ArrayList<>();
         for (int i = 0; i < populationSize; i++) {
-            TreeNode node = SyntaxTreeUtils.createWithDepth(manager, manager.maxProgramDepth,
-                    manager, manager.popInitStrategy);
+            TreeNode node = SyntaxTreeUtils.createWithDepth(manager, manager.getMaxProgramDepth(),
+                    manager, manager.getPopInitStrategy());
             pop.add(new TGPChromosome(node, manager));
         }
         return pop;

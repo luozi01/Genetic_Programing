@@ -17,23 +17,22 @@ import java.util.*;
 @Getter
 @Setter
 public class TreeGP {
-    public TGPInitializationStrategy popInitStrategy = TGPInitializationStrategy.INITIALIZATION_METHOD_FULL;
-    public TGPCrossoverStrategy crossoverStrategy = TGPCrossoverStrategy.CROSSOVER_SUBTREE_BIAS;
-    public TGPMutationStrategy mutationStrategy = TGPMutationStrategy.MUTATION_SHRINK;
-    public TGPEvolveStrategy replacementStrategy = TGPEvolveStrategy.TINY_GP;
+    private TGPInitializationStrategy popInitStrategy = TGPInitializationStrategy.INITIALIZATION_METHOD_PTC1;
+    private TGPCrossoverStrategy crossoverStrategy = TGPCrossoverStrategy.CROSSOVER_SUBTREE_BIAS;
+    private TGPMutationStrategy mutationStrategy = TGPMutationStrategy.MUTATION_SHRINK;
+    private TGPEvolveStrategy replacementStrategy = TGPEvolveStrategy.TINY_GP;
 
-    public RandEngine randEngine = new SimpleRandEngine();
-    public int populationSize = 500;
-    public int maxDepthForCrossover = 4;
-    public int maxProgramDepth = 4;
-    public int maxDepthForCreation = 3;
-    public double macroMutationRate = 0.75;
-    public double microMutationRate = 0.75;
-    public double crossoverRate = 0.3;
-    public double reproductionRate = 0.0;
-    public double elitismRatio = .4;
-    public int tournamentSize = 3;
-
+    private RandEngine randEngine = new SimpleRandEngine();
+    private int populationSize = 500;
+    private int maxDepthForCreation = 3;
+    private int maxDepthForCrossover = 4;
+    private int maxProgramDepth = 4;
+    private double macroMutationRate = 0.75;
+    private double microMutationRate = 0.75;
+    private double crossoverRate = 0.3;
+    private double reproductionRate = 0.0;
+    private double elitismRatio = .4;
+    private int tournamentSize = 3;
     private List<Operator> terminal = new ArrayList<>(); // variables | numbers
     private List<Operator> nonTerminal = new ArrayList<>(); // operators
     private Map<String, Double> variables = new HashMap<>();
