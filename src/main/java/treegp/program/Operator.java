@@ -1,5 +1,7 @@
 package treegp.program;
 
+import genetics.utils.Observation;
+
 public interface Operator {
 
     int argumentCount();
@@ -10,5 +12,5 @@ public interface Operator {
 
     String toString(TreeNode treeNode);
 
-    double eval(TreeNode treeNode);
+    double eval(TreeNode treeNode, Observation observation);
 }

@@ -1,4 +1,4 @@
-package treegp.tools;
+package genetics.utils;
 
 public class Pair<T> {
     private final T v1;
@@ -9,11 +9,11 @@ public class Pair<T> {
         this.v2 = v2;
     }
 
-    public T _1() {
+    public T getFirst() {
         return v1;
     }
 
-    public T _2() {
+    public T getSecond() {
         return v2;
     }
 

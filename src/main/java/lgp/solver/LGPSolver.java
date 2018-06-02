@@ -1,16 +1,24 @@
 package lgp.solver;
 
+import genetics.Chromosome;
+import genetics.Fitness;
 import genetics.Population;
 import lgp.gp.*;
-import org.apache.commons.math3.genetics.Chromosome;
 
 public class LGPSolver {
     private final LGA environment;
+    private LGPFitnessCalc LGPFitnessCalc;
 
-    public LGPSolver(LinearGP manager) {
+    public LGPSolver(LinearGP manager, LGPFitnessCalc LGPFitnessCalc) {
+        this.LGPFitnessCalc = LGPFitnessCalc;
+        LGPFitness LGPFitness = new LGPFitness(LGPFitnessCalc);
         Population population = new Population(new LGPGenerator(manager));
-        environment = new LGA(population, new Crossover(manager),
-                new MicroMutation(manager), new MacroMutation(manager), manager);
+        environment = new LGA(population,
+                LGPFitness,
+                new Crossover(manager),
+                new MicroMutation(manager),
+                new MacroMutation(manager),
+                manager);
     }
 
     public void addIterationListener(final LGPListener listener) {
@@ -38,11 +46,24 @@ public class LGPSolver {
         return (LGPChromosome) environment.getBest();
     }
 
-    public double fitness(Chromosome chromosome) {
-        return chromosome.getFitness();
+    public double fitness(LGPChromosome chromosome) {
+        return LGPFitnessCalc.fitness(chromosome);
     }
 
     public interface LGPListener {
         void update(LGPSolver solver);
+    }
+
+    private class LGPFitness implements Fitness {
+        private LGPFitnessCalc LGPFitnessCalc;
+
+        LGPFitness(LGPFitnessCalc LGPFitnessCalc) {
+            this.LGPFitnessCalc = LGPFitnessCalc;
+        }
+
+        @Override
+        public double calc(Chromosome chromosome) {
+            return LGPFitnessCalc.fitness((LGPChromosome) chromosome);
+        }
     }
 }

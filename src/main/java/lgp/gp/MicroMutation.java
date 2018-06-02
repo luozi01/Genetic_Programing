@@ -1,10 +1,10 @@
 package lgp.gp;
 
+import genetics.Chromosome;
+import genetics.MutationPolicy;
 import genetics.utils.RandEngine;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.MutationPolicy;
 
 import java.util.List;
 

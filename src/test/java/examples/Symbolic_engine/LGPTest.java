@@ -2,9 +2,11 @@ package examples.Symbolic_engine;
 
 import genetics.utils.Observation;
 import lgp.gp.LGPChromosome;
+import lgp.solver.LGPFitnessCalc;
 import lgp.solver.LGPSolver;
 import lgp.solver.LinearGP;
 
+import java.util.LinkedList;
 import java.util.List;
 
 class LGPTest {
@@ -17,8 +19,10 @@ class LGPTest {
         List<Observation> testing = list.subList(split_point, list.size());
         System.out.printf("Training: %d\t Testing: %d\t\n", training.size(), testing.size());
 
+        FunctionFitness fitnessFunction = new FunctionFitness(training);
+
         LinearGP gp = LinearGP.defaultConfig(training, 3);
-        LGPSolver solver = new LGPSolver(gp);
+        LGPSolver solver = new LGPSolver(gp, fitnessFunction);
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();
@@ -54,5 +58,25 @@ class LGPTest {
                 System.out.println(bestGene);
             }
         });
+    }
+
+    private static class FunctionFitness implements LGPFitnessCalc {
+
+        private List<Observation> targets = new LinkedList<>();
+
+        FunctionFitness(List<Observation> targets) {
+            this.targets.addAll(targets);
+        }
+
+        @Override
+        public double fitness(LGPChromosome chromosome) {
+            double diff = 0;
+
+            for (Observation o : this.targets) {
+                chromosome.eval(o);
+                diff += Math.pow(o.getOutput(0) - o.getPredictedOutput(0), 2);
+            }
+            return diff;
+        }
     }
 }

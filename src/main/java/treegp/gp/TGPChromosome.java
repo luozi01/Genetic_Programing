@@ -1,10 +1,10 @@
 package treegp.gp;
 
 import com.google.gson.Gson;
+import genetics.Chromosome;
 import genetics.utils.Observation;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.math3.genetics.Chromosome;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;
 
@@ -13,7 +13,7 @@ import treegp.solver.TreeGP;
 public class TGPChromosome extends Chromosome {
 
     private TreeNode root;
-    private TreeGP manager;
+    private transient TreeGP manager;
 
     public TGPChromosome(TreeNode root, TreeGP manager) {
         this.root = root;
@@ -29,8 +29,8 @@ public class TGPChromosome extends Chromosome {
         return root.toString();
     }
 
-    public double eval() {
-        return root.eval();
+    public double eval(Observation observation) {
+        return root.eval(observation);
     }
 
     public String serialization() {
@@ -39,20 +39,6 @@ public class TGPChromosome extends Chromosome {
 
     public TGPChromosome deserialization(String json) {
         return new Gson().fromJson(json, TGPChromosome.class);
-    }
-
-    @Override
-    public double fitness() {
-        double diff = 0;
-        for (Observation o : manager.getTargets()) {
-            for (int i = 0; i < o.inputCount(); i++) {
-                manager.setVariable(o.getTextInput(i), o.getInput(i));
-            }
-            double targetValue = o.getOutput(0);
-            double calculatedValue = root.eval();
-            diff += Math.pow(targetValue - calculatedValue, 2);
-        }
-        return diff;
     }
 }
 

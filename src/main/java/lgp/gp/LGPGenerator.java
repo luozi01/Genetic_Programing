@@ -1,11 +1,11 @@
 package lgp.gp;
 
 
+import genetics.Chromosome;
 import genetics.Generator;
 import lgp.enums.LGPInitialization;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
-import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.ArrayList;
 import java.util.List;

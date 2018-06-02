@@ -1,10 +1,11 @@
 package treegp.program;
 
+import genetics.utils.Observation;
 import genetics.utils.RandEngine;
 import lombok.Getter;
 import lombok.Setter;
 import treegp.solver.TreeGP;
-import treegp.tools.Pair;
+import genetics.utils.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class TreeNode implements Serializable {
     private Operator op;
     private String variable;
     private double value = 0;
-    private TreeGP manager;
+    private transient TreeGP manager;
     private List<TreeNode> children = new ArrayList<>(2);
 
     TreeNode(Operator op, TreeGP manager) {
@@ -37,8 +38,8 @@ public class TreeNode implements Serializable {
         return maxDepth;
     }
 
-    public double eval() {
-        return op.eval(this);
+    public double eval(Observation observation) {
+        return op.eval(this, observation);
     }
 
     void addChildren(TreeNode treeNode) {
@@ -115,7 +116,7 @@ public class TreeNode implements Serializable {
             if (randEngine.uniform() <= 0.1) {
                 List<Pair<TreeNode>> terminal_nodes = new ArrayList<>();
                 for (Pair<TreeNode> tuple : nodes) {
-                    TreeNode node = tuple._1();
+                    TreeNode node = tuple.getFirst();
                     if (node.isTerminal()) {
                         terminal_nodes.add(tuple);
                     }
@@ -128,7 +129,7 @@ public class TreeNode implements Serializable {
             } else {
                 List<Pair<TreeNode>> function_nodes = new ArrayList<>();
                 for (Pair<TreeNode> tuple : nodes) {
-                    TreeNode node = tuple._1();
+                    TreeNode node = tuple.getFirst();
                     if (!node.isTerminal()) {
                         function_nodes.add(tuple);
                     }

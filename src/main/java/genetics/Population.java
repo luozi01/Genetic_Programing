@@ -1,6 +1,5 @@
 package genetics;
 
-import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.ArrayList;
 import java.util.Comparator;

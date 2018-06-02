@@ -2,9 +2,9 @@ package cgp.gp;
 
 import cgp.Solver.CartesianGP;
 import cgp.program.Function;
+import genetics.Chromosome;
 import genetics.utils.Observation;
 import lombok.Getter;
-import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.Arrays;
 
@@ -117,18 +117,6 @@ public class CGPChromosome extends Chromosome {
         for (int i = 0; i < outputRegisterCount; i++) {
             observation.setPredictedOutput(i, (Double) varMap[outputs[i]]);
         }
-    }
-
-    @Override
-    public double fitness() {
-        double diff = 0;
-        for (Observation o : manager.getTargets()) {
-            for (int i = 0; i < o.outputCount(); i++) {
-                eval(o);
-                diff += Math.pow(o.getOutput(i) - o.getPredictedOutput(i), 2);
-            }
-        }
-        return diff;
     }
 
     @Override

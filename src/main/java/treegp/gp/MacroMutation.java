@@ -1,8 +1,8 @@
 package treegp.gp;
 
+import genetics.Chromosome;
+import genetics.MutationPolicy;
 import genetics.utils.RandEngine;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.MutationPolicy;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.enums.TGPMutationStrategy;
 import treegp.program.SyntaxTreeUtils;
@@ -29,7 +29,7 @@ public class MacroMutation implements MutationPolicy {
         TGPMutationStrategy method = manager.getMutationStrategy();
         RandEngine randEngine = manager.getRandEngine();
 
-        TreeNode node = treeNode.getRoot().anyNode(randEngine)._1();
+        TreeNode node = treeNode.getRoot().anyNode(randEngine).getFirst();
         if (method == TGPMutationStrategy.MUTATION_SUBTREE || method == TGPMutationStrategy.MUTATION_SUBTREE_KINNEAR) {
             int depth = treeNode.getRoot().length();
 

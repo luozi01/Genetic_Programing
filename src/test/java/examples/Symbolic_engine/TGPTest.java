@@ -1,12 +1,14 @@
 package examples.Symbolic_engine;
 
 import genetics.utils.Observation;
-import org.apache.commons.math3.genetics.Chromosome;
+import treegp.gp.TGPChromosome;
 import treegp.program.Operator;
+import treegp.solver.TGPFitnessCalc;
 import treegp.solver.TGPSolver;
 import treegp.solver.TreeGP;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static treegp.program.Type.*;
@@ -22,9 +24,11 @@ class TGPTest {
         List<Observation> testing = list.subList(split_point, list.size());
         System.out.printf("Training: %d\t Testing: %d\t\n", training.size(), testing.size());
 
+        TabulatedFunctionFitness fitnessFunction = new TabulatedFunctionFitness(training);
+
         List<Operator> func = Arrays.asList(ADD, SUB, MUL, VARIABLE, CONSTANT);
-        TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"), training);
-        TGPSolver solver = new TGPSolver(env);
+        TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"));
+        TGPSolver solver = new TGPSolver(env, fitnessFunction);
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();
@@ -38,7 +42,7 @@ class TGPTest {
             for (int i = 0; i < o.inputCount(); i++) {
                 solver.getBestGene().getManager().setVariable(o.getTextInput(i), o.getInput(i));
             }
-            double predicted = solver.getBestGene().eval();
+            double predicted = solver.getBestGene().eval(o);
             double actual = o.getOutput(0);
 
             System.out.printf("predicted: %f\t actual: %f\t difference: %f\t\n",
@@ -49,7 +53,7 @@ class TGPTest {
     private static void addListener(TGPSolver engine) {
         engine.addIterationListener(engine1 -> {
 
-            Chromosome bestGene = engine1.getBestGene();
+            TGPChromosome bestGene = engine1.getBestGene();
 
             double bestFit = engine1.fitness(bestGene);
 
@@ -61,8 +65,33 @@ class TGPTest {
             if (bestFit < 5) {
                 engine1.terminate();
                 System.out.printf("Function: %s\n", bestGene);
+                System.out.println(bestGene.serialization());
             }
         });
+    }
+
+    private static class TabulatedFunctionFitness implements TGPFitnessCalc {
+
+        private List<Observation> targets = new LinkedList<>();
+
+        TabulatedFunctionFitness(List<Observation> targets) {
+            this.targets.addAll(targets);
+        }
+
+        @Override
+        public double fitness(TGPChromosome expression) {
+            double diff = 0;
+
+            for (Observation o : this.targets) {
+                for (int i = 0; i < o.inputCount(); i++) {
+                    expression.getManager().setVariable(o.getTextInput(i), o.getInput(i));
+                }
+                double targetValue = o.getOutput(0);
+                double calculatedValue = expression.eval(o);
+                diff += Math.pow(targetValue - calculatedValue, 2);
+            }
+            return diff;
+        }
     }
 }
 

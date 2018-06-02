@@ -1,11 +1,8 @@
 package examples;
 
-import genetics.Generator;
-import genetics.GeneticAlgorithm;
-import genetics.Population;
+import genetics.*;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
-import org.apache.commons.math3.genetics.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,11 +90,12 @@ public class Knapsack {
 
         GeneticAlgorithm ga = new GeneticAlgorithm(
                 new Population(new KGenerator(100, itemsWeight, itemsValue, capacity, defaultGeneLength)),
+                new KEvaluate(),
                 new UniformCrossover<K>(.5), .4,
                 new BinaryMutation(), .02, 3, 1);
         ga.evolve(1000);
         Chromosome k = ga.getBest();
-        System.out.println("Fittest: " + k.getFitness());
+        System.out.println("Fittest: " + new KEvaluate().calc(k));
         System.out.println("Genes: " + k.toString());
         System.out.println("Weights: " + sum((K) k, itemsWeight));
         System.out.println("Value: " + sum((K) k, itemsValue));
@@ -123,7 +121,7 @@ public class Knapsack {
         }
 
         @Override
-        public AbstractListChromosome<Integer> newFixedLengthChromosome(List<Integer> list) {
+        public AbstractListChromosome<Integer> newCopy(List<Integer> list) {
             K k = new K(list);
             k.itemsWeight = itemsWeight;
             k.itemsValue = itemsValue;
@@ -143,19 +141,23 @@ public class Knapsack {
             }
             return geneString.toString();
         }
+    }
+
+    static class KEvaluate implements Fitness {
 
         @Override
-        public double fitness() {
+        public double calc(Chromosome chromosome) {
             int totalWeight = 0, totalValue = 0;
             // Loop through our individuals genes and compare them to our candidates
-            for (int i = 0; i < getLength(); i++) {
-                if (getGene(i) == 1) {
-                    totalWeight += itemsWeight[i];
-                    totalValue += itemsValue[i];
+            for (int i = 0; i < ((K) chromosome).getLength(); i++) {
+                if (((K) chromosome).getLength() == 1) {
+                    totalWeight += ((K) chromosome).itemsWeight[i];
+                    totalValue += ((K) chromosome).itemsValue[i];
                 }
             }
             double fitness = Double.MIN_VALUE;
-            if (totalWeight <= capacity && fitness < totalValue) fitness = totalValue;
+            if (totalWeight <= ((K) chromosome).capacity)
+                if (fitness < totalValue) fitness = totalValue;
             return -fitness;
         }
     }

@@ -1,5 +1,6 @@
 package lgp.gp;
 
+import genetics.Chromosome;
 import genetics.utils.Observation;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.program.Instruction;
@@ -8,7 +9,6 @@ import lgp.program.Register;
 import lgp.solver.LinearGP;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.*;
 
@@ -215,15 +215,5 @@ public class LGPChromosome extends Chromosome {
         LGPChromosome clone = new LGPChromosome(manager);
         clone.copy(this, false);
         return clone;
-    }
-
-    @Override
-    public double fitness() {
-        double diff = 0;
-        for (Observation o : manager.getTargets()) {
-            eval(o);
-            diff += Math.pow(o.getOutput(0) - o.getPredictedOutput(0), 2);
-        }
-        return diff;
     }
 }

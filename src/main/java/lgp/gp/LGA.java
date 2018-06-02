@@ -1,14 +1,10 @@
 package lgp.gp;
 
 
-import genetics.GeneticAlgorithm;
-import genetics.Population;
+import genetics.*;
+import genetics.utils.Pair;
 import genetics.utils.RandEngine;
 import lgp.solver.LinearGP;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.ChromosomePair;
-import org.apache.commons.math3.genetics.CrossoverPolicy;
-import org.apache.commons.math3.genetics.MutationPolicy;
 
 public class LGA extends GeneticAlgorithm {
 
@@ -16,9 +12,13 @@ public class LGA extends GeneticAlgorithm {
     private final MutationPolicy micro, macro;
     private final LinearGP manager;
 
-    public LGA(Population pop, final CrossoverPolicy crossoverPolicy,
-               final MutationPolicy micro, final MutationPolicy macro, final LinearGP manager) {
-        super(pop);
+    public LGA(Population pop,
+               final Fitness fitness,
+               final CrossoverPolicy crossoverPolicy,
+               final MutationPolicy micro,
+               final MutationPolicy macro,
+               final LinearGP manager) {
+        super(pop, fitness);
         this.crossoverPolicy = crossoverPolicy;
         this.micro = micro;
         this.macro = macro;
@@ -39,7 +39,7 @@ public class LGA extends GeneticAlgorithm {
 
             double r = randEngine.uniform();
             if (r < manager.getCrossoverRate()) {
-                ChromosomePair pair = crossoverPolicy.crossover(gp1, gp2);
+                Pair<Chromosome> pair = crossoverPolicy.crossover(gp1, gp2);
                 pop.addChromosome(pair.getFirst());
                 pop.addChromosome(pair.getSecond());
             }

@@ -1,16 +1,25 @@
 package treegp.solver;
 
+import genetics.Chromosome;
+import genetics.Fitness;
 import genetics.Population;
-import org.apache.commons.math3.genetics.Chromosome;
 import treegp.gp.*;
 
 public class TGPSolver {
     private final TGA environment;
+    private TGPFitnessCalc TGPFitnessCalc;
 
-    public TGPSolver(TreeGP manager) {
+    public TGPSolver(TreeGP manager, TGPFitnessCalc TGPFitnessCalc) {
+        this.TGPFitnessCalc = TGPFitnessCalc;
+        TGPFitness TGPFitness = new TGPFitness(TGPFitnessCalc);
         Population population = new Population(new TGPGenerator(manager));
-        environment = new TGA(population, new Crossover(manager),
-                new MicroMutation(manager), new MacroMutation(manager), manager);
+        environment = new TGA(
+                population,
+                TGPFitness,
+                new Crossover(manager),
+                new MicroMutation(manager),
+                new MacroMutation(manager),
+                manager);
     }
 
     public void addIterationListener(final TGPListener listener) {
@@ -38,11 +47,24 @@ public class TGPSolver {
         return (TGPChromosome) environment.getBest();
     }
 
-    public double fitness(Chromosome chromosome) {
-        return chromosome.getFitness();
+    public double fitness(TGPChromosome chromosome) {
+        return TGPFitnessCalc.fitness(chromosome);
     }
 
     public interface TGPListener {
         void update(TGPSolver solver);
+    }
+
+    private class TGPFitness implements Fitness {
+        private TGPFitnessCalc TGPFitnessCalc;
+
+        TGPFitness(TGPFitnessCalc TGPFitnessCalc) {
+            this.TGPFitnessCalc = TGPFitnessCalc;
+        }
+
+        @Override
+        public double calc(Chromosome chromosome) {
+            return TGPFitnessCalc.fitness((TGPChromosome) chromosome);
+        }
     }
 }

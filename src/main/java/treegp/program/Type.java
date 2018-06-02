@@ -1,5 +1,7 @@
 package treegp.program;
 
+import genetics.utils.Observation;
+
 public enum Type implements Operator {
 
     CONSTANT {
@@ -25,7 +27,7 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
+        public double eval(TreeNode treeNode, Observation observation) {
             return treeNode.getValue();
         }
     },
@@ -51,7 +53,7 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
+        public double eval(TreeNode treeNode, Observation observation) {
             return treeNode.getManager().lookupVariable(treeNode.getVariable());
         }
     },
@@ -77,9 +79,9 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double left = treeNode.getLeft().eval();
-            double right = treeNode.getRight().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double left = treeNode.getLeft().eval(observation);
+            double right = treeNode.getRight().eval(observation);
             return left + right;
         }
     },
@@ -105,9 +107,9 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double left = treeNode.getLeft().eval();
-            double right = treeNode.getRight().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double left = treeNode.getLeft().eval(observation);
+            double right = treeNode.getRight().eval(observation);
             return left - right;
         }
     },
@@ -133,9 +135,9 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double left = treeNode.getLeft().eval();
-            double right = treeNode.getRight().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double left = treeNode.getLeft().eval(observation);
+            double right = treeNode.getRight().eval(observation);
             return left * right;
         }
     },
@@ -160,9 +162,9 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double left = treeNode.getLeft().eval();
-            double right = treeNode.getRight().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double left = treeNode.getLeft().eval(observation);
+            double right = treeNode.getRight().eval(observation);
             return right == 0 ? Double.MAX_VALUE : left / right;
         }
     },
@@ -188,9 +190,9 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double left = treeNode.getLeft().eval();
-            double right = treeNode.getRight().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double left = treeNode.getLeft().eval(observation);
+            double right = treeNode.getRight().eval(observation);
             return Math.pow(left, right);
         }
     },
@@ -215,8 +217,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double arg = treeNode.getLeft().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double arg = treeNode.getLeft().eval(observation);
             return arg < 0 ? Double.MAX_VALUE : Math.sqrt(arg);
         }
     },
@@ -245,8 +247,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double arg = treeNode.getLeft().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double arg = treeNode.getLeft().eval(observation);
             return arg < 0 ? Double.MAX_VALUE : Math.log(arg + threshold);
         }
     },
@@ -272,8 +274,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double arg = treeNode.getLeft().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double arg = treeNode.getLeft().eval(observation);
             return Math.sin(arg);
         }
     },
@@ -298,8 +300,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double arg = treeNode.getLeft().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double arg = treeNode.getLeft().eval(observation);
             return Math.cos(arg);
         }
     },
@@ -326,8 +328,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double arg = treeNode.getLeft().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double arg = treeNode.getLeft().eval(observation);
             return Math.tan(arg);
         }
     },
@@ -357,8 +359,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            return isTrue(treeNode.getLeft().eval()) && isTrue(treeNode.getRight().eval()) ? 1 : 0;
+        public double eval(TreeNode treeNode, Observation observation) {
+            return isTrue(treeNode.getLeft().eval(observation)) && isTrue(treeNode.getRight().eval(observation)) ? 1 : 0;
         }
 
         private boolean isTrue(double x) {
@@ -388,8 +390,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            return Math.exp(treeNode.getLeft().eval());
+        public double eval(TreeNode treeNode, Observation observation) {
+            return Math.exp(treeNode.getLeft().eval(observation));
         }
     },
 
@@ -415,9 +417,9 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            double left = treeNode.getLeft().eval();
-            double right = treeNode.getRight().eval();
+        public double eval(TreeNode treeNode, Observation observation) {
+            double left = treeNode.getLeft().eval(observation);
+            double right = treeNode.getRight().eval(observation);
             return right == 0 ? Double.MAX_VALUE : left % right;
         }
     },
@@ -447,8 +449,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            return isTrue(treeNode.getLeft().eval()) ? 1 : 0;
+        public double eval(TreeNode treeNode, Observation observation) {
+            return isTrue(treeNode.getLeft().eval(observation)) ? 1 : 0;
         }
 
         private boolean isTrue(double x) {
@@ -480,8 +482,8 @@ public enum Type implements Operator {
         }
 
         @Override
-        public double eval(TreeNode treeNode) {
-            return isTrue(treeNode.getLeft().eval()) || isTrue(treeNode.getRight().eval()) ? 1 : 0;
+        public double eval(TreeNode treeNode, Observation observation) {
+            return isTrue(treeNode.getLeft().eval(observation)) || isTrue(treeNode.getRight().eval(observation)) ? 1 : 0;
         }
 
         private boolean isTrue(double x) {

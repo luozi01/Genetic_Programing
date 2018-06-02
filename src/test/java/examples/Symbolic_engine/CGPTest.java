@@ -2,9 +2,12 @@ package examples.Symbolic_engine;
 
 import cgp.Solver.CGPSolver;
 import cgp.Solver.CartesianGP;
+import cgp.Solver.FitnessCalc;
+import cgp.gp.CGPChromosome;
+import genetics.Chromosome;
 import genetics.utils.Observation;
-import org.apache.commons.math3.genetics.Chromosome;
 
+import java.util.LinkedList;
 import java.util.List;
 
 class CGPTest {
@@ -19,8 +22,10 @@ class CGPTest {
         List<Observation> testing = list.subList(split_point, list.size());
         System.out.printf("Training: %d\t Testing: %d\t\n", training.size(), testing.size());
 
-        CartesianGP env = CartesianGP.defaultConfig(training);
-        CGPSolver solver = new CGPSolver(env);
+        TabulatedFunctionFitness functionFitness = new TabulatedFunctionFitness(training);
+
+        CartesianGP env = CartesianGP.defaultConfig(3, 1);
+        CGPSolver solver = new CGPSolver(env, functionFitness);
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();
@@ -45,7 +50,7 @@ class CGPTest {
 
             Chromosome bestGene = engine1.getBestGene();
 
-            double bestFit = engine1.fitness(bestGene);
+            double bestFit = engine1.fitness((CGPChromosome) bestGene);
 
             if (bestFit < fittest) {
                 fittest = bestFit;
@@ -57,5 +62,26 @@ class CGPTest {
                 System.out.printf("Function: %s\n", bestGene);
             }
         });
+    }
+
+    private static class TabulatedFunctionFitness implements FitnessCalc {
+
+        private List<Observation> targets = new LinkedList<>();
+
+        TabulatedFunctionFitness(List<Observation> targets) {
+            this.targets.addAll(targets);
+        }
+
+        @Override
+        public double fitness(CGPChromosome expression) {
+            double diff = 0;
+            for (Observation o : targets) {
+                for (int i = 0; i < o.outputCount(); i++) {
+                    expression.eval(o);
+                    diff += Math.pow(o.getOutput(i) - o.getPredictedOutput(i), 2);
+                }
+            }
+            return diff;
+        }
     }
 }

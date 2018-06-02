@@ -1,6 +1,5 @@
 package treegp.solver;
 
-import genetics.utils.Observation;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import lombok.Getter;
@@ -17,13 +16,13 @@ import java.util.*;
 @Getter
 @Setter
 public class TreeGP {
-    private TGPInitializationStrategy popInitStrategy = TGPInitializationStrategy.INITIALIZATION_METHOD_PTC1;
+    private TGPInitializationStrategy popInitStrategy = TGPInitializationStrategy.INITIALIZATION_METHOD_FULL;
     private TGPCrossoverStrategy crossoverStrategy = TGPCrossoverStrategy.CROSSOVER_SUBTREE_BIAS;
     private TGPMutationStrategy mutationStrategy = TGPMutationStrategy.MUTATION_SHRINK;
     private TGPEvolveStrategy replacementStrategy = TGPEvolveStrategy.TINY_GP;
 
     private RandEngine randEngine = new SimpleRandEngine();
-    private int populationSize = 500;
+    private int populationSize = 512;
     private int maxDepthForCreation = 3;
     private int maxDepthForCrossover = 4;
     private int maxProgramDepth = 4;
@@ -38,9 +37,7 @@ public class TreeGP {
     private Map<String, Double> variables = new HashMap<>();
     private int index;
 
-    private List<Observation> targets = new LinkedList<>();
-
-    public TreeGP(List<Operator> operators, Collection<String> variables, List<Observation> targets) {
+    public TreeGP(List<Operator> operators, Collection<String> variables) {
         for (Operator op : operators) {
             if (op.argumentCount() == 0)
                 terminal.add(op);
@@ -51,8 +48,6 @@ public class TreeGP {
             throw new IllegalArgumentException("At least one terminal function must be defined");
         if (variables.isEmpty())
             throw new IllegalArgumentException("At least one variable name must be defined");
-
-        this.targets.addAll(targets);
 
         for (String variable : variables) {
             setVariable(variable, 0);

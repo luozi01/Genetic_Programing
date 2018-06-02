@@ -1,7 +1,7 @@
 package treegp.gp;
 
+import genetics.Chromosome;
 import genetics.Generator;
-import org.apache.commons.math3.genetics.Chromosome;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.program.SyntaxTreeUtils;
 import treegp.program.TreeNode;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class TGPGenerator implements Generator {
 
-    private final TreeGP manager;
+    protected final TreeGP manager;
 
     public TGPGenerator(TreeGP manager) {
         this.manager = manager;
@@ -68,7 +68,7 @@ public class TGPGenerator implements Generator {
         return pop;
     }
 
-    private List<Chromosome> initializeRamped(int populationSize) {
+    protected List<Chromosome> initializeRamped(int populationSize) {
         List<Chromosome> pop = new ArrayList<>();
         int maxDepthForCreation = manager.getMaxDepthForCreation();
         int part_count = maxDepthForCreation - 1;

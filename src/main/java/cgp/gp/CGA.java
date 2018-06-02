@@ -2,18 +2,18 @@ package cgp.gp;
 
 import cgp.Solver.CartesianGP;
 import cgp.enums.CGPEvolvePolicy;
-import genetics.GeneticAlgorithm;
-import genetics.Population;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.MutationPolicy;
+import genetics.*;
 
 public class CGA extends GeneticAlgorithm {
 
     private final CartesianGP manager;
     private final MutationPolicy mutationPolicy;
 
-    public CGA(Population pop, MutationPolicy mutationPolicy, CartesianGP manager) {
-        super(pop);
+    public CGA(Population pop,
+               final Fitness fitness,
+               final MutationPolicy mutationPolicy,
+               final CartesianGP manager) {
+        super(pop, fitness);
         this.manager = manager;
         this.mutationPolicy = mutationPolicy;
     }

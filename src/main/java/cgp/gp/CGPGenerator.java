@@ -1,8 +1,8 @@
 package cgp.gp;
 
 import cgp.Solver.CartesianGP;
+import genetics.Chromosome;
 import genetics.Generator;
-import org.apache.commons.math3.genetics.Chromosome;
 
 import java.util.ArrayList;
 import java.util.List;

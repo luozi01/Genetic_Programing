@@ -40,15 +40,13 @@ public class CartesianGP {
     private RandEngine randEngine = new SimpleRandEngine();
 
     private List<Function> functions = new ArrayList<>();
-    private List<Observation> targets = new LinkedList<>();
 
-    public static CartesianGP defaultConfig(List<Observation> targets) {
+    public static CartesianGP defaultConfig(int input, int output) {
         CartesianGP gp = new CartesianGP();
         gp.functions.addAll(Arrays.asList(ADD, SUB, DIV, MUL, POW, SQRT, SIN, COS, EXP));
         gp.arity = gp.getMaxArity();
-        gp.targets.addAll(targets);
-        gp.input = gp.targets.get(0).inputCount();
-        gp.output = gp.targets.get(0).outputCount();
+        gp.input = input;
+        gp.output = output;
         return gp;
     }
 

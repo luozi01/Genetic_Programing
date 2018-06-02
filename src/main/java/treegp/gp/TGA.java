@@ -1,12 +1,8 @@
 package treegp.gp;
 
-import genetics.GeneticAlgorithm;
-import genetics.Population;
+import genetics.*;
+import genetics.utils.Pair;
 import genetics.utils.RandEngine;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.ChromosomePair;
-import org.apache.commons.math3.genetics.CrossoverPolicy;
-import org.apache.commons.math3.genetics.MutationPolicy;
 import treegp.enums.TGPEvolveStrategy;
 import treegp.solver.TreeGP;
 
@@ -16,9 +12,13 @@ public class TGA extends GeneticAlgorithm {
     private final MutationPolicy micro, macro;
     private final TreeGP manager;
 
-    public TGA(Population pop, final CrossoverPolicy crossoverPolicy,
-               final MutationPolicy micro, final MutationPolicy macro, final TreeGP manager) {
-        super(pop);
+    public TGA(Population pop,
+               final Fitness fitness,
+               final CrossoverPolicy crossoverPolicy,
+               final MutationPolicy micro,
+               final MutationPolicy macro,
+               final TreeGP manager) {
+        super(pop, fitness);
         this.crossoverPolicy = crossoverPolicy;
         this.micro = micro;
         this.macro = macro;
@@ -61,7 +61,7 @@ public class TGA extends GeneticAlgorithm {
             Chromosome child1 = tournamentSelection(manager.getTournamentSize());
             Chromosome child2 = tournamentSelection(manager.getTournamentSize());
 
-            ChromosomePair genes = crossoverPolicy.crossover(child1, child2);
+            Pair<Chromosome> genes = crossoverPolicy.crossover(child1, child2);
             newPopulation.addChromosome(genes.getFirst());
             newPopulation.addChromosome(genes.getSecond());
         }
@@ -105,7 +105,7 @@ public class TGA extends GeneticAlgorithm {
                 Chromosome child1 = tournamentSelection(manager.getTournamentSize());
                 Chromosome child2 = tournamentSelection(manager.getTournamentSize());
 
-                ChromosomePair pair = crossoverPolicy.crossover(child1, child2);
+                Pair<Chromosome> pair = crossoverPolicy.crossover(child1, child2);
                 pop.addChromosome(pair.getFirst());
                 pop.addChromosome(pair.getSecond());
             } else if (r <= micro_mutation_disk) {

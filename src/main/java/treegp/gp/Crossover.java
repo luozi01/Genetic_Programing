@@ -1,13 +1,12 @@
 package treegp.gp;
 
+import genetics.Chromosome;
+import genetics.CrossoverPolicy;
+import genetics.utils.Pair;
 import genetics.utils.RandEngine;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.ChromosomePair;
-import org.apache.commons.math3.genetics.CrossoverPolicy;
 import treegp.enums.TGPCrossoverStrategy;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;
-import treegp.tools.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ public class Crossover implements CrossoverPolicy {
     }
 
     @Override
-    public ChromosomePair crossover(Chromosome c1, Chromosome c2) {
+    public Pair<Chromosome> crossover(Chromosome c1, Chromosome c2) {
         if (!(c1 instanceof TGPChromosome && c2 instanceof TGPChromosome)) {
             throw new IllegalArgumentException("Both chromosome should be TGPChromosome");
         }
@@ -36,7 +35,7 @@ public class Crossover implements CrossoverPolicy {
      * @param chromosome1 One tree to be crossover with
      * @param chromosome2 Another tree to be crossover with
      */
-    private ChromosomePair apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
+    private Pair<Chromosome> apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
         int iMaxDepthForCrossover = manager.getMaxDepthForCrossover();
         TGPCrossoverStrategy method = manager.getCrossoverStrategy();
 
@@ -71,8 +70,8 @@ public class Crossover implements CrossoverPolicy {
                         is_crossover_performed = true;
                         break;
                     } else {
-                        Pair<TreeNode> newCutPoint1 = result._1();
-                        Pair<TreeNode> newCutPoint2 = result._2();
+                        Pair<TreeNode> newCutPoint1 = result.getFirst();
+                        Pair<TreeNode> newCutPoint2 = result.getSecond();
 
                         // swap back so as to restore to the original GP trees
                         // if the crossover is not valid due to max depth violation
@@ -93,15 +92,15 @@ public class Crossover implements CrossoverPolicy {
                 swap(pCutPoint1, pCutPoint2);
             }
         }
-        return new ChromosomePair(chromosome1, chromosome2);
+        return new Pair<>(chromosome1, chromosome2);
     }
 
     private Pair<Pair<TreeNode>> swap(Pair<TreeNode> cutPoint1, Pair<TreeNode> cutPoint2) {
-        TreeNode parent1 = cutPoint1._2();
-        TreeNode parent2 = cutPoint2._2();
+        TreeNode parent1 = cutPoint1.getSecond();
+        TreeNode parent2 = cutPoint2.getSecond();
 
-        TreeNode point1 = cutPoint1._1();
-        TreeNode point2 = cutPoint2._1();
+        TreeNode point1 = cutPoint1.getFirst();
+        TreeNode point2 = cutPoint2.getFirst();
 
         //if either of the point is a root
         if (parent1 == null || parent2 == null) {

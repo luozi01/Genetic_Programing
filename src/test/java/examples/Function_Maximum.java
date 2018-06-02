@@ -1,10 +1,7 @@
 package examples;
 
-import genetics.Generator;
-import genetics.GeneticAlgorithm;
-import genetics.Population;
+import genetics.*;
 import org.apache.commons.math3.analysis.TrivariateFunction;
-import org.apache.commons.math3.genetics.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +12,14 @@ public class Function_Maximum {
 
     public static void main(String[] args) {
         Population population = new Population(new SolveGenerate(100));
-        GeneticAlgorithm ga = new GeneticAlgorithm(population, new UniformCrossover<>(.5),
+        GeneticAlgorithm ga = new GeneticAlgorithm(
+                population,
+                new Solve_Evaluate(),
+                new UniformCrossover<>(.5),
                 .4, new BinaryMutation(), .02, 3, 1);
         ga.evolve(1000);
         String output = ga.getBest().toString();
-        System.out.println(ga.getBest().getFitness());
+        System.out.println(new Solve_Evaluate().calc(ga.getBest()));
         System.out.println(output.substring(0, 32) + " " +
                 (int) Long.parseLong(output.substring(0, 32), 2));
         System.out.println(output.substring(32, 64) + " " +
@@ -39,7 +39,7 @@ public class Function_Maximum {
         }
 
         @Override
-        public AbstractListChromosome<Integer> newFixedLengthChromosome(List<Integer> list) {
+        public AbstractListChromosome<Integer> newCopy(List<Integer> list) {
             return new Solve(list);
         }
 
@@ -51,18 +51,21 @@ public class Function_Maximum {
             }
             return geneString.toString();
         }
+    }
+
+    private static class Solve_Evaluate implements Fitness {
+
+        private double function(int x, int y, int z) {
+            return function.value(x, y, z);
+        }
 
         @Override
-        public double fitness() {
-            int length = getLength();
+        public double calc(Chromosome chromosome) {
+            int length = ((Solve) chromosome).getLength();
             String gene = toString();
             return -function((int) Long.parseLong(gene.substring(0, length / 3), 2),
                     (int) Long.parseLong(gene.substring(length / 3, length * 2 / 3), 2),
                     (int) Long.parseLong(gene.substring(length * 2 / 3, length), 2));
-        }
-
-        private double function(int x, int y, int z) {
-            return function.value(x, y, z);
         }
     }
 

@@ -2,9 +2,9 @@ package cgp.gp;
 
 import cgp.Solver.CartesianGP;
 import cgp.enums.CGPMutationPolicy;
+import genetics.Chromosome;
+import genetics.MutationPolicy;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.MutationPolicy;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class CGPMutation implements MutationPolicy {
