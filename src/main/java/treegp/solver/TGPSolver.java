@@ -1,7 +1,7 @@
 package treegp.solver;
 
 import genetics.Chromosome;
-import genetics.Fitness;
+import genetics.FitnessCalc;
 import genetics.Population;
 import treegp.gp.*;
 
@@ -48,14 +48,14 @@ public class TGPSolver {
     }
 
     public double fitness(TGPChromosome chromosome) {
-        return TGPFitnessCalc.fitness(chromosome);
+        return chromosome.fitness;
     }
 
     public interface TGPListener {
         void update(TGPSolver solver);
     }
 
-    private class TGPFitness implements Fitness {
+    private class TGPFitness implements FitnessCalc {
         private TGPFitnessCalc TGPFitnessCalc;
 
         TGPFitness(TGPFitnessCalc TGPFitnessCalc) {

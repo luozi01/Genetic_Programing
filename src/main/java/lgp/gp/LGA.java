@@ -13,12 +13,12 @@ public class LGA extends GeneticAlgorithm {
     private final LinearGP manager;
 
     public LGA(Population pop,
-               final Fitness fitness,
+               final FitnessCalc fitnessCalc,
                final CrossoverPolicy crossoverPolicy,
                final MutationPolicy micro,
                final MutationPolicy macro,
                final LinearGP manager) {
-        super(pop, fitness);
+        super(pop, fitnessCalc);
         this.crossoverPolicy = crossoverPolicy;
         this.micro = micro;
         this.macro = macro;
@@ -40,33 +40,33 @@ public class LGA extends GeneticAlgorithm {
             double r = randEngine.uniform();
             if (r < manager.getCrossoverRate()) {
                 Pair<Chromosome> pair = crossoverPolicy.crossover(gp1, gp2);
-                pop.addChromosome(pair.getFirst());
-                pop.addChromosome(pair.getSecond());
+                population.addChromosome(pair.getFirst());
+                population.addChromosome(pair.getSecond());
             }
 
             r = randEngine.uniform();
             if (r < manager.getMacroMutationRate()) {
-                pop.addChromosome(macro.mutate(gp1));
+                population.addChromosome(macro.mutate(gp1));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMacroMutationRate()) {
-                pop.addChromosome(macro.mutate(gp2));
+                population.addChromosome(macro.mutate(gp2));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMicroMutationRate()) {
-                pop.addChromosome(micro.mutate(gp1));
+                population.addChromosome(micro.mutate(gp1));
             }
 
             r = randEngine.uniform();
             if (r < manager.getMicroMutationRate()) {
-                pop.addChromosome(micro.mutate(gp2));
+                population.addChromosome(micro.mutate(gp2));
             }
             counter++;
         }
-        pop.sort(comparator);
-        pop.trim(iPopSize);
-        return pop;
+        population.sort(comparator);
+        population.trim(iPopSize);
+        return population;
     }
 }

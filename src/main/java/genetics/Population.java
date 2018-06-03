@@ -34,7 +34,7 @@ public class Population implements Iterable<Chromosome> {
         chromosomes.sort(comparator);
     }
 
-    public Chromosome getFirst() {
+    public Chromosome getBest() {
         return chromosomes.get(0);
     }
 

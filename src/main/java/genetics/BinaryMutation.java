@@ -1,5 +1,6 @@
 package genetics;
 
+import genetics.chromosome.BinaryChromosome;
 import genetics.utils.SimpleRandEngine;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;

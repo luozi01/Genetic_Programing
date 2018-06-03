@@ -1,5 +1,6 @@
-package genetics;
+package genetics.chromosome;
 
+import genetics.AbstractListChromosome;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
@@ -56,8 +57,7 @@ public abstract class BinaryChromosome extends AbstractListChromosome<Integer> {
     protected void checkValidity(List<Integer> chromosomeRepresentation) throws InvalidRepresentationException {
         for (int i : chromosomeRepresentation) {
             if (i < 0 || i > 1) {
-                throw new InvalidRepresentationException(LocalizedFormats.INVALID_BINARY_DIGIT,
-                        i);
+                throw new InvalidRepresentationException(LocalizedFormats.INVALID_BINARY_DIGIT, i);
             }
         }
     }

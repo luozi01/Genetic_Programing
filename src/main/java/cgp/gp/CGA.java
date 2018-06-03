@@ -10,10 +10,10 @@ public class CGA extends GeneticAlgorithm {
     private final MutationPolicy mutationPolicy;
 
     public CGA(Population pop,
-               final Fitness fitness,
+               final FitnessCalc fitnessCalc,
                final MutationPolicy mutationPolicy,
                final CartesianGP manager) {
-        super(pop, fitness);
+        super(pop, fitnessCalc);
         this.manager = manager;
         this.mutationPolicy = mutationPolicy;
     }
@@ -32,22 +32,22 @@ public class CGA extends GeneticAlgorithm {
 
     private Population muPlusLambdaEvolve() {
         for (int i = 0; i < manager.getLambda(); i++) {
-            pop.sort(comparator);
-            Chromosome copy = pop.getFirst();
-            pop.addChromosome(mutationPolicy.mutate(copy));
+            population.sort(comparator);
+            Chromosome copy = population.getBest();
+            population.addChromosome(mutationPolicy.mutate(copy));
         }
-        pop.sort(comparator);
-        pop.trim(manager.getPopulationSize());
-        return pop;
+        population.sort(comparator);
+        population.trim(manager.getPopulationSize());
+        return population;
     }
 
     private Population tournament(int populationSize, int tournamentSize) {
         for (int i = 0; i < tournamentSize; i++) {
             Chromosome chromosome = tournamentSelection(manager.getLambda());
-            pop.addChromosome(mutationPolicy.mutate(chromosome));
+            population.addChromosome(mutationPolicy.mutate(chromosome));
         }
-        pop.sort(comparator);
-        pop.trim(populationSize);
-        return pop;
+        population.sort(comparator);
+        population.trim(populationSize);
+        return population;
     }
 }

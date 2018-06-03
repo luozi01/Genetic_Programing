@@ -11,8 +11,8 @@ public class GeneticAlgorithm {
     protected final ChromosomesComparator comparator;
     private final RandEngine randEngine = new SimpleRandEngine();
     private final List<Interrupt> interrupts = new LinkedList<>();
-    private final Fitness fitness;
-    protected Population pop;
+    private final FitnessCalc fitnessCalc;
+    protected Population population;
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
     private double uniformRate;
@@ -22,16 +22,16 @@ public class GeneticAlgorithm {
     private boolean terminate;
     private int generation;
 
-    public GeneticAlgorithm(Population pop,
-                            final Fitness fitness,
+    public GeneticAlgorithm(Population population,
+                            final FitnessCalc fitnessCalc,
                             final CrossoverPolicy crossoverPolicy,
                             final double uniformRate,
                             final MutationPolicy mutationPolicy,
                             final double mutationRate,
                             final int tournamentSize,
                             final int elitism) {
-        this.pop = pop;
-        this.fitness = fitness;
+        this.population = population;
+        this.fitnessCalc = fitnessCalc;
         this.crossoverPolicy = crossoverPolicy;
         this.uniformRate = uniformRate;
         this.mutationPolicy = mutationPolicy;
@@ -39,15 +39,13 @@ public class GeneticAlgorithm {
         this.tournamentSize = tournamentSize;
         this.elitism = elitism;
         comparator = new ChromosomesComparator();
-        pop.sort(comparator);
     }
 
-    protected GeneticAlgorithm(Population pop,
-                               final Fitness fitness) {
-        this.pop = pop;
-        this.fitness = fitness;
+    protected GeneticAlgorithm(Population population,
+                               final FitnessCalc fitnessCalc) {
+        this.population = population;
+        this.fitnessCalc = fitnessCalc;
         comparator = new ChromosomesComparator();
-        pop.sort(comparator);
     }
 
     public void evolve(int iteration) {
@@ -56,7 +54,7 @@ public class GeneticAlgorithm {
             if (terminate) {
                 break;
             }
-            pop = evolvePopulation();
+            population = evolvePopulation();
             generation = i;
             for (Interrupt l : interrupts) {
                 l.update(this);
@@ -68,7 +66,7 @@ public class GeneticAlgorithm {
         terminate = false;
         generation = 0;
         while (!terminate) {
-            pop = evolvePopulation();
+            population = evolvePopulation();
             generation++;
             for (Interrupt l : interrupts) {
                 l.update(this);
@@ -77,16 +75,15 @@ public class GeneticAlgorithm {
     }
 
     protected Population evolvePopulation() {
-        int populationSize = pop.size();
+        final int populationSize = population.size();
         Population newPopulation = new Population();
 
         // Keep our best individual, reproduction
-        pop.sort(comparator);
         for (int i = 0; (i < populationSize) && (i < elitism); i++) {
-            newPopulation.addChromosome(pop.getChromosome(i));
+            newPopulation.addChromosome(population.getChromosome(i));
         }
 
-        for (int i = elitism; i < pop.size(); i++) {
+        for (int i = elitism; i < population.size(); i++) {
             Chromosome c1 = tournamentSelection(tournamentSize);
             Chromosome c2 = tournamentSelection(tournamentSize);
             Pair<Chromosome> pair = new Pair<>(c1, c2);
@@ -119,8 +116,12 @@ public class GeneticAlgorithm {
         return generation;
     }
 
+    public Population getPopulation() {
+        return population;
+    }
+
     public Chromosome getBest() {
-        return pop.getFirst();
+        return population.getBest();
     }
 
     /**
@@ -129,9 +130,9 @@ public class GeneticAlgorithm {
      * @return best chromosome in the selecting group
      */
     protected Chromosome tournamentSelection(int tournamentSize) {
-        assert tournamentSize < pop.size();
+        assert tournamentSize < population.size();
         List<Chromosome> selection = new ArrayList<>();
-        List<Chromosome> chromosomes = new ArrayList<>(pop.getChromosomes());
+        List<Chromosome> chromosomes = new ArrayList<>(population.getChromosomes());
         for (int i = 0; i < tournamentSize; i++) {
             int rind = randEngine.nextInt(chromosomes.size());
             selection.add(chromosomes.get(rind));
@@ -152,7 +153,8 @@ public class GeneticAlgorithm {
         Double fit(Chromosome e) {
             Double fit = cache.get(e);
             if (fit == null) {
-                fit = fitness.calc(e);
+                fit = fitnessCalc.calc(e);
+                e.fitness = fit;
                 cache.put(e, fit);
             }
             return fit;

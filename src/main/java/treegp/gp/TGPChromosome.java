@@ -15,7 +15,7 @@ public class TGPChromosome extends Chromosome {
     private TreeNode root;
     private transient TreeGP manager;
 
-    public TGPChromosome(TreeNode root, TreeGP manager) {
+    TGPChromosome(TreeNode root, TreeGP manager) {
         this.root = root;
         this.manager = manager;
     }
@@ -40,5 +40,6 @@ public class TGPChromosome extends Chromosome {
     public TGPChromosome deserialization(String json) {
         return new Gson().fromJson(json, TGPChromosome.class);
     }
+
 }
 

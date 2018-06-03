@@ -1,7 +1,7 @@
 package lgp.solver;
 
 import genetics.Chromosome;
-import genetics.Fitness;
+import genetics.FitnessCalc;
 import genetics.Population;
 import lgp.gp.*;
 
@@ -47,14 +47,14 @@ public class LGPSolver {
     }
 
     public double fitness(LGPChromosome chromosome) {
-        return LGPFitnessCalc.fitness(chromosome);
+        return chromosome.fitness;
     }
 
     public interface LGPListener {
         void update(LGPSolver solver);
     }
 
-    private class LGPFitness implements Fitness {
+    private class LGPFitness implements FitnessCalc {
         private LGPFitnessCalc LGPFitnessCalc;
 
         LGPFitness(LGPFitnessCalc LGPFitnessCalc) {

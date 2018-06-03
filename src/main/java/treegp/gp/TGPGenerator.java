@@ -68,7 +68,7 @@ public class TGPGenerator implements Generator {
         return pop;
     }
 
-    protected List<Chromosome> initializeRamped(int populationSize) {
+    private List<Chromosome> initializeRamped(int populationSize) {
         List<Chromosome> pop = new ArrayList<>();
         int maxDepthForCreation = manager.getMaxDepthForCreation();
         int part_count = maxDepthForCreation - 1;

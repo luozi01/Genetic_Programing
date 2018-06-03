@@ -1,8 +1,7 @@
 package examples;
 
 import genetics.*;
-import genetics.utils.RandEngine;
-import genetics.utils.SimpleRandEngine;
+import genetics.chromosome.BinaryChromosome;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,18 +69,18 @@ public class Knapsack {
 
     public static void main(String[] args) {
         System.out.println("Initialization");
-//        itemsWeight = new int[]{6, 6, 5, 1, 4, 12, 15, 15};
-//        itemsValue = new int[]{4, 9, 13, 15, 18, 7, 15, 3};
-//        defaultGeneLength = itemsValue.length;
-        int capacity = 10 * 40;
-        int defaultGeneLength = 40;
-        RandEngine randEngine = new SimpleRandEngine();
-        int[] itemsValue = new int[defaultGeneLength];
-        int[] itemsWeight = new int[defaultGeneLength];
-        for (int i = 0; i < defaultGeneLength; i++) {
-            itemsValue[i] = randEngine.nextInt(15) + 1;
-            itemsWeight[i] = randEngine.nextInt(20) + 1;
-        }
+        int[] itemsWeight = new int[]{6, 6, 5, 1, 4, 12, 15, 15};
+        int[] itemsValue = new int[]{4, 9, 13, 15, 18, 7, 15, 3};
+        int defaultGeneLength = itemsValue.length;
+        int capacity = 10 * defaultGeneLength;
+//        int defaultGeneLength = 40;
+//        RandEngine randEngine = new SimpleRandEngine();
+//        int[] itemsValue = new int[defaultGeneLength];
+//        int[] itemsWeight = new int[defaultGeneLength];
+//        for (int i = 0; i < defaultGeneLength; i++) {
+//            itemsValue[i] = randEngine.nextInt(15) + 1;
+//            itemsWeight[i] = randEngine.nextInt(20) + 1;
+//        }
         System.out.println("Capacity: " + capacity);
         System.out.println("Values: \t" + Arrays.toString(itemsValue));
         System.out.println("Weights: \t" + Arrays.toString(itemsWeight));
@@ -143,14 +142,14 @@ public class Knapsack {
         }
     }
 
-    static class KEvaluate implements Fitness {
+    static class KEvaluate implements FitnessCalc {
 
         @Override
         public double calc(Chromosome chromosome) {
             int totalWeight = 0, totalValue = 0;
             // Loop through our individuals genes and compare them to our candidates
             for (int i = 0; i < ((K) chromosome).getLength(); i++) {
-                if (((K) chromosome).getLength() == 1) {
+                if (((K) chromosome).getGene(i) == 1) {
                     totalWeight += ((K) chromosome).itemsWeight[i];
                     totalValue += ((K) chromosome).itemsValue[i];
                 }

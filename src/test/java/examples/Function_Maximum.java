@@ -1,6 +1,7 @@
 package examples;
 
 import genetics.*;
+import genetics.chromosome.BinaryChromosome;
 import org.apache.commons.math3.analysis.TrivariateFunction;
 
 import java.util.ArrayList;
@@ -51,9 +52,14 @@ public class Function_Maximum {
             }
             return geneString.toString();
         }
+
+//        @Override
+//        public double getFitness() {
+//            return 0;
+//        }
     }
 
-    private static class Solve_Evaluate implements Fitness {
+    private static class Solve_Evaluate implements FitnessCalc {
 
         private double function(int x, int y, int z) {
             return function.value(x, y, z);

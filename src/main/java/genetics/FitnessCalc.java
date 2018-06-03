@@ -1,5 +1,5 @@
 package genetics;
 
-public interface Fitness {
+public interface FitnessCalc {
     double calc(Chromosome chromosome);
 }
