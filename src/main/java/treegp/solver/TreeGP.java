@@ -22,7 +22,7 @@ public class TreeGP {
     private TGPEvolveStrategy replacementStrategy = TGPEvolveStrategy.TINY_GP;
 
     private RandEngine randEngine = new SimpleRandEngine();
-    private int populationSize = 512;
+    private int populationSize = 500;
     private int maxDepthForCreation = 3;
     private int maxDepthForCrossover = 4;
     private int maxProgramDepth = 4;

@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Copy paste and modified from apache genetic library
  */
-public abstract class BinaryChromosome extends AbstractListChromosome<Integer> {
+public abstract class BinaryChromosome extends IntegerChromosome {
 
     /**
      * Constructor.

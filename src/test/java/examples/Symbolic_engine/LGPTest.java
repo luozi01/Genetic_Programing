@@ -23,6 +23,7 @@ class LGPTest {
 
         LinearGP gp = LinearGP.defaultConfig(training, 3);
         LGPSolver solver = new LGPSolver(gp, fitnessFunction);
+        System.out.println("Start");
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();
@@ -62,7 +63,7 @@ class LGPTest {
 
     private static class FunctionFitness implements LGPFitnessCalc {
 
-        private List<Observation> targets = new LinkedList<>();
+        private final List<Observation> targets = new LinkedList<>();
 
         FunctionFitness(List<Observation> targets) {
             this.targets.addAll(targets);

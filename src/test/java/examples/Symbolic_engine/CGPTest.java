@@ -2,7 +2,7 @@ package examples.Symbolic_engine;
 
 import cgp.Solver.CGPSolver;
 import cgp.Solver.CartesianGP;
-import cgp.Solver.FitnessCalc;
+import cgp.Solver.CGPFitnessCalc;
 import cgp.gp.CGPChromosome;
 import genetics.Chromosome;
 import genetics.utils.Observation;
@@ -64,9 +64,9 @@ class CGPTest {
         });
     }
 
-    private static class TabulatedFunctionFitness implements FitnessCalc {
+    private static class TabulatedFunctionFitness implements CGPFitnessCalc {
 
-        private List<Observation> targets = new LinkedList<>();
+        private final List<Observation> targets = new LinkedList<>();
 
         TabulatedFunctionFitness(List<Observation> targets) {
             this.targets.addAll(targets);

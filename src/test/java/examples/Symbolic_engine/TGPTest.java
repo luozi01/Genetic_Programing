@@ -72,7 +72,7 @@ class TGPTest {
 
     private static class TabulatedFunctionFitness implements TGPFitnessCalc {
 
-        private List<Observation> targets = new LinkedList<>();
+        private final List<Observation> targets = new LinkedList<>();
 
         TabulatedFunctionFitness(List<Observation> targets) {
             this.targets.addAll(targets);

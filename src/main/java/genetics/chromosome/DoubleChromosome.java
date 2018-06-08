@@ -14,11 +14,4 @@ public abstract class DoubleChromosome extends AbstractListChromosome<Double> {
     public DoubleChromosome(Double[] representation) throws InvalidRepresentationException {
         super(representation);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void checkValidity(List<Double> chromosomeRepresentation) throws InvalidRepresentationException {
-    }
 }

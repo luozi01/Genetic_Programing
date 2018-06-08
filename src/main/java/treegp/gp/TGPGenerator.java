@@ -12,7 +12,7 @@ import java.util.List;
 
 public class TGPGenerator implements Generator {
 
-    protected final TreeGP manager;
+    private final TreeGP manager;
 
     public TGPGenerator(TreeGP manager) {
         this.manager = manager;

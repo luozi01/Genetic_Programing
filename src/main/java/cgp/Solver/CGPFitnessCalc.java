@@ -2,6 +2,6 @@ package cgp.Solver;
 
 import cgp.gp.CGPChromosome;
 
-public interface FitnessCalc {
+public interface CGPFitnessCalc {
     double fitness(CGPChromosome chromosome);
 }

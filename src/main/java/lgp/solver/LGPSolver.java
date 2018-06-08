@@ -7,18 +7,16 @@ import lgp.gp.*;
 
 public class LGPSolver {
     private final LGA environment;
-    private LGPFitnessCalc LGPFitnessCalc;
 
     public LGPSolver(LinearGP manager, LGPFitnessCalc LGPFitnessCalc) {
-        this.LGPFitnessCalc = LGPFitnessCalc;
-        LGPFitness LGPFitness = new LGPFitness(LGPFitnessCalc);
-        Population population = new Population(new LGPGenerator(manager));
-        environment = new LGA(population,
-                LGPFitness,
+        environment = new LGA(
+                new Population(new LGPGenerator(manager)),
+                new LGPFitness(LGPFitnessCalc),
                 new Crossover(manager),
                 new MicroMutation(manager),
                 new MacroMutation(manager),
-                manager);
+                manager
+        );
     }
 
     public void addIterationListener(final LGPListener listener) {
@@ -55,7 +53,7 @@ public class LGPSolver {
     }
 
     private class LGPFitness implements FitnessCalc {
-        private LGPFitnessCalc LGPFitnessCalc;
+        private final LGPFitnessCalc LGPFitnessCalc;
 
         LGPFitness(LGPFitnessCalc LGPFitnessCalc) {
             this.LGPFitnessCalc = LGPFitnessCalc;

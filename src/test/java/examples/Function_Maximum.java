@@ -52,11 +52,6 @@ public class Function_Maximum {
             }
             return geneString.toString();
         }
-
-//        @Override
-//        public double getFitness() {
-//            return 0;
-//        }
     }
 
     private static class Solve_Evaluate implements FitnessCalc {
@@ -68,8 +63,8 @@ public class Function_Maximum {
         @Override
         public double calc(Chromosome chromosome) {
             int length = ((Solve) chromosome).getLength();
-            String gene = toString();
-            return -function((int) Long.parseLong(gene.substring(0, length / 3), 2),
+            String gene = chromosome.toString();
+            return 1 / function((int) Long.parseLong(gene.substring(0, length / 3), 2),
                     (int) Long.parseLong(gene.substring(length / 3, length * 2 / 3), 2),
                     (int) Long.parseLong(gene.substring(length * 2 / 3, length), 2));
         }

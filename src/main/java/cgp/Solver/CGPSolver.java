@@ -10,17 +10,14 @@ import genetics.Population;
 
 public class CGPSolver {
     private final CGA environment;
-    private cgp.Solver.FitnessCalc fitnessCalc;
 
-    public CGPSolver(CartesianGP manager, cgp.Solver.FitnessCalc fitnessCalc) {
-        this.fitnessCalc = fitnessCalc;
-        CGPFitness CGPFitness = new CGPFitness(fitnessCalc);
-        Population population = new Population(new CGPGenerator(manager));
+    public CGPSolver(CartesianGP manager, CGPFitnessCalc CGPFitnessCalc) {
         environment = new CGA(
-                population,
-                CGPFitness,
+                new Population(new CGPGenerator(manager)),
+                new CGPFitness(CGPFitnessCalc),
                 new CGPMutation(manager),
-                manager);
+                manager
+        );
     }
 
     public void addIterationListener(final CGPListener listener) {
@@ -57,15 +54,15 @@ public class CGPSolver {
     }
 
     private class CGPFitness implements FitnessCalc {
-        private cgp.Solver.FitnessCalc fitnessCalc;
+        private final CGPFitnessCalc CGPFitnessCalc;
 
-        CGPFitness(cgp.Solver.FitnessCalc fitnessCalc) {
-            this.fitnessCalc = fitnessCalc;
+        CGPFitness(CGPFitnessCalc CGPFitnessCalc) {
+            this.CGPFitnessCalc = CGPFitnessCalc;
         }
 
         @Override
         public double calc(Chromosome chromosome) {
-            return fitnessCalc.fitness((CGPChromosome) chromosome);
+            return CGPFitnessCalc.fitness((CGPChromosome) chromosome);
         }
 
     }

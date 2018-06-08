@@ -39,6 +39,7 @@ public class GeneticAlgorithm {
         this.tournamentSize = tournamentSize;
         this.elitism = elitism;
         comparator = new ChromosomesComparator();
+        population.sort(comparator);
     }
 
     protected GeneticAlgorithm(Population population,
@@ -46,6 +47,7 @@ public class GeneticAlgorithm {
         this.population = population;
         this.fitnessCalc = fitnessCalc;
         comparator = new ChromosomesComparator();
+        population.sort(comparator);
     }
 
     public void evolve(int iteration) {

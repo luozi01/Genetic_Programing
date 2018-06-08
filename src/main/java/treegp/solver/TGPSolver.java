@@ -7,19 +7,16 @@ import treegp.gp.*;
 
 public class TGPSolver {
     private final TGA environment;
-    private TGPFitnessCalc TGPFitnessCalc;
 
     public TGPSolver(TreeGP manager, TGPFitnessCalc TGPFitnessCalc) {
-        this.TGPFitnessCalc = TGPFitnessCalc;
-        TGPFitness TGPFitness = new TGPFitness(TGPFitnessCalc);
-        Population population = new Population(new TGPGenerator(manager));
         environment = new TGA(
-                population,
-                TGPFitness,
+                new Population(new TGPGenerator(manager)),
+                new TGPFitness(TGPFitnessCalc),
                 new Crossover(manager),
                 new MicroMutation(manager),
                 new MacroMutation(manager),
-                manager);
+                manager
+        );
     }
 
     public void addIterationListener(final TGPListener listener) {
@@ -29,6 +26,10 @@ public class TGPSolver {
 
     public void evolve(int iteration) {
         environment.evolve(iteration);
+    }
+
+    public Population getPopulation() {
+        return environment.getPopulation();
     }
 
     public void evolve() {
@@ -56,7 +57,7 @@ public class TGPSolver {
     }
 
     private class TGPFitness implements FitnessCalc {
-        private TGPFitnessCalc TGPFitnessCalc;
+        private final TGPFitnessCalc TGPFitnessCalc;
 
         TGPFitness(TGPFitnessCalc TGPFitnessCalc) {
             this.TGPFitnessCalc = TGPFitnessCalc;

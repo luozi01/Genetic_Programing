@@ -3,7 +3,6 @@ package cgp.Solver;
 import cgp.enums.CGPEvolvePolicy;
 import cgp.enums.CGPMutationPolicy;
 import cgp.program.Function;
-import genetics.utils.Observation;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import static cgp.program.SymbolicRegressionFunctions.*;

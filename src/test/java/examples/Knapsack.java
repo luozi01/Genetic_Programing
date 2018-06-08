@@ -94,7 +94,6 @@ public class Knapsack {
                 new BinaryMutation(), .02, 3, 1);
         ga.evolve(1000);
         Chromosome k = ga.getBest();
-        System.out.println("Fittest: " + new KEvaluate().calc(k));
         System.out.println("Genes: " + k.toString());
         System.out.println("Weights: " + sum((K) k, itemsWeight));
         System.out.println("Value: " + sum((K) k, itemsValue));
@@ -157,7 +156,7 @@ public class Knapsack {
             double fitness = Double.MIN_VALUE;
             if (totalWeight <= ((K) chromosome).capacity)
                 if (fitness < totalValue) fitness = totalValue;
-            return -fitness;
+            return 1 / fitness;
         }
     }
 

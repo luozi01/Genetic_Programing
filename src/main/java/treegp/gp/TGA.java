@@ -42,7 +42,6 @@ public class TGA extends GeneticAlgorithm {
 
         int elite_count = (int) (manager.getElitismRatio() * populationSize);
 
-        population.sort(comparator);
         for (int i = 0; (i < populationSize) && (i < elite_count); i++) {
             newPopulation.addChromosome(population.getChromosome(i));
         }
