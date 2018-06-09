@@ -1,5 +1,6 @@
 package examples.EvoImage;
 
+import genetics.MutationPolicy;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import javafx.embed.swing.SwingFXUtils;
@@ -8,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
-import org.apache.commons.math3.genetics.MutationPolicy;
 import org.jblas.DoubleMatrix;
 
 import java.awt.image.BufferedImage;
@@ -18,17 +18,16 @@ import java.util.List;
 
 class EvoManager {
 
-    int MAX_WIDTH;
-    int MAX_HEIGHT;
     final int MAX_SHAPES = 50;    // max capacity
     final int MAX_POINTS = 6;
     final int ACTUAL_SHAPES = MAX_SHAPES;
     final int ACTUAL_POINTS = MAX_POINTS;
-
-    DoubleMatrix image_colors;
     final MutationPolicy method = Mutation.MEDIUM;
     final Colors choice = ColorChoice.BLACK;
     final RandEngine randEngine = new SimpleRandEngine();
+    int MAX_WIDTH;
+    int MAX_HEIGHT;
+    DoubleMatrix image_colors;
 
     private List<Double> pixelRGB(int pixel) {
         double red = (pixel >> 16) & 0xff;

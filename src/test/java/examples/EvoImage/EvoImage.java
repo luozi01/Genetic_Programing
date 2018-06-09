@@ -1,5 +1,6 @@
 package examples.EvoImage;
 
+import genetics.Chromosome;
 import genetics.Population;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -7,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
-import org.apache.commons.math3.genetics.Chromosome;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -16,11 +16,11 @@ import java.io.IOException;
 
 public class EvoImage extends Application {
     private static final double FITNESS_MAX = Double.MAX_VALUE;
+    private final EvoManager manager = new EvoManager();
     private double FITNESS_TEST = FITNESS_MAX;
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
     private int COUNTER_BENEFIT = 0;
-    private final EvoManager manager = new EvoManager();
 
     public static void main(String[] args) {
         launch(args);
@@ -39,10 +39,10 @@ public class EvoImage extends Application {
 
     private Paintings run() {
         Population pop = new Population(new GraphGenerator(manager));
-        EvoGA ga = new EvoGA(pop, manager.method);
+        EvoGA ga = new EvoGA(pop, new ImageFitness(), manager.method);
         ga.addIterationListener(environment -> {
             Chromosome bestGene = environment.getBest();
-            FITNESS_TEST = bestGene.getFitness();
+            FITNESS_TEST = bestGene.fitness;
             // log to console
             if (FITNESS_TEST < FITNESS_BEST) {
                 FITNESS_BEST = FITNESS_TEST;

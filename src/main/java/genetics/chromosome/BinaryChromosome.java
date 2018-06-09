@@ -1,6 +1,5 @@
 package genetics.chromosome;
 
-import genetics.AbstractListChromosome;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import org.apache.commons.math3.exception.util.LocalizedFormats;

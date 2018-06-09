@@ -1,9 +1,9 @@
 package examples.EvoImage;
 
 
+import genetics.Chromosome;
+import genetics.MutationPolicy;
 import genetics.utils.RandEngine;
-import org.apache.commons.math3.genetics.Chromosome;
-import org.apache.commons.math3.genetics.MutationPolicy;
 
 public enum Mutation implements MutationPolicy {
 

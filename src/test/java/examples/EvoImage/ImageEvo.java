@@ -20,20 +20,19 @@ import java.util.List;
 import java.util.Random;
 
 public class ImageEvo extends Application {
-    private int MAX_WIDTH = 0;
-    private int MAX_HEIGHT = 0;
-
-    private int COUNTER_BENEFIT = 0;
     private final int MAX_SHAPES = 50;    // max capacity
     private final int MAX_POINTS = 6;
     private final Polygon[] DNA_BEST = new Polygon[MAX_SHAPES];
     private final Polygon[] DNA_TEST = new Polygon[MAX_SHAPES];
-    private int CHANGED_SHAPE_INDEX = 0;
     private final double FITNESS_MAX = Double.MAX_VALUE;
+    private final Random random = new Random();
+    private int MAX_WIDTH = 0;
+    private int MAX_HEIGHT = 0;
+    private int COUNTER_BENEFIT = 0;
+    private int CHANGED_SHAPE_INDEX = 0;
     private double FITNESS_BEST = FITNESS_MAX;
     private double FITNESS_BEST_NORMALIZED = 0; // pixel match: 0% worst - 100% best
     private DoubleMatrix image_colors;
-    private final Random random = new Random();
 
     public static void main(String[] args) {
         launch(args);
@@ -123,12 +122,6 @@ public class ImageEvo extends Application {
             polygon.setColor(0, 0, 0, 0.001);
             dna[i] = polygon;
         }
-    }
-
-    private int clamp(int val, int minval, int maxval) {
-        if (val < minval) return minval;
-        if (val > maxval) return maxval;
-        return val;
     }
 
     private void readImage(BufferedImage image) {
