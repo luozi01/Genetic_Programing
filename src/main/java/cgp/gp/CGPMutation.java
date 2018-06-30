@@ -5,7 +5,6 @@ import cgp.enums.CGPMutationPolicy;
 import genetics.Chromosome;
 import genetics.MutationPolicy;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class CGPMutation implements MutationPolicy {
 
@@ -34,7 +33,7 @@ public class CGPMutation implements MutationPolicy {
                 clone = fix_point(((CGPChromosome) chromosome).makeCopy());
                 break;
             default:
-                throw new NotImplementedException();
+                throw new IllegalStateException("Mutation method is not implemented: " + policy.toString());
         }
         return clone;
     }

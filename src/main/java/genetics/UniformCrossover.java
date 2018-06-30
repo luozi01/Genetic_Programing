@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Copy paste and modified from apache genetic library
+ *
  * @param <T> Chromosome type
  */
 public class UniformCrossover<T> implements CrossoverPolicy {

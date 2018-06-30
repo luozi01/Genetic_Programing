@@ -8,6 +8,7 @@ import treegp.solver.TGPSolver;
 import treegp.solver.TreeGP;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ class TGPTest {
 
     public static void main(String[] args) {
         List<Observation> list = Test.function();
-
+        Collections.shuffle(list);
         int split_point = (int) (list.size() * .9);
         List<Observation> training = list.subList(0, split_point);
         List<Observation> testing = list.subList(split_point, list.size());
@@ -45,7 +46,7 @@ class TGPTest {
             double predicted = solver.getBestGene().eval(o);
             double actual = o.getOutput(0);
 
-            System.out.printf("predicted: %f\t actual: %f\t difference: %f\t\n",
+            System.out.printf("predicted: %f \tactual: %f \tdifference: %f\n",
                     predicted, actual, Math.abs(predicted - actual));
         }
     }

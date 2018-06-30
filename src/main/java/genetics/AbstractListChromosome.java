@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Copy paste and modified from apache genetic library
+ *
  * @param <E> Data type
  */
 public abstract class AbstractListChromosome<E> extends Chromosome {

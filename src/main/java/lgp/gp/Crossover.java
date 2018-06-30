@@ -7,7 +7,6 @@ import genetics.utils.RandEngine;
 import lgp.enums.LGPCrossover;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public class Crossover implements CrossoverPolicy {
                 chromosome = oneSegmentCrossover(gp1, gp2);
                 break;
             default:
-                throw new NotImplementedException();
+                throw new IllegalStateException("Mutation method is not implemented: " + crossoverType.toString());
         }
         return chromosome;
     }

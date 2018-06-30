@@ -6,6 +6,7 @@ import lgp.solver.LGPFitnessCalc;
 import lgp.solver.LGPSolver;
 import lgp.solver.LinearGP;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ class LGPTest {
 
     public static void main(String[] args) {
         List<Observation> list = Test.function();
-
+        Collections.shuffle(list);
         int split_point = (int) (list.size() * .9);
         List<Observation> training = list.subList(0, split_point);
         List<Observation> testing = list.subList(split_point, list.size());

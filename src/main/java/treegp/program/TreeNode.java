@@ -1,11 +1,11 @@
 package treegp.program;
 
 import genetics.utils.Observation;
+import genetics.utils.Pair;
 import genetics.utils.RandEngine;
 import lombok.Getter;
 import lombok.Setter;
 import treegp.solver.TreeGP;
-import genetics.utils.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;

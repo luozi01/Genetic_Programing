@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Copy paste and modified from apache genetic library
  */
-public class BinaryMutation implements MutationPolicy{
+public class BinaryMutation implements MutationPolicy {
     public Chromosome mutate(Chromosome original) throws MathIllegalArgumentException {
         if (!(original instanceof BinaryChromosome)) {
             throw new MathIllegalArgumentException(LocalizedFormats.INVALID_BINARY_CHROMOSOME);

@@ -1,12 +1,13 @@
 package examples.Symbolic_engine;
 
+import cgp.Solver.CGPFitnessCalc;
 import cgp.Solver.CGPSolver;
 import cgp.Solver.CartesianGP;
-import cgp.Solver.CGPFitnessCalc;
 import cgp.gp.CGPChromosome;
 import genetics.Chromosome;
 import genetics.utils.Observation;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ class CGPTest {
 
     public static void main(String[] args) {
         List<Observation> list = Test.function();
-
+        Collections.shuffle(list);
         int split_point = (int) (list.size() * .9);
         List<Observation> training = list.subList(0, split_point);
         List<Observation> testing = list.subList(split_point, list.size());
