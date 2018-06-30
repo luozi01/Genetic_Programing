@@ -1,8 +1,16 @@
 package examples;
 
-import genetics.*;
+import genetics.chromosome.AbstractListChromosome;
 import genetics.chromosome.BinaryChromosome;
+import genetics.chromosome.Chromosome;
+import genetics.common.FitnessCalc;
+import genetics.common.Generator;
+import genetics.common.Population;
+import genetics.crossover.UniformCrossover;
+import genetics.driver.GeneticAlgorithm;
+import genetics.mutation.BinaryMutation;
 import org.apache.commons.math3.analysis.TrivariateFunction;
+import org.eclipse.collections.api.list.MutableList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +39,7 @@ public class Function_Maximum {
 
     private static class Solve extends BinaryChromosome {
 
-        Solve(List<Integer> representation) {
+        Solve(MutableList<Integer> representation) {
             super(representation);
         }
 
@@ -40,7 +48,7 @@ public class Function_Maximum {
         }
 
         @Override
-        public AbstractListChromosome<Integer> newCopy(List<Integer> list) {
+        public AbstractListChromosome<Integer> newCopy(MutableList<Integer> list) {
             return new Solve(list);
         }
 

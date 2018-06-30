@@ -1,10 +1,15 @@
 package lgp.gp;
 
 
-import genetics.*;
-import genetics.utils.Pair;
+import genetics.driver.GeneticAlgorithm;
+import genetics.chromosome.Chromosome;
+import genetics.common.FitnessCalc;
+import genetics.common.Population;
+import genetics.interfaces.CrossoverPolicy;
+import genetics.interfaces.MutationPolicy;
 import genetics.utils.RandEngine;
 import lgp.solver.LinearGP;
+import org.eclipse.collections.api.tuple.Pair;
 
 public class LGA extends GeneticAlgorithm {
 
@@ -39,9 +44,9 @@ public class LGA extends GeneticAlgorithm {
 
             double r = randEngine.uniform();
             if (r < manager.getCrossoverRate()) {
-                Pair<Chromosome> pair = crossoverPolicy.crossover(gp1, gp2);
-                population.addChromosome(pair.getFirst());
-                population.addChromosome(pair.getSecond());
+                Pair<Chromosome, Chromosome> pair = crossoverPolicy.crossover(gp1, gp2);
+                population.addChromosome(pair.getOne());
+                population.addChromosome(pair.getTwo());
             }
 
             r = randEngine.uniform();

@@ -1,8 +1,8 @@
 package lgp.gp;
 
 
-import genetics.Chromosome;
-import genetics.Generator;
+import genetics.chromosome.Chromosome;
+import genetics.common.Generator;
 import lgp.enums.LGPInitialization;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;

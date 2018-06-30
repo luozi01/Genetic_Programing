@@ -1,8 +1,8 @@
 package treegp.solver;
 
-import genetics.Chromosome;
-import genetics.FitnessCalc;
-import genetics.Population;
+import genetics.chromosome.Chromosome;
+import genetics.common.FitnessCalc;
+import genetics.common.Population;
 import treegp.gp.*;
 
 public class TGPSolver {

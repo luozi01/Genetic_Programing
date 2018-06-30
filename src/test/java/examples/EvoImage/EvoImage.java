@@ -1,7 +1,7 @@
 package examples.EvoImage;
 
-import genetics.Chromosome;
-import genetics.Population;
+import genetics.chromosome.Chromosome;
+import genetics.common.Population;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;

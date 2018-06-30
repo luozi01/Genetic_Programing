@@ -1,7 +1,7 @@
 package treegp.gp;
 
-import genetics.Chromosome;
-import genetics.Generator;
+import genetics.chromosome.Chromosome;
+import genetics.common.Generator;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.program.SyntaxTreeUtils;
 import treegp.program.TreeNode;

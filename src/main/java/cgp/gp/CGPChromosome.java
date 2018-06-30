@@ -2,7 +2,7 @@ package cgp.gp;
 
 import cgp.Solver.CartesianGP;
 import cgp.program.Function;
-import genetics.Chromosome;
+import genetics.chromosome.Chromosome;
 import genetics.utils.Observation;
 import lombok.Getter;
 

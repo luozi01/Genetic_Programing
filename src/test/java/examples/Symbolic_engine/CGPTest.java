@@ -4,7 +4,7 @@ import cgp.Solver.CGPFitnessCalc;
 import cgp.Solver.CGPSolver;
 import cgp.Solver.CartesianGP;
 import cgp.gp.CGPChromosome;
-import genetics.Chromosome;
+import genetics.chromosome.Chromosome;
 import genetics.utils.Observation;
 
 import java.util.Collections;

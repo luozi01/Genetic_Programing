@@ -1,8 +1,8 @@
 package examples.EvoImage;
 
 
-import genetics.Chromosome;
-import genetics.MutationPolicy;
+import genetics.chromosome.Chromosome;
+import genetics.interfaces.MutationPolicy;
 import genetics.utils.RandEngine;
 
 public enum Mutation implements MutationPolicy {

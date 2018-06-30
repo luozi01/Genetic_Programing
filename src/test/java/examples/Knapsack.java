@@ -1,7 +1,15 @@
 package examples;
 
-import genetics.*;
+import genetics.chromosome.AbstractListChromosome;
 import genetics.chromosome.BinaryChromosome;
+import genetics.chromosome.Chromosome;
+import genetics.common.FitnessCalc;
+import genetics.common.Generator;
+import genetics.common.Population;
+import genetics.crossover.UniformCrossover;
+import genetics.driver.GeneticAlgorithm;
+import genetics.mutation.BinaryMutation;
+import org.eclipse.collections.api.list.MutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,7 +115,7 @@ public class Knapsack {
         private int[] itemsWeight, itemsValue;
         private int capacity;
 
-        K(List<Integer> representation) {
+        K(MutableList<Integer> representation) {
             super(representation);
         }
 
@@ -119,7 +127,7 @@ public class Knapsack {
         }
 
         @Override
-        public AbstractListChromosome<Integer> newCopy(List<Integer> list) {
+        public AbstractListChromosome<Integer> newCopy(MutableList<Integer> list) {
             K k = new K(list);
             k.itemsWeight = itemsWeight;
             k.itemsValue = itemsValue;

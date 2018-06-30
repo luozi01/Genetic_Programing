@@ -2,7 +2,11 @@ package cgp.gp;
 
 import cgp.Solver.CartesianGP;
 import cgp.enums.CGPEvolvePolicy;
-import genetics.*;
+import genetics.chromosome.Chromosome;
+import genetics.common.FitnessCalc;
+import genetics.common.Population;
+import genetics.driver.GeneticAlgorithm;
+import genetics.interfaces.MutationPolicy;
 
 public class CGA extends GeneticAlgorithm {
 

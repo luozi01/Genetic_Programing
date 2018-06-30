@@ -1,6 +1,6 @@
 package examples.EvoImage;
 
-import genetics.MutationPolicy;
+import genetics.interfaces.MutationPolicy;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
 import javafx.embed.swing.SwingFXUtils;

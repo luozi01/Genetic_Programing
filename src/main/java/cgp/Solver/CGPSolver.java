@@ -4,9 +4,9 @@ import cgp.gp.CGA;
 import cgp.gp.CGPChromosome;
 import cgp.gp.CGPGenerator;
 import cgp.gp.CGPMutation;
-import genetics.Chromosome;
-import genetics.FitnessCalc;
-import genetics.Population;
+import genetics.chromosome.Chromosome;
+import genetics.common.FitnessCalc;
+import genetics.common.Population;
 
 public class CGPSolver {
     private final CGA environment;

@@ -2,8 +2,8 @@ package cgp.gp;
 
 import cgp.Solver.CartesianGP;
 import cgp.enums.CGPMutationPolicy;
-import genetics.Chromosome;
-import genetics.MutationPolicy;
+import genetics.chromosome.Chromosome;
+import genetics.interfaces.MutationPolicy;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 
 public class CGPMutation implements MutationPolicy {

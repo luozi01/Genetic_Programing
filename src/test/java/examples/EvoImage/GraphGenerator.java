@@ -1,7 +1,7 @@
 package examples.EvoImage;
 
-import genetics.Chromosome;
-import genetics.Generator;
+import genetics.chromosome.Chromosome;
+import genetics.common.Generator;
 
 import java.util.Collections;
 import java.util.List;

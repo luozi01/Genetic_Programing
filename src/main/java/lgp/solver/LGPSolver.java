@@ -1,8 +1,8 @@
 package lgp.solver;
 
-import genetics.Chromosome;
-import genetics.FitnessCalc;
-import genetics.Population;
+import genetics.chromosome.Chromosome;
+import genetics.common.FitnessCalc;
+import genetics.common.Population;
 import lgp.gp.*;
 
 public class LGPSolver {

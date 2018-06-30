@@ -1,10 +1,10 @@
 package examples.EvoImage;
 
 
-import genetics.FitnessCalc;
-import genetics.GeneticAlgorithm;
-import genetics.MutationPolicy;
-import genetics.Population;
+import genetics.common.FitnessCalc;
+import genetics.driver.GeneticAlgorithm;
+import genetics.interfaces.MutationPolicy;
+import genetics.common.Population;
 
 public class EvoGA extends GeneticAlgorithm {
     private final MutationPolicy mutate;

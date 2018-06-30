@@ -1,10 +1,11 @@
 package treegp.program;
 
 import genetics.utils.Observation;
-import genetics.utils.Pair;
 import genetics.utils.RandEngine;
 import lombok.Getter;
 import lombok.Setter;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import treegp.solver.TreeGP;
 
 import java.io.Serializable;
@@ -97,7 +98,7 @@ public class TreeNode implements Serializable {
         return clone;
     }
 
-    public Pair<TreeNode> anyNode(RandEngine randEngine) {
+    public Pair<TreeNode, TreeNode> anyNode(RandEngine randEngine) {
         return anyNode(false, randEngine);
     }
 
@@ -109,14 +110,14 @@ public class TreeNode implements Serializable {
      * @param randEngine randomize engine
      * @return new subtree
      */
-    public Pair<TreeNode> anyNode(boolean bias, RandEngine randEngine) {
-        List<Pair<TreeNode>> nodes = flattenNodes();
+    public Pair<TreeNode, TreeNode> anyNode(boolean bias, RandEngine randEngine) {
+        List<Pair<TreeNode, TreeNode>> nodes = flattenNodes();
         if (bias) {
             // As specified by Koza, 90% select function node, 10% select terminal node
             if (randEngine.uniform() <= 0.1) {
-                List<Pair<TreeNode>> terminal_nodes = new ArrayList<>();
-                for (Pair<TreeNode> tuple : nodes) {
-                    TreeNode node = tuple.getFirst();
+                List<Pair<TreeNode, TreeNode>> terminal_nodes = new ArrayList<>();
+                for (Pair<TreeNode, TreeNode> tuple : nodes) {
+                    TreeNode node = tuple.getOne();
                     if (node.isTerminal()) {
                         terminal_nodes.add(tuple);
                     }
@@ -127,9 +128,9 @@ public class TreeNode implements Serializable {
                     return nodes.get(randEngine.nextInt(nodes.size()));
                 }
             } else {
-                List<Pair<TreeNode>> function_nodes = new ArrayList<>();
-                for (Pair<TreeNode> tuple : nodes) {
-                    TreeNode node = tuple.getFirst();
+                List<Pair<TreeNode, TreeNode>> function_nodes = new ArrayList<>();
+                for (Pair<TreeNode, TreeNode> tuple : nodes) {
+                    TreeNode node = tuple.getOne();
                     if (!node.isTerminal()) {
                         function_nodes.add(tuple);
                     }
@@ -150,16 +151,16 @@ public class TreeNode implements Serializable {
      *
      * @return The list of nodes in the tree
      */
-    private List<Pair<TreeNode>> flattenNodes() {
-        List<Pair<TreeNode>> list = new ArrayList<>();
+    private List<Pair<TreeNode, TreeNode>> flattenNodes() {
+        List<Pair<TreeNode, TreeNode>> list = new ArrayList<>();
         collectNodes(this, null, list);
         return list;
     }
 
-    private void collectNodes(TreeNode node, TreeNode parent_node, List<Pair<TreeNode>> list) {
+    private void collectNodes(TreeNode node, TreeNode parent_node, List<Pair<TreeNode, TreeNode>> list) {
         if (node == null) return;
         assert parent_node == null || parent_node.getChildren().contains(node);
-        list.add(new Pair<>(node, parent_node));
+        list.add(Tuples.pair(node, parent_node));
         for (TreeNode child : node.getChildren()) {
             collectNodes(child, node, list);
         }

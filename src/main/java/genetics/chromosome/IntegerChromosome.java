@@ -1,9 +1,7 @@
 package genetics.chromosome;
 
-import genetics.AbstractListChromosome;
 import org.apache.commons.math3.genetics.InvalidRepresentationException;
-
-import java.util.List;
+import org.eclipse.collections.api.list.MutableList;
 
 public abstract class IntegerChromosome extends AbstractListChromosome<Integer> {
     /**
@@ -12,7 +10,7 @@ public abstract class IntegerChromosome extends AbstractListChromosome<Integer> 
      * @param representation list of {0,1} values representing the chromosome
      * @throws InvalidRepresentationException iff the <code>representation</code> can not represent a valid chromosome
      */
-    public IntegerChromosome(List<Integer> representation) throws InvalidRepresentationException {
+    public IntegerChromosome(MutableList<Integer> representation) throws InvalidRepresentationException {
         super(representation);
     }
 

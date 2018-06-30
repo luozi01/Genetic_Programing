@@ -1,9 +1,10 @@
 package treegp.gp;
 
-import genetics.Chromosome;
-import genetics.CrossoverPolicy;
-import genetics.utils.Pair;
+import genetics.chromosome.Chromosome;
+import genetics.interfaces.CrossoverPolicy;
 import genetics.utils.RandEngine;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import treegp.enums.TGPCrossoverStrategy;
 import treegp.program.TreeNode;
 import treegp.solver.TreeGP;
@@ -20,7 +21,7 @@ public class Crossover implements CrossoverPolicy {
     }
 
     @Override
-    public Pair<Chromosome> crossover(Chromosome c1, Chromosome c2) {
+    public Pair<Chromosome, Chromosome> crossover(Chromosome c1, Chromosome c2) {
         if (!(c1 instanceof TGPChromosome && c2 instanceof TGPChromosome)) {
             throw new IllegalArgumentException("Both chromosome should be TGPChromosome");
         }
@@ -35,7 +36,7 @@ public class Crossover implements CrossoverPolicy {
      * @param chromosome1 One tree to be crossover with
      * @param chromosome2 Another tree to be crossover with
      */
-    private Pair<Chromosome> apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
+    private Pair<Chromosome, Chromosome> apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {
         int iMaxDepthForCrossover = manager.getMaxDepthForCrossover();
         TGPCrossoverStrategy method = manager.getCrossoverStrategy();
 
@@ -45,7 +46,7 @@ public class Crossover implements CrossoverPolicy {
         int iMaxDepth1 = chromosome1.getRoot().depth();
         int iMaxDepth2 = chromosome2.getRoot().depth();
 
-        Pair<TreeNode> pCutPoint1, pCutPoint2;
+        Pair<TreeNode, TreeNode> pCutPoint1, pCutPoint2;
 
         boolean is_crossover_performed = false;
         // Suppose that at the beginning both the current tree and the other tree do not violate max depth constraint
@@ -60,7 +61,7 @@ public class Crossover implements CrossoverPolicy {
 
 
                 if (pCutPoint1 != null && pCutPoint2 != null) {
-                    Pair<Pair<TreeNode>> result = swap(pCutPoint1, pCutPoint2);
+                    Pair<Pair<TreeNode, TreeNode>, Pair<TreeNode, TreeNode>> result = swap(pCutPoint1, pCutPoint2);
 
                     iMaxDepth1 = chromosome1.getRoot().depth();
                     iMaxDepth2 = chromosome2.getRoot().depth();
@@ -70,8 +71,8 @@ public class Crossover implements CrossoverPolicy {
                         is_crossover_performed = true;
                         break;
                     } else {
-                        Pair<TreeNode> newCutPoint1 = result.getFirst();
-                        Pair<TreeNode> newCutPoint2 = result.getSecond();
+                        Pair<TreeNode, TreeNode> newCutPoint1 = result.getOne();
+                        Pair<TreeNode, TreeNode> newCutPoint2 = result.getTwo();
 
                         // swap back so as to restore to the original GP trees
                         // if the crossover is not valid due to max depth violation
@@ -92,15 +93,16 @@ public class Crossover implements CrossoverPolicy {
                 swap(pCutPoint1, pCutPoint2);
             }
         }
-        return new Pair<>(chromosome1, chromosome2);
+        return Tuples.pair(chromosome1, chromosome2);
     }
 
-    private Pair<Pair<TreeNode>> swap(Pair<TreeNode> cutPoint1, Pair<TreeNode> cutPoint2) {
-        TreeNode parent1 = cutPoint1.getSecond();
-        TreeNode parent2 = cutPoint2.getSecond();
+    private Pair<Pair<TreeNode, TreeNode>, Pair<TreeNode, TreeNode>> swap(Pair<TreeNode, TreeNode> cutPoint1,
+                                                                          Pair<TreeNode, TreeNode> cutPoint2) {
+        TreeNode parent1 = cutPoint1.getTwo();
+        TreeNode parent2 = cutPoint2.getTwo();
 
-        TreeNode point1 = cutPoint1.getFirst();
-        TreeNode point2 = cutPoint2.getFirst();
+        TreeNode point1 = cutPoint1.getOne();
+        TreeNode point2 = cutPoint2.getOne();
 
         //if either of the point is a root
         if (parent1 == null || parent2 == null) {
@@ -124,7 +126,7 @@ public class Crossover implements CrossoverPolicy {
             for (TreeNode node : children2) {
                 point1.getChildren().add(node);
             }
-            return new Pair<>(cutPoint1, cutPoint2);
+            return Tuples.pair(cutPoint1, cutPoint2);
         } else {
             int child_index1 = parent1.getChildren().indexOf(point1);
             int child_index2 = parent2.getChildren().indexOf(point2);
@@ -135,7 +137,7 @@ public class Crossover implements CrossoverPolicy {
             parent1.getChildren().set(child_index1, newChild1);
             parent2.getChildren().set(child_index2, newChild2);
 
-            return new Pair<>(new Pair<>(newChild1, parent1), new Pair<>(newChild2, parent2));
+            return Tuples.pair(Tuples.pair(newChild1, parent1), Tuples.pair(newChild2, parent2));
         }
     }
 }

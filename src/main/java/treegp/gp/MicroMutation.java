@@ -1,7 +1,7 @@
 package treegp.gp;
 
-import genetics.Chromosome;
-import genetics.MutationPolicy;
+import genetics.chromosome.Chromosome;
+import genetics.interfaces.MutationPolicy;
 import genetics.utils.RandEngine;
 import treegp.program.Operator;
 import treegp.program.TreeNode;
@@ -28,7 +28,7 @@ public class MicroMutation implements MutationPolicy {
      */
     private Chromosome apply(TGPChromosome treeNode) {
         RandEngine randEngine = manager.getRandEngine();
-        TreeNode node = treeNode.getRoot().anyNode(randEngine).getFirst();
+        TreeNode node = treeNode.getRoot().anyNode(randEngine).getOne();
 
         if (node.isTerminal()) {
             Operator terminal = manager.getRandomTerminal();

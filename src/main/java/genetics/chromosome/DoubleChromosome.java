@@ -1,13 +1,11 @@
 package genetics.chromosome;
 
-import genetics.AbstractListChromosome;
 import org.apache.commons.math3.genetics.InvalidRepresentationException;
-
-import java.util.List;
+import org.eclipse.collections.api.list.MutableList;
 
 public abstract class DoubleChromosome extends AbstractListChromosome<Double> {
 
-    public DoubleChromosome(List<Double> representation) throws InvalidRepresentationException {
+    public DoubleChromosome(MutableList<Double> representation) throws InvalidRepresentationException {
         super(representation);
     }
 

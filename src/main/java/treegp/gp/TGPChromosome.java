@@ -1,7 +1,7 @@
 package treegp.gp;
 
 import com.google.gson.Gson;
-import genetics.Chromosome;
+import genetics.chromosome.Chromosome;
 import genetics.utils.Observation;
 import lombok.Getter;
 import lombok.Setter;

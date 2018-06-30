@@ -1,6 +1,6 @@
 package lgp.gp;
 
-import genetics.Chromosome;
+import genetics.chromosome.Chromosome;
 import genetics.utils.Observation;
 import lgp.enums.OperatorExecutionStatus;
 import lgp.program.Instruction;

@@ -1,7 +1,7 @@
 package treegp.gp;
 
-import genetics.Chromosome;
-import genetics.MutationPolicy;
+import genetics.chromosome.Chromosome;
+import genetics.interfaces.MutationPolicy;
 import genetics.utils.RandEngine;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.enums.TGPMutationStrategy;
@@ -29,7 +29,7 @@ public class MacroMutation implements MutationPolicy {
         TGPMutationStrategy method = manager.getMutationStrategy();
         RandEngine randEngine = manager.getRandEngine();
 
-        TreeNode node = treeNode.getRoot().anyNode(randEngine).getFirst();
+        TreeNode node = treeNode.getRoot().anyNode(randEngine).getOne();
         if (method == TGPMutationStrategy.MUTATION_SUBTREE || method == TGPMutationStrategy.MUTATION_SUBTREE_KINNEAR) {
             int depth = treeNode.getRoot().length();
 

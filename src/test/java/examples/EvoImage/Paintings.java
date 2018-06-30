@@ -1,6 +1,6 @@
 package examples.EvoImage;
 
-import genetics.Chromosome;
+import genetics.chromosome.Chromosome;
 
 class Paintings extends Chromosome {
 
