@@ -67,18 +67,17 @@ public class GeneticAlgorithm {
         this.population = new Population(initialization);
         this.fitnessCalc = fitnessCalc;
         this.populationSize = population.size();
-        calcFitness(isParallel);
     }
 
     public void evolve(int iteration) {
         terminate = false;
-        calcFitness(isParallel);
+        calcFitness(population);
         for (int i = 0; i < iteration; i++) {
             if (terminate) {
                 break;
             }
             population = evolvePopulation();
-            calcFitness(isParallel);
+            calcFitness(population);
             generation = i;
             for (TerminationCheck l : terminationChecks) {
                 l.update(this);
@@ -89,10 +88,10 @@ public class GeneticAlgorithm {
     public void evolve() {
         terminate = false;
         generation = 0;
-        calcFitness(isParallel);
+        calcFitness(population);
         while (!terminate) {
             population = evolvePopulation();
-            calcFitness(isParallel);
+            calcFitness(population);
             generation++;
             for (TerminationCheck l : terminationChecks) {
                 l.update(this);
@@ -128,41 +127,32 @@ public class GeneticAlgorithm {
         return nextGeneration;
     }
 
-
-    private void calcFitness(boolean isParallel) {
+    private void calcFitness(Population population) {
         if (isParallel)
             master_slave_evaluation(population);
         else
             sequential_evaluation(population);
     }
 
-
     private void master_slave_evaluation(Population population) {
         final int numberOfNodes = Runtime.getRuntime().availableProcessors();
-        final int split_length = populationSize / numberOfNodes;
-        List<List<Chromosome>> split_population = chopped(population.getChromosomes(), split_length);
         ExecutorService executor = Executors.newFixedThreadPool(numberOfNodes);
-        ParallelFitnessCalc[] workers = new ParallelFitnessCalc[split_population.size()];
-        int i = 0;
-        for (List<Chromosome> pop : split_population) {
-            workers[i] = new ParallelFitnessCalc(pop);
-            executor.submit(workers[i++]);
+        List<Chromosome> chromosomes = Collections.synchronizedList(population.getChromosomes());
+        for (Chromosome chromosome : chromosomes) {
+            executor.execute(new ParallelFitnessCalc(chromosome));
         }
         executor.shutdown();
         //noinspection StatementWithEmptyBody
         while (!executor.isTerminated()) ;
-        Arrays.stream(workers).
-                max(Comparator.comparingDouble(o -> o.best.fitness)).
-                ifPresent(parallelFitnessCalc -> bestChromosome = Optional.of(parallelFitnessCalc.best));
+        chromosomes.stream()
+                .min(Comparator.comparingDouble(o -> o.fitness))
+                .ifPresent(o -> bestChromosome = Optional.of(o));
     }
 
     private void sequential_evaluation(Population population) {
         double bestFitness = Double.MAX_VALUE;
         for (Chromosome chromosome : population) {
-            if (alwaysEval)
-                chromosome.fitness = fitnessCalc.calc(chromosome);
-            else if (Double.isNaN(chromosome.fitness))
-                chromosome.fitness = fitnessCalc.calc(chromosome);
+            if (alwaysEval || Double.isNaN(chromosome.fitness)) chromosome.fitness = fitnessCalc.calc(chromosome);
             if (chromosome.fitness < bestFitness) {
                 bestFitness = chromosome.fitness;
                 bestChromosome = Optional.of(chromosome);
@@ -198,37 +188,17 @@ public class GeneticAlgorithm {
         alwaysEval = true;
     }
 
-    private <T> List<List<T>> chopped(List<T> list, final int L) {
-        List<List<T>> parts = new ArrayList<>();
-        final int N = list.size();
-        for (int i = 0; i < N; i += L) {
-            parts.add(list.subList(i, Math.min(N, i + L)));
-        }
-        return parts;
-    }
-
     private class ParallelFitnessCalc implements Runnable {
 
-        private final List<Chromosome> subPopulation;
-        private Chromosome best;
+        private Chromosome chromosome;
 
-        ParallelFitnessCalc(List<Chromosome> subPopulation) {
-            this.subPopulation = subPopulation;
+        ParallelFitnessCalc(Chromosome chromosome) {
+            this.chromosome = chromosome;
         }
 
         @Override
         public void run() {
-            double bestFitness = Double.MAX_VALUE;
-            for (Chromosome chromosome : subPopulation) {
-                if (alwaysEval)
-                    chromosome.fitness = fitnessCalc.calc(chromosome);
-                else if (Double.isNaN(chromosome.fitness))
-                    chromosome.fitness = fitnessCalc.calc(chromosome);
-                if (chromosome.fitness < bestFitness) {
-                    bestFitness = chromosome.fitness;
-                    best = chromosome;
-                }
-            }
+            if (alwaysEval || Double.isNaN(chromosome.fitness)) chromosome.fitness = fitnessCalc.calc(chromosome);
         }
     }
 }
