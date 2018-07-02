@@ -33,6 +33,7 @@ public class GeneticAlgorithm {
     private boolean terminate;
     private int generation;
     private boolean isParallel = false;
+    private boolean alwaysEval = false;
 
     public GeneticAlgorithm(final Initialization initialization,
                             final FitnessCalc fitnessCalc,
@@ -158,7 +159,9 @@ public class GeneticAlgorithm {
     private void sequential_evaluation(Population population) {
         double bestFitness = Double.MAX_VALUE;
         for (Chromosome chromosome : population) {
-            if (Double.isNaN(chromosome.fitness))
+            if (alwaysEval)
+                chromosome.fitness = fitnessCalc.calc(chromosome);
+            else if (Double.isNaN(chromosome.fitness))
                 chromosome.fitness = fitnessCalc.calc(chromosome);
             if (chromosome.fitness < bestFitness) {
                 bestFitness = chromosome.fitness;
@@ -191,6 +194,10 @@ public class GeneticAlgorithm {
         isParallel = true;
     }
 
+    public void evalAll() {
+        alwaysEval = true;
+    }
+
     private <T> List<List<T>> chopped(List<T> list, final int L) {
         List<List<T>> parts = new ArrayList<>();
         final int N = list.size();
@@ -213,7 +220,9 @@ public class GeneticAlgorithm {
         public void run() {
             double bestFitness = Double.MAX_VALUE;
             for (Chromosome chromosome : subPopulation) {
-                if (Double.isNaN(chromosome.fitness))
+                if (alwaysEval)
+                    chromosome.fitness = fitnessCalc.calc(chromosome);
+                else if (Double.isNaN(chromosome.fitness))
                     chromosome.fitness = fitnessCalc.calc(chromosome);
                 if (chromosome.fitness < bestFitness) {
                     bestFitness = chromosome.fitness;

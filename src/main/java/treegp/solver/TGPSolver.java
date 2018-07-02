@@ -50,6 +50,10 @@ public class TGPSolver {
         environment.runInParallel();
     }
 
+    public void evaluateAll() {
+        environment.evalAll();
+    }
+
     public interface TGPListener {
         void update(TGPSolver solver);
     }
