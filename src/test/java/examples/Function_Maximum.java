@@ -3,12 +3,12 @@ package examples;
 import genetics.chromosome.AbstractListChromosome;
 import genetics.chromosome.BinaryChromosome;
 import genetics.chromosome.Chromosome;
-import genetics.common.FitnessCalc;
-import genetics.common.Generator;
-import genetics.common.Population;
 import genetics.crossover.UniformCrossover;
 import genetics.driver.GeneticAlgorithm;
+import genetics.interfaces.FitnessCalc;
+import genetics.interfaces.Initialization;
 import genetics.mutation.BinaryMutation;
+import genetics.selection.TournamentSelection;
 import org.apache.commons.math3.analysis.TrivariateFunction;
 import org.eclipse.collections.api.list.MutableList;
 
@@ -20,12 +20,12 @@ public class Function_Maximum {
     private static final TrivariateFunction function = (x, y, z) -> (-x * x + 1000000.0 * x - y * y - 40000.0 * y - z * z);
 
     public static void main(String[] args) {
-        Population population = new Population(new SolveGenerate(100));
         GeneticAlgorithm ga = new GeneticAlgorithm(
-                population,
+                new SolveGenerate(100),
                 new Solve_Evaluate(),
-                new UniformCrossover<>(.5),
-                .4, new BinaryMutation(), .02, 3, 1);
+                new UniformCrossover<>(.5), .4,
+                new BinaryMutation(), .02,
+                new TournamentSelection(), 3, 1);
         ga.evolve(1000);
         String output = ga.getBest().toString();
         System.out.println(new Solve_Evaluate().calc(ga.getBest()));
@@ -48,8 +48,8 @@ public class Function_Maximum {
         }
 
         @Override
-        public AbstractListChromosome<Integer> newCopy(MutableList<Integer> list) {
-            return new Solve(list);
+        public AbstractListChromosome<Integer> newCopy(MutableList<Integer> representation) {
+            return new Solve(representation);
         }
 
         @Override
@@ -78,7 +78,7 @@ public class Function_Maximum {
         }
     }
 
-    private static class SolveGenerate implements Generator {
+    private static class SolveGenerate implements Initialization {
 
         private final int populationSize;
 

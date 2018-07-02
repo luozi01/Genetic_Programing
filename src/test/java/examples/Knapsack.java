@@ -3,12 +3,12 @@ package examples;
 import genetics.chromosome.AbstractListChromosome;
 import genetics.chromosome.BinaryChromosome;
 import genetics.chromosome.Chromosome;
-import genetics.common.FitnessCalc;
-import genetics.common.Generator;
-import genetics.common.Population;
 import genetics.crossover.UniformCrossover;
 import genetics.driver.GeneticAlgorithm;
+import genetics.interfaces.FitnessCalc;
+import genetics.interfaces.Initialization;
 import genetics.mutation.BinaryMutation;
+import genetics.selection.TournamentSelection;
 import org.eclipse.collections.api.list.MutableList;
 
 import java.util.ArrayList;
@@ -96,10 +96,11 @@ public class Knapsack {
 
 
         GeneticAlgorithm ga = new GeneticAlgorithm(
-                new Population(new KGenerator(100, itemsWeight, itemsValue, capacity, defaultGeneLength)),
+                new KInitialization(100, itemsWeight, itemsValue, capacity, defaultGeneLength),
                 new KEvaluate(),
                 new UniformCrossover<K>(.5), .4,
-                new BinaryMutation(), .02, 3, 1);
+                new BinaryMutation(), .02,
+                new TournamentSelection(), 3, 1);
         ga.evolve(1000);
         Chromosome k = ga.getBest();
         System.out.println("Genes: " + k.toString());
@@ -127,8 +128,8 @@ public class Knapsack {
         }
 
         @Override
-        public AbstractListChromosome<Integer> newCopy(MutableList<Integer> list) {
-            K k = new K(list);
+        public AbstractListChromosome<Integer> newCopy(MutableList<Integer> representation) {
+            K k = new K(representation);
             k.itemsWeight = itemsWeight;
             k.itemsValue = itemsValue;
             k.capacity = capacity;
@@ -168,7 +169,7 @@ public class Knapsack {
         }
     }
 
-    static class KGenerator implements Generator {
+    static class KInitialization implements Initialization {
 
         private final int populationSize;
         private final int[] itemsWeight;
@@ -176,7 +177,7 @@ public class Knapsack {
         private final int capacity;
         private final int defaultGeneLength;
 
-        KGenerator(int populationSize, int[] itemsWeight, int[] itemsValue, int capacity, int defaultGeneLength) {
+        KInitialization(int populationSize, int[] itemsWeight, int[] itemsValue, int capacity, int defaultGeneLength) {
             this.populationSize = populationSize;
             this.itemsWeight = itemsWeight;
             this.itemsValue = itemsValue;

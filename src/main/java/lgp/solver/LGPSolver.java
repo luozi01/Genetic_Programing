@@ -1,22 +1,15 @@
 package lgp.solver;
 
 import genetics.chromosome.Chromosome;
-import genetics.common.FitnessCalc;
-import genetics.common.Population;
-import lgp.gp.*;
+import genetics.interfaces.FitnessCalc;
+import lgp.gp.LGA;
+import lgp.gp.LGPChromosome;
 
 public class LGPSolver {
     private final LGA environment;
 
     public LGPSolver(LinearGP manager, LGPFitnessCalc LGPFitnessCalc) {
-        environment = new LGA(
-                new Population(new LGPGenerator(manager)),
-                new LGPFitness(LGPFitnessCalc),
-                new Crossover(manager),
-                new MicroMutation(manager),
-                new MacroMutation(manager),
-                manager
-        );
+        environment = new LGA(new LGPFitness(LGPFitnessCalc), manager);
     }
 
     public void addIterationListener(final LGPListener listener) {

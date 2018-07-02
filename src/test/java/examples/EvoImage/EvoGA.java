@@ -1,16 +1,19 @@
 package examples.EvoImage;
 
 
-import genetics.common.FitnessCalc;
-import genetics.driver.GeneticAlgorithm;
-import genetics.interfaces.MutationPolicy;
 import genetics.common.Population;
+import genetics.driver.GeneticAlgorithm;
+import genetics.interfaces.FitnessCalc;
+import genetics.interfaces.Initialization;
+import genetics.interfaces.MutationPolicy;
 
 public class EvoGA extends GeneticAlgorithm {
     private final MutationPolicy mutate;
 
-    EvoGA(Population pop, final FitnessCalc fitnessCalc, final MutationPolicy mutate) {
-        super(pop, fitnessCalc);
+    EvoGA(final Initialization initialization,
+          final FitnessCalc fitnessCalc,
+          final MutationPolicy mutate) {
+        super(initialization, fitnessCalc);
         this.mutate = mutate;
     }
 
@@ -23,9 +26,6 @@ public class EvoGA extends GeneticAlgorithm {
             newPopulation.addChromosome(population.getChromosome(i));
             newPopulation.addChromosome(mutate.mutate(population.getChromosome(i)));
         }
-
-        newPopulation.sort(comparator);
-        newPopulation.trim(populationSize);
         return newPopulation;
     }
 }

@@ -1,7 +1,7 @@
 package treegp.gp;
 
 import genetics.chromosome.Chromosome;
-import genetics.common.Generator;
+import genetics.interfaces.Initialization;
 import treegp.enums.TGPInitializationStrategy;
 import treegp.program.SyntaxTreeUtils;
 import treegp.program.TreeNode;
@@ -10,11 +10,11 @@ import treegp.solver.TreeGP;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TGPGenerator implements Generator {
+public class TGPInitialization implements Initialization {
 
     private final TreeGP manager;
 
-    public TGPGenerator(TreeGP manager) {
+    public TGPInitialization(TreeGP manager) {
         this.manager = manager;
     }
 

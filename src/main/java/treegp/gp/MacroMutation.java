@@ -14,7 +14,7 @@ public class MacroMutation implements MutationPolicy {
 
     private final TreeGP manager;
 
-    public MacroMutation(TreeGP manager) {
+    MacroMutation(TreeGP manager) {
         this.manager = manager;
     }
 

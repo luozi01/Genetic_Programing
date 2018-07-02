@@ -2,16 +2,16 @@ package cgp.gp;
 
 import cgp.Solver.CartesianGP;
 import genetics.chromosome.Chromosome;
-import genetics.common.Generator;
+import genetics.interfaces.Initialization;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CGPGenerator implements Generator {
+public class CGPInitialization implements Initialization {
 
     private final CartesianGP manager;
 
-    public CGPGenerator(CartesianGP manager) {
+    public CGPInitialization(CartesianGP manager) {
         this.manager = manager;
     }
 

@@ -14,7 +14,7 @@ public class MicroMutation implements MutationPolicy {
 
     private final TreeGP manager;
 
-    public MicroMutation(TreeGP manager) {
+    MicroMutation(TreeGP manager) {
         this.manager = manager;
     }
 

@@ -30,7 +30,7 @@ public class TreeGP {
     private double microMutationRate = 0.75;
     private double crossoverRate = 0.3;
     private double reproductionRate = 0.0;
-    private double elitismRatio = .4;
+    private double elitismRatio = .1;
     private int tournamentSize = 3;
     private List<Operator> terminal = new ArrayList<>(); // variables | numbers
     private List<Operator> nonTerminal = new ArrayList<>(); // operators

@@ -1,10 +1,10 @@
-package genetics.common;
+package genetics.interfaces;
 
 import genetics.chromosome.Chromosome;
 
 import java.util.List;
 
-public interface Generator {
+public interface Initialization {
     /**
      * Generate chromosome population
      *

@@ -1,60 +1,72 @@
 package genetics.driver;
 
 import genetics.chromosome.Chromosome;
-import genetics.common.FitnessCalc;
-import genetics.common.Interrupt;
 import genetics.common.Population;
-import genetics.interfaces.CrossoverPolicy;
-import genetics.interfaces.MutationPolicy;
+import genetics.interfaces.*;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
+import org.apache.commons.math3.exception.OutOfRangeException;
+import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GeneticAlgorithm {
 
-    protected final ChromosomesComparator comparator;
+    protected final FitnessCalc fitnessCalc;
     private final RandEngine randEngine = new SimpleRandEngine();
-    private final List<Interrupt> interrupts = new LinkedList<>();
-    private final FitnessCalc fitnessCalc;
+    private final List<TerminationCheck> terminationChecks = new LinkedList<>();
+    private final int populationSize;
     protected Population population;
+    private Optional<Chromosome> bestChromosome = Optional.empty();
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
+    private SelectionPolicy selectionPolicy;
     private double uniformRate;
     private double mutationRate;
     private int tournamentSize;
     private int elitism;
     private boolean terminate;
     private int generation;
+    private boolean isParallel = false;
 
-    public GeneticAlgorithm(Population population,
+    public GeneticAlgorithm(final Initialization initialization,
                             final FitnessCalc fitnessCalc,
                             final CrossoverPolicy crossoverPolicy,
                             final double uniformRate,
                             final MutationPolicy mutationPolicy,
                             final double mutationRate,
+                            final SelectionPolicy selectionPolicy,
                             final int tournamentSize,
-                            final int elitism) {
-        this.population = population;
+                            final int elitism) throws OutOfRangeException {
+        if (uniformRate < 0 || uniformRate > 1) {
+            throw new OutOfRangeException(LocalizedFormats.CROSSOVER_RATE, uniformRate, 0, 1);
+        }
+        if (mutationRate < 0 || mutationRate > 1) {
+            throw new OutOfRangeException(LocalizedFormats.MUTATION_RATE, mutationRate, 0, 1);
+        }
+        this.population = new Population(initialization);
         this.fitnessCalc = fitnessCalc;
         this.crossoverPolicy = crossoverPolicy;
         this.uniformRate = uniformRate;
         this.mutationPolicy = mutationPolicy;
         this.mutationRate = mutationRate;
+        this.selectionPolicy = selectionPolicy;
         this.tournamentSize = tournamentSize;
         this.elitism = elitism;
-        comparator = new ChromosomesComparator();
-        population.sort(comparator);
+        this.populationSize = population.size();
+        calcFitness(isParallel);
     }
 
-    protected GeneticAlgorithm(Population population,
+    protected GeneticAlgorithm(final Initialization initialization,
                                final FitnessCalc fitnessCalc) {
-        this.population = population;
+        this.population = new Population(initialization);
         this.fitnessCalc = fitnessCalc;
-        comparator = new ChromosomesComparator();
-        population.sort(comparator);
+        this.populationSize = population.size();
+        calcFitness(isParallel);
     }
 
     public void evolve(int iteration) {
@@ -64,8 +76,9 @@ public class GeneticAlgorithm {
                 break;
             }
             population = evolvePopulation();
+            calcFitness(isParallel);
             generation = i;
-            for (Interrupt l : interrupts) {
+            for (TerminationCheck l : terminationChecks) {
                 l.update(this);
             }
         }
@@ -75,27 +88,27 @@ public class GeneticAlgorithm {
         terminate = false;
         generation = 0;
         while (!terminate) {
+            System.out.println(population.size());
             population = evolvePopulation();
+            System.out.println(population.size());
+            calcFitness(isParallel);
             generation++;
-            for (Interrupt l : interrupts) {
+            for (TerminationCheck l : terminationChecks) {
                 l.update(this);
             }
         }
     }
 
     protected Population evolvePopulation() {
-        final int populationSize = population.size();
-        Population newPopulation = new Population();
+        Population nextGeneration = new Population();
 
         // Keep our best individual, reproduction
         for (int i = 0; (i < populationSize) && (i < elitism); i++) {
-            newPopulation.addChromosome(population.getChromosome(i));
+            nextGeneration.addChromosome(population.getChromosome(i));
         }
-
-        for (int i = elitism; i < population.size(); i++) {
-            Chromosome c1 = tournamentSelection(tournamentSize);
-            Chromosome c2 = tournamentSelection(tournamentSize);
-            Pair<Chromosome, Chromosome> pair = Tuples.pair(c1, c2);
+        Pair<Chromosome, Chromosome> pair;
+        while (nextGeneration.size() < populationSize) {
+            pair = selectionPolicy.select(population, tournamentSize, randEngine);
             if (randEngine.uniform() < uniformRate) {
                 pair = crossoverPolicy.crossover(pair.getOne(), pair.getTwo());
             }
@@ -105,16 +118,58 @@ public class GeneticAlgorithm {
                         mutationPolicy.mutate(pair.getOne()),
                         mutationPolicy.mutate(pair.getTwo()));
             }
-            newPopulation.addChromosome(pair.getOne());
-            newPopulation.addChromosome(pair.getTwo());
+
+            nextGeneration.addChromosome(pair.getOne());
+            if (nextGeneration.size() < populationSize) {
+                nextGeneration.addChromosome(pair.getTwo());
+            }
         }
-        newPopulation.sort(comparator);
-        newPopulation.trim(populationSize);
-        return newPopulation;
+        return nextGeneration;
     }
 
-    public void addIterationListener(Interrupt listener) {
-        interrupts.add(listener);
+
+    private void calcFitness(boolean isParallel) {
+        if (isParallel)
+            master_slave_evaluation(population);
+        else
+            sequential_evaluation(population);
+    }
+
+
+    private void master_slave_evaluation(Population population) {
+        final int numberOfNodes = Runtime.getRuntime().availableProcessors();
+        final int split_length = populationSize / numberOfNodes;
+        List<List<Chromosome>> split_population = chopped(population.getChromosomes(), split_length);
+        ExecutorService executor = Executors.newFixedThreadPool(numberOfNodes);
+        ParallelFitnessCalc[] workers = new ParallelFitnessCalc[split_population.size()];
+        int i = 0;
+        for (List<Chromosome> pop : split_population) {
+            workers[i] = new ParallelFitnessCalc(pop);
+            executor.submit(workers[i++]);
+        }
+        executor.shutdown();
+        //noinspection StatementWithEmptyBody
+        while (!executor.isTerminated()) ;
+        Arrays.stream(workers).
+                max(Comparator.comparingDouble(o -> o.best.fitness)).
+                ifPresent(parallelFitnessCalc -> bestChromosome = Optional.of(parallelFitnessCalc.best));
+        System.out.println("finish");
+    }
+
+    private void sequential_evaluation(Population population) {
+        double bestFitness = Double.MAX_VALUE;
+        for (Chromosome chromosome : population) {
+            if (Double.isNaN(chromosome.fitness))
+                chromosome.fitness = fitnessCalc.calc(chromosome);
+            if (chromosome.fitness < bestFitness) {
+                bestFitness = chromosome.fitness;
+                bestChromosome = Optional.of(chromosome);
+            }
+        }
+    }
+
+    public void addIterationListener(TerminationCheck listener) {
+        terminationChecks.add(listener);
     }
 
     public void terminate() {
@@ -130,43 +185,42 @@ public class GeneticAlgorithm {
     }
 
     public Chromosome getBest() {
-        return population.getBest();
+        return bestChromosome.orElse(null);
     }
 
-    /**
-     * select chromosome from population
-     *
-     * @return best chromosome in the selecting group
-     */
-    protected Chromosome tournamentSelection(int tournamentSize) {
-        assert tournamentSize < population.size();
-        List<Chromosome> selection = new ArrayList<>();
-        List<Chromosome> chromosomes = new ArrayList<>(population.getChromosomes());
-        for (int i = 0; i < tournamentSize; i++) {
-            int rind = randEngine.nextInt(chromosomes.size());
-            selection.add(chromosomes.get(rind));
-            chromosomes.remove(rind);
+    public void runInParallel() {
+        isParallel = true;
+    }
+
+    private <T> List<List<T>> chopped(List<T> list, final int L) {
+        List<List<T>> parts = new ArrayList<>();
+        final int N = list.size();
+        for (int i = 0; i < N; i += L) {
+            parts.add(list.subList(i, Math.min(N, i + L)));
         }
-        selection.sort(comparator);
-        return selection.get(0);
+        return parts;
     }
 
-    protected class ChromosomesComparator implements Comparator<Chromosome> {
-        private final Map<Chromosome, Double> cache = new WeakHashMap<>();
+    protected class ParallelFitnessCalc implements Runnable {
+
+        private List<Chromosome> subPopulation;
+        private Chromosome best;
+
+        ParallelFitnessCalc(List<Chromosome> subPopulation) {
+            this.subPopulation = subPopulation;
+        }
 
         @Override
-        public int compare(Chromosome e1, Chromosome e2) {
-            return Double.compare(fit(e1), fit(e2));
-        }
-
-        Double fit(Chromosome e) {
-            Double fit = cache.get(e);
-            if (fit == null) {
-                fit = fitnessCalc.calc(e);
-                e.fitness = fit;
-                cache.put(e, fit);
+        public void run() {
+            double bestFitness = Double.MAX_VALUE;
+            for (Chromosome chromosome : subPopulation) {
+                if (Double.isNaN(chromosome.fitness))
+                    chromosome.fitness = fitnessCalc.calc(chromosome);
+                if (chromosome.fitness < bestFitness) {
+                    bestFitness = chromosome.fitness;
+                    best = chromosome;
+                }
             }
-            return fit;
         }
     }
 }

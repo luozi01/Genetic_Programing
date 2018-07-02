@@ -1,22 +1,16 @@
 package treegp.solver;
 
 import genetics.chromosome.Chromosome;
-import genetics.common.FitnessCalc;
 import genetics.common.Population;
-import treegp.gp.*;
+import genetics.interfaces.FitnessCalc;
+import treegp.gp.TGA;
+import treegp.gp.TGPChromosome;
 
 public class TGPSolver {
     private final TGA environment;
 
     public TGPSolver(TreeGP manager, TGPFitnessCalc TGPFitnessCalc) {
-        environment = new TGA(
-                new Population(new TGPGenerator(manager)),
-                new TGPFitness(TGPFitnessCalc),
-                new Crossover(manager),
-                new MicroMutation(manager),
-                new MacroMutation(manager),
-                manager
-        );
+        environment = new TGA(new TGPFitness(TGPFitnessCalc), manager);
     }
 
     public void addIterationListener(final TGPListener listener) {
@@ -50,6 +44,10 @@ public class TGPSolver {
 
     public double fitness(TGPChromosome chromosome) {
         return chromosome.fitness;
+    }
+
+    public void inParallel() {
+        environment.runInParallel();
     }
 
     public interface TGPListener {

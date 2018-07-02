@@ -1,4 +1,4 @@
-package genetics.common;
+package genetics.interfaces;
 
 import genetics.chromosome.Chromosome;
 

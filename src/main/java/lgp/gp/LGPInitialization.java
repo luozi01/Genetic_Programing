@@ -2,28 +2,27 @@ package lgp.gp;
 
 
 import genetics.chromosome.Chromosome;
-import genetics.common.Generator;
-import lgp.enums.LGPInitialization;
+import genetics.interfaces.Initialization;
 import lgp.program.Instruction;
 import lgp.solver.LinearGP;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LGPGenerator implements Generator {
+public class LGPInitialization implements Initialization {
 
     private final LinearGP manager;
 
-    public LGPGenerator(LinearGP manager) {
+    LGPInitialization(LinearGP manager) {
         this.manager = manager;
     }
 
     @Override
     public List<Chromosome> generate() {
         List<Chromosome> pop = new ArrayList<>();
-        if (manager.getInitialization() == LGPInitialization.CONSTANT_LENGTH) {
+        if (manager.getInitialization() == lgp.enums.LGPInitialization.CONSTANT_LENGTH) {
             pop = initializeWithConstantLength();
-        } else if (manager.getInitialization() == LGPInitialization.VARIABLE_LENGTH) {
+        } else if (manager.getInitialization() == lgp.enums.LGPInitialization.VARIABLE_LENGTH) {
             pop = initializeWithVariableLength();
         }
         return pop;

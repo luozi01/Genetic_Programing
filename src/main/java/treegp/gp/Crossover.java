@@ -16,7 +16,7 @@ public class Crossover implements CrossoverPolicy {
 
     private final TreeGP manager;
 
-    public Crossover(TreeGP manager) {
+    Crossover(TreeGP manager) {
         this.manager = manager;
     }
 

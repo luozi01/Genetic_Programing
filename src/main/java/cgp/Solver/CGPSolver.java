@@ -2,20 +2,21 @@ package cgp.Solver;
 
 import cgp.gp.CGA;
 import cgp.gp.CGPChromosome;
-import cgp.gp.CGPGenerator;
+import cgp.gp.CGPInitialization;
 import cgp.gp.CGPMutation;
 import genetics.chromosome.Chromosome;
-import genetics.common.FitnessCalc;
-import genetics.common.Population;
+import genetics.interfaces.FitnessCalc;
+import genetics.selection.TournamentSelection;
 
 public class CGPSolver {
     private final CGA environment;
 
     public CGPSolver(CartesianGP manager, CGPFitnessCalc CGPFitnessCalc) {
         environment = new CGA(
-                new Population(new CGPGenerator(manager)),
+                new CGPInitialization(manager),
                 new CGPFitness(CGPFitnessCalc),
                 new CGPMutation(manager),
+                new TournamentSelection(),
                 manager
         );
     }

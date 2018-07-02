@@ -1,7 +1,6 @@
 package examples.EvoImage;
 
 import genetics.chromosome.Chromosome;
-import genetics.common.Population;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -38,8 +37,7 @@ public class EvoImage extends Application {
     }
 
     private Paintings run() {
-        Population pop = new Population(new GraphGenerator(manager));
-        EvoGA ga = new EvoGA(pop, new ImageFitness(), manager.method);
+        EvoGA ga = new EvoGA(new GraphInitialization(manager), new ImageFitness(), manager.method);
         ga.addIterationListener(environment -> {
             Chromosome bestGene = environment.getBest();
             FITNESS_TEST = bestGene.fitness;

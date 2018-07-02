@@ -36,5 +36,5 @@ public abstract class AbstractListChromosome<E> extends Chromosome {
         return getRepresentation().size();
     }
 
-    public abstract AbstractListChromosome<E> newCopy(final MutableList<E> chromosomeRepresentation);
+    public abstract AbstractListChromosome<E> newCopy(final MutableList<E> representation);
 }

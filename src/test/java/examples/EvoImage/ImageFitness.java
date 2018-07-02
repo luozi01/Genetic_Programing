@@ -1,7 +1,7 @@
 package examples.EvoImage;
 
 import genetics.chromosome.Chromosome;
-import genetics.common.FitnessCalc;
+import genetics.interfaces.FitnessCalc;
 import org.jblas.DoubleMatrix;
 
 public class ImageFitness implements FitnessCalc {

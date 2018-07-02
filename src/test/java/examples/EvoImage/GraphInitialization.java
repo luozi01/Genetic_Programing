@@ -1,16 +1,16 @@
 package examples.EvoImage;
 
 import genetics.chromosome.Chromosome;
-import genetics.common.Generator;
+import genetics.interfaces.Initialization;
 
 import java.util.Collections;
 import java.util.List;
 
-public class GraphGenerator implements Generator {
+public class GraphInitialization implements Initialization {
 
     private final EvoManager manager;
 
-    GraphGenerator(EvoManager manager) {
+    GraphInitialization(EvoManager manager) {
         this.manager = manager;
     }
 
