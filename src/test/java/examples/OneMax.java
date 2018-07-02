@@ -40,11 +40,11 @@ public class OneMax {
 
     public static class OM extends BinaryChromosome {
 
-        public OM(MutableList<Integer> representation) throws InvalidRepresentationException {
+        OM(MutableList<Integer> representation) throws InvalidRepresentationException {
             super(representation);
         }
 
-        public OM(int length) {
+        OM(int length) {
             this(BinaryChromosome.randomBinaryRepresentation(length));
         }
 
@@ -82,9 +82,10 @@ public class OneMax {
 
     static class OMInitialization implements Initialization {
 
-        private int length, populationSize;
+        private final int length;
+        private final int populationSize;
 
-        public OMInitialization(int length, int populationSize) {
+        OMInitialization(int length, int populationSize) {
             this.length = length;
             this.populationSize = populationSize;
         }

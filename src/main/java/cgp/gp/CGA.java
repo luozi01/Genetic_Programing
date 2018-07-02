@@ -10,6 +10,10 @@ import genetics.interfaces.Initialization;
 import genetics.interfaces.MutationPolicy;
 import genetics.interfaces.SelectionPolicy;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.list.mutable.FastList;
+
+import java.util.Comparator;
+import java.util.List;
 
 public class CGA extends GeneticAlgorithm {
 
@@ -40,14 +44,19 @@ public class CGA extends GeneticAlgorithm {
         return newPop;
     }
 
-    //Todo fix
     private Population muPlusLambdaEvolve() {
-//        for (int i = 0; i < manager.getLambda(); i++) {
-//            population.sort(comparator);
-//            Chromosome copy = population.getBest();
-//            population.addChromosome(mutationPolicy.mutate(copy));
-//        }
-        return population;
+        Population nextGeneration = new Population();
+        List<Chromosome> chromosomes = FastList.newList(population.getChromosomes());
+        chromosomes.sort(Comparator.comparingDouble(o -> o.fitness));
+        for (int i = 0; i < manager.getMu(); i++) {
+            nextGeneration.addChromosome(chromosomes.get(i));
+        }
+        for (int i = 0; i < manager.getLambda(); i++) {
+            chromosomes.sort(Comparator.comparingDouble(o -> o.fitness));
+            Chromosome copy = chromosomes.get(0);
+            nextGeneration.addChromosome(mutationPolicy.mutate(copy));
+        }
+        return nextGeneration;
     }
 
     //Todo fix

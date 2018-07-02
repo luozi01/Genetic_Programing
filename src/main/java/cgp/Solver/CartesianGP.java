@@ -21,8 +21,8 @@ public class CartesianGP {
     private CGPEvolvePolicy evolvePolicy = CGPEvolvePolicy.MU_PLUS_LAMBDA;
     private CGPMutationPolicy mutationPolicy = CGPMutationPolicy.PROBABILISTIC;
 
-    private int rows = 8;
-    private int cols = 8;
+    private int rows = 40;
+    private int cols = 3;
     private int nodes = rows * cols;
     private int input, output;
     private int populationSize = 5;

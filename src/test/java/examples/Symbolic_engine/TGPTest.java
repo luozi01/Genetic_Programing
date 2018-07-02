@@ -8,6 +8,7 @@ import treegp.solver.TGPSolver;
 import treegp.solver.TreeGP;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ class TGPTest {
 
     public static void main(String[] args) {
         List<Observation> list = Test.function();
-//        Collections.shuffle(list);
+        Collections.shuffle(list);
         int split_point = (int) (list.size() * .9);
         List<Observation> training = list.subList(0, split_point);
         List<Observation> testing = list.subList(split_point, list.size());
@@ -28,7 +29,7 @@ class TGPTest {
 
         List<Operator> func = Arrays.asList(ADD, SUB, MUL, VARIABLE, CONSTANT);
         TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"));
-        env.setPopulationSize(10000);
+//        env.setPopulationSize(10000);
         TGPSolver solver = new TGPSolver(env, fitnessFunction);
         solver.inParallel();
         addListener(solver);

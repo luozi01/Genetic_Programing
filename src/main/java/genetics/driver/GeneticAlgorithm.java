@@ -21,6 +21,7 @@ public class GeneticAlgorithm {
     private final List<TerminationCheck> terminationChecks = new LinkedList<>();
     private final int populationSize;
     protected Population population;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Chromosome> bestChromosome = Optional.empty();
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
@@ -58,7 +59,6 @@ public class GeneticAlgorithm {
         this.tournamentSize = tournamentSize;
         this.elitism = elitism;
         this.populationSize = population.size();
-        calcFitness(isParallel);
     }
 
     protected GeneticAlgorithm(final Initialization initialization,
@@ -71,6 +71,7 @@ public class GeneticAlgorithm {
 
     public void evolve(int iteration) {
         terminate = false;
+        calcFitness(isParallel);
         for (int i = 0; i < iteration; i++) {
             if (terminate) {
                 break;
@@ -87,10 +88,9 @@ public class GeneticAlgorithm {
     public void evolve() {
         terminate = false;
         generation = 0;
+        calcFitness(isParallel);
         while (!terminate) {
-            System.out.println(population.size());
             population = evolvePopulation();
-            System.out.println(population.size());
             calcFitness(isParallel);
             generation++;
             for (TerminationCheck l : terminationChecks) {
@@ -153,7 +153,6 @@ public class GeneticAlgorithm {
         Arrays.stream(workers).
                 max(Comparator.comparingDouble(o -> o.best.fitness)).
                 ifPresent(parallelFitnessCalc -> bestChromosome = Optional.of(parallelFitnessCalc.best));
-        System.out.println("finish");
     }
 
     private void sequential_evaluation(Population population) {
@@ -201,9 +200,9 @@ public class GeneticAlgorithm {
         return parts;
     }
 
-    protected class ParallelFitnessCalc implements Runnable {
+    private class ParallelFitnessCalc implements Runnable {
 
-        private List<Chromosome> subPopulation;
+        private final List<Chromosome> subPopulation;
         private Chromosome best;
 
         ParallelFitnessCalc(List<Chromosome> subPopulation) {
