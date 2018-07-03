@@ -2,17 +2,25 @@ package genetics.driver;
 
 import genetics.chromosome.Chromosome;
 import genetics.common.Population;
+import genetics.executor.ExecutionType;
+import genetics.executor.Executor;
+import genetics.executor.SequentialExecutor;
+import genetics.executor.global.GlobalDistributionExecutor;
 import genetics.interfaces.*;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.math3.exception.OutOfRangeException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GeneticAlgorithm {
 
@@ -20,6 +28,8 @@ public class GeneticAlgorithm {
     private final RandEngine randEngine = new SimpleRandEngine();
     private final List<TerminationCheck> terminationChecks = new LinkedList<>();
     private final int populationSize;
+    @Getter
+    @Setter
     protected Population population;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<Chromosome> bestChromosome = Optional.empty();
@@ -31,9 +41,13 @@ public class GeneticAlgorithm {
     private int tournamentSize;
     private int elitism;
     private boolean terminate;
+    @Getter
     private int generation;
     private boolean isParallel = false;
     private boolean alwaysEval = false;
+    @Setter
+    private ExecutionType executionType = ExecutionType.SEQUENTIAL;
+    private Executor executor;
 
     public GeneticAlgorithm(final Initialization initialization,
                             final FitnessCalc fitnessCalc,
@@ -70,33 +84,39 @@ public class GeneticAlgorithm {
     }
 
     public void evolve(int iteration) {
+        initExecutor();
         terminate = false;
-        calcFitness(population);
+        bestChromosome = Optional.of(executor.evaluate(population));
         for (int i = 0; i < iteration; i++) {
             if (terminate) {
                 break;
             }
             population = evolvePopulation();
-            calcFitness(population);
+            bestChromosome = Optional.of(executor.evaluate(population));
             generation = i;
             for (TerminationCheck l : terminationChecks) {
                 l.update(this);
             }
         }
+        if (isParallel && executor instanceof GlobalDistributionExecutor)
+            ((GlobalDistributionExecutor) executor).killAll();
     }
 
     public void evolve() {
+        initExecutor();
         terminate = false;
         generation = 0;
-        calcFitness(population);
+        bestChromosome = Optional.of(executor.evaluate(population));
         while (!terminate) {
             population = evolvePopulation();
-            calcFitness(population);
+            bestChromosome = Optional.of(executor.evaluate(population));
             generation++;
             for (TerminationCheck l : terminationChecks) {
                 l.update(this);
             }
         }
+        if (isParallel && executor instanceof GlobalDistributionExecutor)
+            ((GlobalDistributionExecutor) executor).killAll();
     }
 
     protected Population evolvePopulation() {
@@ -127,36 +147,22 @@ public class GeneticAlgorithm {
         return nextGeneration;
     }
 
-    private void calcFitness(Population population) {
-        if (isParallel)
-            master_slave_evaluation(population);
-        else
-            sequential_evaluation(population);
-    }
-
-    private void master_slave_evaluation(Population population) {
-        final int numberOfNodes = Runtime.getRuntime().availableProcessors();
-        ExecutorService executor = Executors.newFixedThreadPool(numberOfNodes);
-        List<Chromosome> chromosomes = Collections.synchronizedList(population.getChromosomes());
-        for (Chromosome chromosome : chromosomes) {
-            executor.execute(new ParallelFitnessCalc(chromosome));
-        }
-        executor.shutdown();
-        //noinspection StatementWithEmptyBody
-        while (!executor.isTerminated()) ;
-        chromosomes.stream()
-                .min(Comparator.comparingDouble(o -> o.fitness))
-                .ifPresent(o -> bestChromosome = Optional.of(o));
-    }
-
-    private void sequential_evaluation(Population population) {
-        double bestFitness = Double.MAX_VALUE;
-        for (Chromosome chromosome : population) {
-            if (alwaysEval || Double.isNaN(chromosome.fitness)) chromosome.fitness = fitnessCalc.calc(chromosome);
-            if (chromosome.fitness < bestFitness) {
-                bestFitness = chromosome.fitness;
-                bestChromosome = Optional.of(chromosome);
-            }
+    //Todo implement island and diffusion model
+    private void initExecutor() {
+        switch (executionType) {
+            case SEQUENTIAL:
+                executor = new SequentialExecutor(alwaysEval, fitnessCalc);
+                break;
+            case GLOBAL_MODEL:
+                final int MAX_THREAD = Runtime.getRuntime().availableProcessors();
+                BlockingQueue<Optional<Chromosome>> tasks = new LinkedBlockingQueue<>();
+                BlockingQueue<Optional<Chromosome>> results = new LinkedBlockingQueue<>();
+                executor = new GlobalDistributionExecutor(MAX_THREAD, alwaysEval, tasks, results, fitnessCalc);
+                break;
+            case ISLAND_MODEL:
+                break;
+            case DIFFUSION_MODEL:
+                break;
         }
     }
 
@@ -168,37 +174,16 @@ public class GeneticAlgorithm {
         terminate = true;
     }
 
-    public int getGeneration() {
-        return generation;
-    }
-
-    public Population getPopulation() {
-        return population;
-    }
-
     public Chromosome getBest() {
         return bestChromosome.orElse(null);
     }
 
     public void runInParallel() {
         isParallel = true;
+        executionType = ExecutionType.GLOBAL_MODEL;
     }
 
     public void evalAll() {
         alwaysEval = true;
-    }
-
-    private class ParallelFitnessCalc implements Runnable {
-
-        private Chromosome chromosome;
-
-        ParallelFitnessCalc(Chromosome chromosome) {
-            this.chromosome = chromosome;
-        }
-
-        @Override
-        public void run() {
-            if (alwaysEval || Double.isNaN(chromosome.fitness)) chromosome.fitness = fitnessCalc.calc(chromosome);
-        }
     }
 }

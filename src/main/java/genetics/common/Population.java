@@ -52,6 +52,7 @@ public class Population implements Iterable<Chromosome> {
         return chromosomes;
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public Iterator<Chromosome> iterator() {
         return chromosomes.iterator();

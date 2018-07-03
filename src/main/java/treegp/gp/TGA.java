@@ -90,9 +90,9 @@ public class TGA extends GeneticAlgorithm {
         }
 
         for (Chromosome c : nextGeneration) {
-            if (Double.isNaN(c.fitness))
-                c.fitness = fitnessCalc.calc(c);
+            c.fitness = fitnessCalc.calc(c);
         }
+
         nextGeneration.sort(Comparator.comparingDouble(o -> o.fitness));
         List<Chromosome> copy = FastList.newList(population.getChromosomes());
         copy.sort(Comparator.comparingDouble(o -> o.fitness));
