@@ -32,7 +32,6 @@ public class TGA extends GeneticAlgorithm {
         this.macro = new MacroMutation(manager);
         this.selectionPolicy = new TournamentSelection();
         this.manager = manager;
-
     }
 
     @Override
@@ -147,9 +146,12 @@ public class TGA extends GeneticAlgorithm {
                         break;
                     }
                 }
-
                 if (successfully_replaced) break;
             }
+        }
+        for (Chromosome c : nextGeneration) {
+            if (Double.isNaN(c.fitness))
+                System.out.println("here");
         }
         return nextGeneration;
     }
