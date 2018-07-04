@@ -112,14 +112,15 @@ public class Knapsack {
 
             if (value == optimal) {
                 o.terminate();
-                System.out.println("Genes: " + best.toString());
-                System.out.println("Weights: " + sum((K) best, itemsWeight));
-                System.out.println("Value: " + sum((K) best, itemsValue));
-
-                System.out.println("Optimal value: " + knapsack(capacity, itemsWeight, itemsValue));
             }
         });
-        ga.evolve();
+        ga.evolve(2000);
+        Chromosome best = ga.getBest();
+        System.out.println("Genes: " + best.toString());
+        System.out.println("Weights: " + sum((K) best, itemsWeight));
+        System.out.println("Value: " + sum((K) best, itemsValue));
+
+        System.out.println("Optimal value: " + knapsack(capacity, itemsWeight, itemsValue));
     }
 
     private static class K extends BinaryChromosome {

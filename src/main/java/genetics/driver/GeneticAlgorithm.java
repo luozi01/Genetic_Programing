@@ -151,7 +151,7 @@ public class GeneticAlgorithm {
     private void initExecutor() {
         switch (executionType) {
             case SEQUENTIAL:
-                executor = new SequentialExecutor(alwaysEval, fitnessCalc);
+                executor = new SequentialExecutor(fitnessCalc);
                 break;
             case GLOBAL_MODEL:
                 final int MAX_THREAD = Runtime.getRuntime().availableProcessors();
@@ -180,9 +180,5 @@ public class GeneticAlgorithm {
 
     public void runInGlobal() {
         executionType = ExecutionType.GLOBAL_MODEL;
-    }
-
-    public void evalAll() {
-        alwaysEval = true;
     }
 }
