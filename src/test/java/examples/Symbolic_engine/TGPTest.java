@@ -28,7 +28,6 @@ class TGPTest {
 
         List<Operator> func = Arrays.asList(ADD, SUB, MUL, VARIABLE, CONSTANT);
         TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"));
-//        env.setPopulationSize(10000);
         TGPSolver solver = new TGPSolver(env, fitnessFunction);
         solver.runGlobal();
         addListener(solver);

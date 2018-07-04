@@ -149,10 +149,6 @@ public class TGA extends GeneticAlgorithm {
                 if (successfully_replaced) break;
             }
         }
-        for (Chromosome c : nextGeneration) {
-            if (Double.isNaN(c.fitness))
-                System.out.println("here");
-        }
         return nextGeneration;
     }
 }
