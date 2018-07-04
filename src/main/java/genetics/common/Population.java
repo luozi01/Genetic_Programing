@@ -3,6 +3,7 @@ package genetics.common;
 
 import genetics.chromosome.Chromosome;
 import genetics.interfaces.Initialization;
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,6 +16,8 @@ public class Population implements Iterable<Chromosome> {
     private List<Chromosome> chromosomes;
 
     public Population(Initialization initialization) {
+        if (initialization == null)
+            throw new IllegalStateException("Initialization method cannot be null");
         chromosomes = initialization.generate();
     }
 
@@ -23,7 +26,7 @@ public class Population implements Iterable<Chromosome> {
     }
 
     public Population(List<Chromosome> chromosomes) {
-        this.chromosomes = new ArrayList<>(chromosomes);
+        this.chromosomes = FastList.newList(chromosomes);
     }
 
     public Chromosome getChromosome(int index) {
@@ -60,7 +63,6 @@ public class Population implements Iterable<Chromosome> {
                 .limit(length).collect(Collectors.toList());
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     public Iterator<Chromosome> iterator() {
         return chromosomes.iterator();

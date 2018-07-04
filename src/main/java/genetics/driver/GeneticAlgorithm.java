@@ -157,7 +157,7 @@ public class GeneticAlgorithm {
                 final int MAX_THREAD = Runtime.getRuntime().availableProcessors();
                 BlockingQueue<Optional<Chromosome>> tasks = new LinkedBlockingQueue<>();
                 BlockingQueue<Optional<Chromosome>> results = new LinkedBlockingQueue<>();
-                executor = new GlobalDistributionExecutor(MAX_THREAD, alwaysEval, tasks, results, fitnessCalc);
+                executor = new GlobalDistributionExecutor(MAX_THREAD, tasks, results, fitnessCalc);
                 break;
             case ISLAND_MODEL:
                 break;

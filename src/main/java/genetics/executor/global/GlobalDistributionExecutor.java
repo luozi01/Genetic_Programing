@@ -19,7 +19,6 @@ public class GlobalDistributionExecutor extends Executor {
 
 
     public GlobalDistributionExecutor(int numberOfThreads,
-                                      boolean alwaysEval,
                                       BlockingQueue<Optional<Chromosome>> tasks,
                                       BlockingQueue<Optional<Chromosome>> results,
                                       FitnessCalc fitnessCalc) {
@@ -28,7 +27,7 @@ public class GlobalDistributionExecutor extends Executor {
         this.numberOfThreads = numberOfThreads;
         executorService = Executors.newFixedThreadPool(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
-            executorService.execute(new EvaluationThread(tasks, results, fitnessCalc, alwaysEval));
+            executorService.execute(new EvaluationThread(tasks, results, fitnessCalc));
         }
     }
 
