@@ -14,7 +14,6 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 import treegp.enums.TGPEvolveStrategy;
 import treegp.solver.TreeGP;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class TGA extends GeneticAlgorithm {
@@ -46,14 +45,9 @@ public class TGA extends GeneticAlgorithm {
         return newPop;
     }
 
-    //Todo fix efficiency issues
     private Population muPlusLambdaEvolve(int populationSize) {
-        List<Chromosome> nextGeneration = FastList.newList();
-
-        int elite_count = (int) (manager.getElitismRatio() * populationSize);
-
         int crossover_count = (int) (manager.getCrossoverRate() * populationSize);
-
+        Population copy = new Population(population.getChromosomes());
         if (crossover_count % 2 != 0) crossover_count += 1;
 
         int micro_mutation_count = (int) (manager.getMicroMutationRate() * populationSize);
@@ -64,41 +58,30 @@ public class TGA extends GeneticAlgorithm {
         //do crossover
         for (int offspring_index = 0; offspring_index < crossover_count; offspring_index += 2) {
 
-            pair = selectionPolicy.select(population, manager.getTournamentSize(), manager.getRandEngine());
+            pair = selectionPolicy.select(copy, manager.getTournamentSize(), manager.getRandEngine());
             Pair<Chromosome, Chromosome> genes = crossoverPolicy.crossover(pair.getOne(), pair.getTwo());
-            nextGeneration.add(genes.getOne());
-            nextGeneration.add(genes.getTwo());
+            population.addChromosome(genes.getOne());
+            population.addChromosome(genes.getTwo());
         }
 
         // do point mutation
         for (int offspring_index = 0; offspring_index < micro_mutation_count; ++offspring_index) {
-            pair = selectionPolicy.select(population, manager.getTournamentSize(), manager.getRandEngine());
-            nextGeneration.add(micro.mutate(pair.getOne()));
+            pair = selectionPolicy.select(copy, manager.getTournamentSize(), manager.getRandEngine());
+            population.addChromosome(micro.mutate(pair.getOne()));
         }
 
         // do subtree mutation
         for (int offspring_index = 0; offspring_index < macro_mutation_count; ++offspring_index) {
-            pair = selectionPolicy.select(population, manager.getTournamentSize(), manager.getRandEngine());
-            nextGeneration.add(macro.mutate(pair.getOne()));
+            pair = selectionPolicy.select(copy, manager.getTournamentSize(), manager.getRandEngine());
+            population.addChromosome(macro.mutate(pair.getOne()));
         }
 
         // do reproduction
         for (int offspring_index = 0; offspring_index < reproduction_count; ++offspring_index) {
-            pair = selectionPolicy.select(population, manager.getTournamentSize(), manager.getRandEngine());
-            nextGeneration.add(pair.getOne());
+            pair = selectionPolicy.select(copy, manager.getTournamentSize(), manager.getRandEngine());
+            population.addChromosome(pair.getOne());
         }
-
-        for (Chromosome c : nextGeneration) {
-            c.fitness = fitnessCalc.calc(c);
-        }
-
-        nextGeneration.sort(Comparator.comparingDouble(o -> o.fitness));
-        List<Chromosome> copy = FastList.newList(population.getChromosomes());
-        copy.sort(Comparator.comparingDouble(o -> o.fitness));
-        for (int offspring_index = elite_count; offspring_index < populationSize; ++offspring_index) {
-            copy.set(offspring_index, nextGeneration.get(offspring_index - elite_count));
-        }
-        return new Population(copy);
+        return population;
     }
 
     private Population tinyGPEvolve(int populationSize) {

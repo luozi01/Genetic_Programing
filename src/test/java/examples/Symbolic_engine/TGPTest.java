@@ -1,6 +1,7 @@
 package examples.Symbolic_engine;
 
 import genetics.utils.Observation;
+import treegp.enums.TGPEvolveStrategy;
 import treegp.gp.TGPChromosome;
 import treegp.program.Operator;
 import treegp.solver.TGPFitnessCalc;
@@ -28,8 +29,9 @@ class TGPTest {
 
         List<Operator> func = Arrays.asList(ADD, SUB, MUL, VARIABLE, CONSTANT);
         TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"));
+        env.setReplacementStrategy(TGPEvolveStrategy.MU_PLUS_LAMBDA);
         TGPSolver solver = new TGPSolver(env, fitnessFunction);
-        solver.runGlobal();
+//        solver.runGlobal();
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();
