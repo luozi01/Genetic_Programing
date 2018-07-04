@@ -53,7 +53,7 @@ public class OneMax {
             }
         });
         if (parallel)
-            ga.runInParallel();
+            ga.runInGlobal();
         long startTime = System.currentTimeMillis();
         ga.evolve();
         long useTime = System.currentTimeMillis() - startTime;

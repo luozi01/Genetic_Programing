@@ -46,12 +46,8 @@ public class TGPSolver {
         return chromosome.fitness;
     }
 
-    public void inParallel() {
-        environment.runInParallel();
-    }
-
-    public void evaluateAll() {
-        environment.evalAll();
+    public void runGlobal() {
+        environment.runInGlobal();
     }
 
     public interface TGPListener {

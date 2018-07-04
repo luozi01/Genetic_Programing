@@ -30,7 +30,7 @@ class TGPTest {
         TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"));
 //        env.setPopulationSize(10000);
         TGPSolver solver = new TGPSolver(env, fitnessFunction);
-        solver.inParallel();
+        solver.runGlobal();
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();

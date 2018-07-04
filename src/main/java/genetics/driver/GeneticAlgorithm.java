@@ -43,9 +43,7 @@ public class GeneticAlgorithm {
     private boolean terminate;
     @Getter
     private int generation;
-    private boolean isParallel = false;
     private boolean alwaysEval = false;
-    @Setter
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
     private Executor executor;
 
@@ -98,7 +96,7 @@ public class GeneticAlgorithm {
                 l.update(this);
             }
         }
-        if (isParallel && executor instanceof GlobalDistributionExecutor)
+        if (executor instanceof GlobalDistributionExecutor)
             ((GlobalDistributionExecutor) executor).killAll();
     }
 
@@ -115,7 +113,7 @@ public class GeneticAlgorithm {
                 l.update(this);
             }
         }
-        if (isParallel && executor instanceof GlobalDistributionExecutor)
+        if (executor instanceof GlobalDistributionExecutor)
             ((GlobalDistributionExecutor) executor).killAll();
     }
 
@@ -178,8 +176,7 @@ public class GeneticAlgorithm {
         return bestChromosome.orElse(null);
     }
 
-    public void runInParallel() {
-        isParallel = true;
+    public void runInGlobal() {
         executionType = ExecutionType.GLOBAL_MODEL;
     }
 
