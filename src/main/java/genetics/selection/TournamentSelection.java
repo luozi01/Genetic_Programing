@@ -6,11 +6,13 @@ import genetics.interfaces.SelectionPolicy;
 import genetics.utils.RandEngine;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
+import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.tuple.Tuples;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
 
 public class TournamentSelection implements SelectionPolicy {
 
@@ -32,21 +34,13 @@ public class TournamentSelection implements SelectionPolicy {
         }
 
         // create a copy of the chromosome list
-        List<Chromosome> copy = new ArrayList<>(population.getChromosomes());
-        Chromosome best = null;
-        double fitness = Double.MAX_VALUE;
+        MutableList<Chromosome> copy = FastList.newList(population.getChromosomes());
+        MutableList<Chromosome> selection = Lists.mutable.empty();
         for (int i = 0; i < arity; i++) {
-            // select a random individual and add it to the tournament
             int rind = randEngine.nextInt(copy.size());
-            Chromosome chose = copy.get(rind);
-            if (chose.fitness < fitness) {
-                fitness = chose.fitness;
-                best = chose;
-            }
-            // do not select it again
+            selection.add(copy.get(rind));
             copy.remove(rind);
         }
-        // the winner takes it all
-        return best;
+        return selection.min(Comparator.comparingDouble(o -> o.fitness));
     }
 }

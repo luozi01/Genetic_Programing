@@ -9,6 +9,8 @@ import genetics.interfaces.FitnessCalc;
 import genetics.interfaces.Initialization;
 import genetics.mutation.BinaryMutation;
 import genetics.selection.TournamentSelection;
+import genetics.utils.RandEngine;
+import genetics.utils.SimpleRandEngine;
 import org.eclipse.collections.api.list.MutableList;
 
 import java.util.ArrayList;
@@ -77,23 +79,25 @@ public class Knapsack {
 
     public static void main(String[] args) {
         System.out.println("Initialization");
-        int[] itemsWeight = new int[]{6, 6, 5, 1, 4, 12, 15, 15};
-        int[] itemsValue = new int[]{4, 9, 13, 15, 18, 7, 15, 3};
-        int defaultGeneLength = itemsValue.length;
+//        int[] itemsWeight = new int[]{6, 6, 5, 1, 4, 12, 15, 15};
+//        int[] itemsValue = new int[]{4, 9, 13, 15, 18, 7, 15, 3};
+//        int defaultGeneLength = itemsValue.length;
+
+        int defaultGeneLength = 40;
         int capacity = 10 * defaultGeneLength;
-//        int defaultGeneLength = 40;
-//        RandEngine randEngine = new SimpleRandEngine();
-//        int[] itemsValue = new int[defaultGeneLength];
-//        int[] itemsWeight = new int[defaultGeneLength];
-//        for (int i = 0; i < defaultGeneLength; i++) {
-//            itemsValue[i] = randEngine.nextInt(15) + 1;
-//            itemsWeight[i] = randEngine.nextInt(20) + 1;
-//        }
+        RandEngine randEngine = new SimpleRandEngine();
+        int[] itemsValue = new int[defaultGeneLength];
+        int[] itemsWeight = new int[defaultGeneLength];
+        for (int i = 0; i < defaultGeneLength; i++) {
+            itemsValue[i] = randEngine.nextInt(15) + 1;
+            itemsWeight[i] = randEngine.nextInt(20) + 1;
+        }
         System.out.println("Capacity: " + capacity);
         System.out.println("Values: \t" + Arrays.toString(itemsValue));
         System.out.println("Weights: \t" + Arrays.toString(itemsWeight));
         System.out.println("=======================================\n");
 
+        final int optimal = knapsack(capacity, itemsWeight, itemsValue);
 
         GeneticAlgorithm ga = new GeneticAlgorithm(
                 new KInitialization(100, itemsWeight, itemsValue, capacity, defaultGeneLength),
@@ -101,14 +105,21 @@ public class Knapsack {
                 new UniformCrossover<K>(.5), .4,
                 new BinaryMutation(), .02,
                 new TournamentSelection(), 3, 1);
-        ga.evolve(1000);
-        Chromosome k = ga.getBest();
-        System.out.println("Genes: " + k.toString());
-        System.out.println("Weights: " + sum((K) k, itemsWeight));
-        System.out.println("Value: " + sum((K) k, itemsValue));
+        ga.addIterationListener(o -> {
+            Chromosome best = o.getBest();
+            int value = sum((K) best, itemsValue);
+            System.out.printf("Generation: %s, \t Value: %d\n", o.getGeneration(), value);
 
-        System.out.println("Optimal value: " + knapsack(capacity, itemsWeight, itemsValue));
+            if (value == optimal) {
+                o.terminate();
+                System.out.println("Genes: " + best.toString());
+                System.out.println("Weights: " + sum((K) best, itemsWeight));
+                System.out.println("Value: " + sum((K) best, itemsValue));
 
+                System.out.println("Optimal value: " + knapsack(capacity, itemsWeight, itemsValue));
+            }
+        });
+        ga.evolve();
     }
 
     private static class K extends BinaryChromosome {

@@ -91,6 +91,7 @@ public class GeneticAlgorithm {
             }
             population = evolvePopulation();
             bestChromosome = Optional.of(executor.evaluate(population));
+            population.trim(populationSize);
             generation = i;
             for (TerminationCheck l : terminationChecks) {
                 l.update(this);
@@ -108,6 +109,7 @@ public class GeneticAlgorithm {
         while (!terminate) {
             population = evolvePopulation();
             bestChromosome = Optional.of(executor.evaluate(population));
+            population.trim(populationSize);
             generation++;
             for (TerminationCheck l : terminationChecks) {
                 l.update(this);

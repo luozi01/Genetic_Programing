@@ -5,12 +5,14 @@ import genetics.chromosome.Chromosome;
 import genetics.interfaces.Initialization;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Population implements Iterable<Chromosome> {
 
-    private final List<Chromosome> chromosomes;
+    private List<Chromosome> chromosomes;
 
     public Population(Initialization initialization) {
         chromosomes = initialization.generate();
@@ -50,6 +52,12 @@ public class Population implements Iterable<Chromosome> {
 
     public List<Chromosome> getChromosomes() {
         return chromosomes;
+    }
+
+    public void trim(int length) {
+        chromosomes = chromosomes.stream()
+                .sorted(Comparator.comparingDouble(o -> o.fitness))
+                .limit(length).collect(Collectors.toList());
     }
 
     @SuppressWarnings("NullableProblems")
