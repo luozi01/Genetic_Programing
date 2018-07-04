@@ -22,7 +22,7 @@ public class OneMax {
     public static void main(String[] args) {
         DescriptiveStatistics sequential_stats = new DescriptiveStatistics();
         DescriptiveStatistics parallelStats = new DescriptiveStatistics();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             List<Chromosome> sample = new OMInitialization(1000, 10000).generate();
             System.out.println("Running sequential");
             sequential_stats.addValue(benchmark(new Population(sample), false));
@@ -45,8 +45,8 @@ public class OneMax {
         ga.setPopulation(population);
         ga.addIterationListener(environment -> {
             Chromosome best = environment.getBest();
-//            System.out.printf("Generation: %s, Fitness: %s\n",
-//                    environment.getGeneration(), best.fitness);
+            System.out.printf("Generation: %s, Fitness: %s\n",
+                    environment.getGeneration(), best.fitness);
 
             if (!((BinaryChromosome) best).getRepresentation().contains(0)) {
                 environment.terminate();

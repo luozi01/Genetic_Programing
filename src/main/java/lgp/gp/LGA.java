@@ -40,8 +40,8 @@ public class LGA extends GeneticAlgorithm {
         int counter = 0;
         while (program_count < iPopSize && counter < computationBudget) {
 
-            Pair<Chromosome, Chromosome> gp1 = selectionPolicy.select(nextGeneration, manager.getTournamentSize(), randEngine);
-            Pair<Chromosome, Chromosome> gp2 = selectionPolicy.select(nextGeneration, manager.getTournamentSize(), randEngine);
+            Pair<Chromosome, Chromosome> gp1 = selectionPolicy.select(population, manager.getTournamentSize(), randEngine);
+            Pair<Chromosome, Chromosome> gp2 = selectionPolicy.select(population, manager.getTournamentSize(), randEngine);
 
             Chromosome tp1 = gp1.getOne();
             Chromosome tp2 = gp2.getOne();
@@ -88,6 +88,8 @@ public class LGA extends GeneticAlgorithm {
 
             counter++;
         }
+
+        updateGlobal(nextGeneration.trim(manager.getPopulationSize()));
         return nextGeneration;
     }
 }

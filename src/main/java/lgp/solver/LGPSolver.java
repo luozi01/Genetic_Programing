@@ -41,10 +41,6 @@ public class LGPSolver {
         return chromosome.fitness;
     }
 
-    public void runGlobal() {
-        environment.runInGlobal();
-    }
-
     public interface LGPListener {
         void update(LGPSolver solver);
     }

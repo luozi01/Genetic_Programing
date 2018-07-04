@@ -32,7 +32,7 @@ public class GeneticAlgorithm {
     @Setter
     protected Population population;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<Chromosome> bestChromosome = Optional.empty();
+    protected Optional<Chromosome> bestChromosome = Optional.empty();
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
     private SelectionPolicy selectionPolicy;
@@ -43,7 +43,6 @@ public class GeneticAlgorithm {
     private boolean terminate;
     @Getter
     private int generation;
-    private boolean alwaysEval = false;
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
     private Executor executor;
 
@@ -105,11 +104,9 @@ public class GeneticAlgorithm {
         initExecutor();
         terminate = false;
         generation = 0;
-        bestChromosome = Optional.of(executor.evaluate(population));
+        executor.evaluate(population);
         while (!terminate) {
             population = evolvePopulation();
-            bestChromosome = Optional.of(executor.evaluate(population));
-            population.trim(populationSize);
             generation++;
             for (TerminationCheck l : terminationChecks) {
                 l.update(this);
@@ -144,6 +141,7 @@ public class GeneticAlgorithm {
                 nextGeneration.addChromosome(pair.getTwo());
             }
         }
+        updateGlobal(executor.evaluate(nextGeneration));
         return nextGeneration;
     }
 
@@ -164,6 +162,11 @@ public class GeneticAlgorithm {
             case DIFFUSION_MODEL:
                 break;
         }
+    }
+
+    protected void updateGlobal(Chromosome chromosome) {
+        if (!bestChromosome.isPresent() || chromosome.betterThan(bestChromosome.get()))
+            bestChromosome = Optional.of(chromosome);
     }
 
     public void addIterationListener(TerminationCheck listener) {

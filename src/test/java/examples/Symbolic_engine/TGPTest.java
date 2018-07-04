@@ -31,7 +31,6 @@ class TGPTest {
         TreeGP env = new TreeGP(func, Arrays.asList("x", "y", "z"));
         env.setReplacementStrategy(TGPEvolveStrategy.MU_PLUS_LAMBDA);
         TGPSolver solver = new TGPSolver(env, fitnessFunction);
-//        solver.runGlobal();
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();

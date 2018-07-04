@@ -25,8 +25,7 @@ public class EvaluationThread implements Runnable {
             try {
                 Optional<Chromosome> solution = tasks.take();
                 if (!solution.isPresent()) break;
-                if (Double.isNaN(solution.get().fitness))
-                    solution.get().fitness = evaluator.calc(solution.get());
+                solution.get().fitness = evaluator.calc(solution.get());
 
                 results.put(solution);
             } catch (InterruptedException e) {

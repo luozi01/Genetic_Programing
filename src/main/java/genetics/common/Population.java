@@ -57,10 +57,11 @@ public class Population implements Iterable<Chromosome> {
         return chromosomes;
     }
 
-    public void trim(int length) {
+    public Chromosome trim(int length) {
         chromosomes = chromosomes.stream()
                 .sorted(Comparator.comparingDouble(o -> o.fitness))
                 .limit(length).collect(Collectors.toList());
+        return chromosomes.get(0);
     }
 
     @Override

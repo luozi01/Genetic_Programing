@@ -23,7 +23,6 @@ class LGPTest {
 
         LinearGP gp = LinearGP.defaultConfig(training, 3);
         LGPSolver solver = new LGPSolver(gp, fitnessFunction);
-//        solver.runGlobal();
         addListener(solver);
         Long startTime = System.currentTimeMillis();
         solver.evolve();
