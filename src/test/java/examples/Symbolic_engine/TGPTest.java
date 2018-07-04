@@ -61,13 +61,11 @@ class TGPTest {
 
             // log to console
             System.out.printf("Generation = %s\t fit = %s\t\n", engine1.getIteration(), bestFit);
-//            System.out.println(engine1.getGeneration() + " " + bestFit);
 
             // halt condition
             if (bestFit < 5) {
                 engine1.terminate();
                 System.out.printf("Function: %s\n", bestGene);
-                System.out.println(bestGene.serialization());
             }
         });
     }

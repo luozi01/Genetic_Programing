@@ -24,7 +24,7 @@ public class TGA extends GeneticAlgorithm {
     private final SelectionPolicy selectionPolicy;
     private final TreeGP manager;
 
-    private Chromosome currBset = null;
+    private Chromosome currBest = null;
 
     public TGA(final FitnessCalc fitnessCalc,
                final TreeGP manager) {
@@ -61,7 +61,7 @@ public class TGA extends GeneticAlgorithm {
         int macro_mutation_count = (int) (manager.getMacroMutationRate() * populationSize);
         int reproduction_count = populationSize - crossover_count - micro_mutation_count - macro_mutation_count;
 
-        currBset = null;
+        currBest = null;
         Pair<Chromosome, Chromosome> pair;
         //do crossover
         for (int offspring_index = 0; offspring_index < crossover_count; offspring_index += 2) {
@@ -90,18 +90,16 @@ public class TGA extends GeneticAlgorithm {
             nextGeneration.add(pair.getOne());
         }
 
-        for (Chromosome child : nextGeneration) {
+        nextGeneration.forEach(child -> {
             child.fitness = fitnessCalc.calc(child);
-            if (currBset == null || child.betterThan(currBset)) {
-                currBset = child;
-            }
-        }
-
-        updateGlobal(currBset);
+            if (currBest == null || child.betterThan(currBest)) currBest = child;
+        });
+        updateGlobal(currBest);
 
         nextGeneration.sort(Comparator.comparingDouble(o -> o.fitness));
         List<Chromosome> copy = FastList.newList(population.getChromosomes());
         copy.sort(Comparator.comparingDouble(o -> o.fitness));
+
         for (int offspring_index = elite_count; offspring_index < populationSize; ++offspring_index) {
             copy.set(offspring_index, nextGeneration.get(offspring_index - elite_count));
         }
@@ -118,7 +116,7 @@ public class TGA extends GeneticAlgorithm {
 
         RandEngine randEngine = manager.getRandEngine();
         List<Chromosome> children, bad_parents;
-        currBset = bestChromosome.orElse(null);
+        currBest = bestChromosome.orElse(null);
 
         for (int offspring_index = 0; offspring_index < populationSize; offspring_index += 1) {
             double r = randEngine.uniform();
@@ -147,8 +145,8 @@ public class TGA extends GeneticAlgorithm {
             for (Chromosome child : children) {
                 child.fitness = fitnessCalc.calc(child);
 
-                if (currBset == null || child.betterThan(currBset)) {
-                    currBset = child;
+                if (currBest == null || child.betterThan(currBest)) {
+                    currBest = child;
                 }
 
                 for (Chromosome bad_parent : bad_parents) {
@@ -161,7 +159,7 @@ public class TGA extends GeneticAlgorithm {
                 if (successfully_replaced) break;
             }
         }
-        updateGlobal(currBset);
+        updateGlobal(currBest);
         return nextGeneration;
     }
 }
