@@ -21,7 +21,7 @@ import java.util.List;
 public class LinearGP {
     private RandEngine randEngine = new SimpleRandEngine();
 
-    private int populationSize = 1000;
+    private int populationSize = 500;
 
     // number of registers of a linear program
     private int registerCount;
