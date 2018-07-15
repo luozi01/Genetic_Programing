@@ -4,6 +4,7 @@ import cgp.interfaces.*;
 import cgp.program.DataSet;
 import cgp.program.FunctionSet;
 import cgp.program.Node;
+import cgp.program.Results;
 import cgp.solver.CartesianGP;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
@@ -16,7 +17,6 @@ import static java.lang.Math.*;
 
 public class CGPCore {
     private final static int FUNCTION_SET_SIZE = 50;
-
     private final static RandEngine randEngine = new SimpleRandEngine();
 
     /**
@@ -214,10 +214,10 @@ public class CGPCore {
         return chromo;
     }
 
-    /*
-        Executes the given chromosome
-    */
-    private static void executeChromosome(CGPChromosome chromo, double[] inputs) {
+    /**
+     * Executes the given chromosome
+     */
+    public static void executeChromosome(CGPChromosome chromo, double[] inputs) {
 
         int i, j;
         int nodeInputLocation;
@@ -286,11 +286,11 @@ public class CGPCore {
         }
     }
 
-    /*
-        used to access the chromosome outputs after executeChromosome
-        has been called
-    */
-    private static double getChromosomeOutput(CGPChromosome chromo, int output) {
+    /**
+     * used to access the chromosome outputs after executeChromosome
+     * has been called
+     */
+    public static double getChromosomeOutput(CGPChromosome chromo, int output) {
 
         if (output < 0 || output > chromo.numOutputs) {
             System.out.print("Error: outputNodes less than or greater than the number of chromosome outputs. Called from getChromosomeOutput.\n");
@@ -316,7 +316,7 @@ public class CGPCore {
     /*
         returns whether the specified node is active in the given chromosome
     */
-    private static int isNodeActive(CGPChromosome chromo, int node) {
+    private static boolean isNodeActive(CGPChromosome chromo, int node) {
 
         if (node < 0 || node > chromo.numNodes) {
             System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from isNodeActive.\n");
@@ -470,7 +470,7 @@ public class CGPCore {
     /**
      * Gets the chromosome fitness
      */
-    static double getChromosomeFitness(CGPChromosome chromo) {
+    public static double getChromosomeFitness(CGPChromosome chromo) {
         return chromo.fitness;
     }
 
@@ -514,7 +514,7 @@ public class CGPCore {
 
         /* reset the active nodes */
         for (i = 0; i < chromo.numNodes; i++) {
-            chromo.nodes[i].active = 0;
+            chromo.nodes[i].active = false;
         }
 
         /* start the recursive search for active nodes from the outputNodes nodes for the number of outputNodes nodes */
@@ -537,21 +537,18 @@ public class CGPCore {
         used by setActiveNodes to recursively search for active nodes
     */
     private static void recursivelySetActiveNodes(CGPChromosome chromo, int nodeIndex) {
-
-        int i;
-
         /* if the given node is an input, stop */
         if (nodeIndex < chromo.numInputs) {
             return;
         }
 
         /* if the given node has already been flagged as active */
-        if (chromo.nodes[nodeIndex - chromo.numInputs].active == 1) {
+        if (chromo.nodes[nodeIndex - chromo.numInputs].active) {
             return;
         }
 
         /* log the node as active */
-        chromo.nodes[nodeIndex - chromo.numInputs].active = 1;
+        chromo.nodes[nodeIndex - chromo.numInputs].active = true;
         chromo.activeNodes[chromo.numActiveNodes] = nodeIndex - chromo.numInputs;
         chromo.numActiveNodes++;
 
@@ -559,7 +556,7 @@ public class CGPCore {
         chromo.nodes[nodeIndex - chromo.numInputs].actArity = getChromosomeNodeArity(chromo, nodeIndex - chromo.numInputs);
 
         /* recursively log all the nodes to which the current nodes connect as active */
-        for (i = 0; i < chromo.nodes[nodeIndex - chromo.numInputs].actArity; i++) {
+        for (int i = 0; i < chromo.nodes[nodeIndex - chromo.numInputs].actArity; i++) {
             recursivelySetActiveNodes(chromo, chromo.nodes[nodeIndex - chromo.numInputs].inputs[i]);
         }
     }
@@ -569,13 +566,9 @@ public class CGPCore {
         uses insertion sort (quickish and stable)
     */
     static void sortChromosomeArray(CGPChromosome[] chromoArray, int numChromos) {
-
-        int i, j;
         CGPChromosome chromoTmp;
-
-        for (i = 0; i < numChromos; i++) {
-            for (j = i; j < numChromos; j++) {
-
+        for (int i = 0; i < numChromos; i++) {
+            for (int j = i; j < numChromos; j++) {
                 if (chromoArray[i].fitness > chromoArray[j].fitness) {
                     chromoTmp = chromoArray[i];
                     chromoArray[i] = chromoArray[j];
@@ -624,21 +617,21 @@ public class CGPCore {
     /*
         returns the outputs of the given sample of the given dataSet
     */
-    static double[] getDataSetSampleOutputs(DataSet data, int sample) {
+    public static double[] getDataSetSampleOutputs(DataSet data, int sample) {
         return data.outputData[sample];
     }
 
     /*
         returns the given outputNodes of the given sample of the given dataSet
     */
-    static double getDataSetSampleOutput(DataSet data, int sample, int output) {
+    public static double getDataSetSampleOutput(DataSet data, int sample, int output) {
         return data.outputData[sample][output];
     }
 
     /*
         Gets the number of chromosomes in the results ure
     */
-    static int getNumChromosomes(results rels) {
+    public static int getNumChromosomes(Results rels) {
         return rels.numRuns;
     }
 
@@ -646,7 +639,7 @@ public class CGPCore {
         returns the average number of chromosome active nodes from repeated
         run results specified in rels.
     */
-    static double getAverageActiveNodes(results rels) {
+    static double getAverageActiveNodes(Results rels) {
 
         int i;
         double avgActiveNodes = 0;
@@ -668,20 +661,10 @@ public class CGPCore {
         returns the median number of chromosome active nodes from repeated
         run results specified in rels.
     */
-    static double getMedianActiveNodes(results rels) {
-
-        int i;
-        double medActiveNodes = 0;
-
-        int[] array = new int[getNumChromosomes(rels)];
-
-        for (i = 0; i < getNumChromosomes(rels); i++) {
-            array[i] = getNumChromosomeActiveNodes(rels.bestCGPChromosomes[i]);
-        }
-
-        medActiveNodes = medianInt(array, getNumChromosomes(rels));
-
-        return medActiveNodes;
+    static double getMedianActiveNodes(Results rels) {
+        int[] array = IntStream.range(0, getNumChromosomes(rels)).
+                map(i -> getNumChromosomeActiveNodes(rels.bestCGPChromosomes[i])).toArray();
+        return medianInt(array, getNumChromosomes(rels));
     }
 
     static double medianInt(int[] anArray, int length) {
@@ -736,18 +719,40 @@ public class CGPCore {
         return median;
     }
 
-    /*
-        returns the average chromosome fitness from repeated
-        run results specified in rels.
-    */
-    private static double getAverageFitness(results rels) {
+    /**
+     * returns the median chromosome fitness from repeated
+     * run results specified in rels.
+     */
+    private static double getMedianFitness(Results rels) {
+        double[] array = IntStream.range(0, getNumChromosomes(rels))
+                .mapToDouble(i -> getChromosomeFitness(rels.bestCGPChromosomes[i])).toArray();
+        return medianDouble(array, getNumChromosomes(rels));
+    }
 
-        int i;
+    /**
+     * returns the average number of generations used by each run  specified in rels.
+     */
+    static double getAverageGenerations(Results rels) {
+        double avgGens = 0;
+        CGPChromosome chromoTemp;
+        for (int i = 0; i < getNumChromosomes(rels); i++) {
+            chromoTemp = rels.bestCGPChromosomes[i];
+            avgGens += getChromosomeGenerations(chromoTemp);
+        }
+        avgGens = avgGens / getNumChromosomes(rels);
+        return avgGens;
+    }
+
+    /**
+     * returns the average chromosome fitness from repeated
+     * run rels specified in rels.
+     */
+    public static double getAverageFitness(Results rels) {
+
         double avgFit = 0;
         CGPChromosome chromoTemp;
 
-
-        for (i = 0; i < getNumChromosomes(rels); i++) {
+        for (int i = 0; i < getNumChromosomes(rels); i++) {
 
             chromoTemp = rels.bestCGPChromosomes[i];
 
@@ -760,83 +765,38 @@ public class CGPCore {
     }
 
     /**
-     * returns the median chromosome fitness from repeated
-     * run results specified in rels.
-     */
-    private static double getMedianFitness(results rels) {
-        double[] array = IntStream.range(0, getNumChromosomes(rels))
-                .mapToDouble(i -> getChromosomeFitness(rels.bestCGPChromosomes[i])).toArray();
-        return medianDouble(array, getNumChromosomes(rels));
-    }
-
-    /*
-        returns the average number of generations used by each run  specified in rels.
-    */
-    static double getAverageGenerations(results rels) {
-
-        int i;
-        double avgGens = 0;
-        CGPChromosome chromoTemp;
-
-        for (i = 0; i < getNumChromosomes(rels); i++) {
-
-            chromoTemp = rels.bestCGPChromosomes[i];
-
-            avgGens += getChromosomeGenerations(chromoTemp);
-        }
-
-        avgGens = avgGens / getNumChromosomes(rels);
-
-        return avgGens;
-    }
-
-    /**
      * returns the median number of generations used by each run  specified in rels.
      */
-    private static double getMedianGenerations(results rels) {
+    private static double getMedianGenerations(Results rels) {
         int[] array = IntStream.range(0, getNumChromosomes(rels)).
                 map(i -> getChromosomeGenerations(rels.bestCGPChromosomes[i])).toArray();
         return medianInt(array, getNumChromosomes(rels));
     }
 
-    static results initialiseResults(CartesianGP params, int numRuns) {
-
-        results rels = new results();
-
+    private static Results initialiseResults(int numRuns) {
+        Results rels = new Results();
         rels.bestCGPChromosomes = new CGPChromosome[numRuns];
-
         rels.numRuns = numRuns;
-
-	/*
-		Initialised chromosomes are returns from runCGP and stored in a results structure.
-		Therefore they should not be initialised here.
-	*/
-
         return rels;
     }
 
-    /*
-        repetitively applies runCGP to obtain average behaviour
-    */
-    static results repeatCGP(CartesianGP params, DataSet data, int numGens, int numRuns) {
-
-        int i;
-        results rels;
+    /**
+     * repetitively applies runCGP to obtain average behaviour
+     */
+    public static Results repeatCGP(CartesianGP params, DataSet data, int numGens, int numRuns) {
+        Results rels;
         int updateFrequency = params.updateFrequency;
 
         /* set the update frequency so as to to so generational results */
         params.updateFrequency = 0;
 
-        rels = initialiseResults(params, numRuns);
+        rels = initialiseResults(numRuns);
 
         System.out.print("Run\tFitness\t\tGenerations\tActive nodes\n");
 
         /* for each run */
-        for (i = 0; i < numRuns; i++) {
-
-            /* run cgp */
+        for (int i = 0; i < numRuns; i++) {
             rels.bestCGPChromosomes[i] = runCGP(params, data, numGens);
-
             System.out.printf("%d\t%f\t%d\t\t%d\n", i, rels.bestCGPChromosomes[i].fitness, rels.bestCGPChromosomes[i].generation, rels.bestCGPChromosomes[i].numActiveNodes);
         }
 
@@ -852,20 +812,10 @@ public class CGPCore {
     }
 
     public static CGPChromosome runCGP(CartesianGP params, DataSet data, int numGens) {
-
-        int i;
         int gen;
 
-        /* bestChromo found using runCGP */
-        CGPChromosome bestChromo;
-
-        /* arrays of the parents and children */
-        CGPChromosome[] parentChromos;
-        CGPChromosome[] childrenChromos;
-
-        /* storage for chromosomes used by selection scheme */
-        CGPChromosome[] candidateChromos;
-        int numCandidateChromos = 0;
+        /* bestChromosome found using runCGP */
+        CGPChromosome bestChromosome;
 
         /* error checking */
         if (numGens < 0) {
@@ -886,42 +836,43 @@ public class CGPCore {
         }
 
         /* initialise parent chromosomes */
-        parentChromos = new CGPChromosome[params.mu];
+        CGPChromosome[] parents = new CGPChromosome[params.mu];
 
-        for (i = 0; i < params.mu; i++) {
-            parentChromos[i] = initialiseChromosome(params);
+        for (int i = 0; i < params.mu; i++) {
+            parents[i] = initialiseChromosome(params);
         }
 
         /* initialise children chromosomes */
-        childrenChromos = new CGPChromosome[params.lambda];
+        CGPChromosome[] children = new CGPChromosome[params.lambda];
 
-        for (i = 0; i < params.lambda; i++) {
-            childrenChromos[i] = initialiseChromosome(params);
+        for (int i = 0; i < params.lambda; i++) {
+            children[i] = initialiseChromosome(params);
         }
 
-        /* intilise best chromosome */
-        bestChromo = initialiseChromosome(params);
+        /* initialize best chromosome */
+        bestChromosome = initialiseChromosome(params);
 
         /* determine the size of the Candidate Chromos based on the evolutionary Strategy */
+        int numCandidate = 0;
         if (params.evolutionaryStrategy == '+') {
-            numCandidateChromos = params.mu + params.lambda;
+            numCandidate = params.mu + params.lambda;
         } else if (params.evolutionaryStrategy == ',') {
-            numCandidateChromos = params.lambda;
+            numCandidate = params.lambda;
         } else {
             System.out.printf("Error: the evolutionary strategy '%c' is not known.\nTerminating CGP-Library.\n", params.evolutionaryStrategy);
             System.exit(0);
         }
 
         /* initialise the candidateChromos */
-        candidateChromos = new CGPChromosome[numCandidateChromos];
+        CGPChromosome[] candidates = new CGPChromosome[numCandidate];
 
-        for (i = 0; i < numCandidateChromos; i++) {
-            candidateChromos[i] = initialiseChromosome(params);
+        for (int i = 0; i < numCandidate; i++) {
+            candidates[i] = initialiseChromosome(params);
         }
 
         /* set fitness of the parents */
-        for (i = 0; i < params.mu; i++) {
-            setChromosomeFitness(params, parentChromos[i], data);
+        for (int i = 0; i < params.mu; i++) {
+            setChromosomeFitness(params, parents[i], data);
         }
 
         /* show the user whats going on */
@@ -934,26 +885,24 @@ public class CGPCore {
         for (gen = 0; gen < numGens; gen++) {
 
             /* set fitness of the children of the population */
-            for (i = 0; i < params.lambda; i++) {
-                setChromosomeFitness(params, childrenChromos[i], data);
+            for (int i = 0; i < params.lambda; i++) {
+                setChromosomeFitness(params, children[i], data);
             }
 
             /* get best chromosome */
-            getBestChromosome(parentChromos, childrenChromos, params.mu, params.lambda, bestChromo);
+            getBestChromosome(parents, children, params.mu, params.lambda, bestChromosome);
 
             /* check termination conditions */
-            if (getChromosomeFitness(bestChromo) <= params.targetFitness) {
-
+            if (getChromosomeFitness(bestChromosome) <= params.targetFitness) {
                 if (params.updateFrequency != 0) {
-                    System.out.printf("%d\t%f - Solution Found\n", gen, bestChromo.fitness);
+                    System.out.printf("%d\t%f - Solution Found\n", gen, bestChromosome.fitness);
                 }
-
                 break;
             }
 
             /* display progress to the user at the update frequency specified */
             if (params.updateFrequency != 0 && (gen % params.updateFrequency == 0 || gen >= numGens - 1)) {
-                System.out.printf("%d\t%f\n", gen, bestChromo.fitness);
+                System.out.printf("%d\t%f\n", gen, bestChromosome.fitness);
             }
 
             // Set the chromosomes which will be used by the selection scheme
@@ -967,26 +916,24 @@ public class CGPCore {
 				fitness are equal.
 			*/
 
-                for (i = 0; i < numCandidateChromos; i++) {
-
+                for (int i = 0; i < numCandidate; i++) {
                     if (i < params.lambda) {
-                        copyChromosome(candidateChromos[i], childrenChromos[i]);
+                        copyChromosome(candidates[i], children[i]);
                     } else {
-                        copyChromosome(candidateChromos[i], parentChromos[i - params.lambda]);
+                        copyChromosome(candidates[i], parents[i - params.lambda]);
                     }
                 }
             } else if (params.evolutionaryStrategy == ',') {
-
-                for (i = 0; i < numCandidateChromos; i++) {
-                    copyChromosome(candidateChromos[i], childrenChromos[i]);
+                for (int i = 0; i < numCandidate; i++) {
+                    copyChromosome(candidates[i], children[i]);
                 }
             }
 
             /* select the parents from the candidateChromos */
-            params.selectionScheme.select(params, parentChromos, candidateChromos, params.mu, numCandidateChromos);
+            params.selectionScheme.select(params, parents, candidates, params.mu, numCandidate);
 
             /* create the children from the parents */
-            params.reproductionScheme.reproduce(params, parentChromos, childrenChromos, params.mu, params.lambda);
+            params.reproductionScheme.reproduce(params, parents, children, params.mu, params.lambda);
         }
 
         /* deal with formatting for displaying progress */
@@ -995,10 +942,10 @@ public class CGPCore {
         }
 
         /* copy the best best chromosome */
-        bestChromo.generation = gen;
-        /*copyChromosome(chromo, bestChromo);*/
+        bestChromosome.generation = gen;
+        /*copyChromosome(chromo, bestChromosome);*/
 
-        return bestChromo;
+        return bestChromosome;
     }
 
     /**
@@ -1086,7 +1033,7 @@ public class CGPCore {
         n.function = getRandomFunction(numFunctions);
 
         /* set as active by default */
-        n.active = 1;
+        n.active = true;
 
         /* set the nodes inputs and connection weights */
         for (int i = 0; i < arity; i++) {
@@ -1160,11 +1107,9 @@ public class CGPCore {
      */
     private static void printFunctionSet(CartesianGP params) {
         System.out.print("Function Set:");
-
         for (int i = 0; i < params.funcSet.numFunctions; i++) {
             System.out.printf(" %s", params.funcSet.functionNames[i]);
         }
-
         System.out.printf(" (%d)\n", params.funcSet.numFunctions);
     }
 
@@ -1203,7 +1148,7 @@ public class CGPCore {
     /**
      * Prints the given chromosome to the screen
      */
-    public static void printChromosome(CGPChromosome chromo, int weights) {
+    public static void printChromosome(CGPChromosome chromo, boolean weights) {
 
         int i, j;
 
@@ -1231,7 +1176,7 @@ public class CGPCore {
             for (j = 0; j < getChromosomeNodeArity(chromo, i); j++) {
 
                 /* print the node input information */
-                if (weights == 1) {
+                if (weights) {
                     System.out.printf("%d,%+.1f\t", chromo.nodes[i].inputs[j], chromo.nodes[i].weights[j]);
                 } else {
                     System.out.printf("%d ", chromo.nodes[i].inputs[j]);
@@ -1239,7 +1184,7 @@ public class CGPCore {
             }
 
             /* Highlight active nodes */
-            if (chromo.nodes[i].active == 1) {
+            if (chromo.nodes[i].active) {
                 System.out.print("*");
             }
 
@@ -1405,7 +1350,7 @@ public class CGPCore {
 
                         newGeneValue = chromo.nodes[nodeIndex].function;
 
-                        if ((previousGeneValue != newGeneValue) && (chromo.nodes[nodeIndex].active == 1)) {
+                        if ((previousGeneValue != newGeneValue) && (chromo.nodes[nodeIndex].active)) {
                             mutatedActive = 1;
                         }
 
@@ -1423,7 +1368,7 @@ public class CGPCore {
 
                         newGeneValue = chromo.nodes[nodeIndex].inputs[nodeInputIndex];
 
-                        if ((previousGeneValue != newGeneValue) && (chromo.nodes[nodeIndex].active == 1)) {
+                        if ((previousGeneValue != newGeneValue) && (chromo.nodes[nodeIndex].active)) {
                             mutatedActive = 1;
                         }
                     }
@@ -1947,10 +1892,5 @@ public class CGPCore {
                 return error;
             }
         }
-    }
-
-    static class results {
-        int numRuns;
-        CGPChromosome[] bestCGPChromosomes;
     }
 }

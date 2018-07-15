@@ -7,6 +7,7 @@ import cgp.interfaces.CGPReproductionStrategy;
 import cgp.interfaces.CGPSelectionStrategy;
 import cgp.program.DataSet;
 import cgp.program.FunctionSet;
+import cgp.program.Results;
 
 import java.io.InputStream;
 import java.util.Optional;
@@ -19,10 +20,13 @@ import static cgp.gp.CGPCore.reproduction.mutateRandomParent;
 import static cgp.gp.CGPCore.selection.selectFittest;
 
 public class CGPSolver {
-    private CartesianGP params;
-    private DataSet data;
+    private final CartesianGP params;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private Optional<DataSet> data = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<CGPChromosome> globalBest = Optional.empty();
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private Optional<Results> results = Optional.empty();
 
     public CGPSolver(final int numInputs,
                      final int numNodes,
@@ -79,11 +83,9 @@ public class CGPSolver {
      * sets num chromosome inputs in parameters
      */
     private static void setNumInputs(CartesianGP params, int numInputs) {
-
         /* error checking */
         if (numInputs <= 0) {
-            System.out.printf("Error: number of chromosome inputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numInputs);
-            System.exit(0);
+            throw new IllegalArgumentException(String.format("Error: number of chromosome inputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numInputs));
         }
 
         params.numInputs = numInputs;
@@ -93,11 +95,9 @@ public class CGPSolver {
      * sets num chromosome nodes in parameters
      */
     private static void setNumNodes(CartesianGP params, int numNodes) {
-
         /* error checking */
         if (numNodes < 0) {
-            System.out.printf("Warning: number of chromosome nodes cannot be negative; %d is invalid.\nTerminating CGP-Library.\n", numNodes);
-            System.exit(0);
+            throw new IllegalArgumentException(String.format("Warning: number of chromosome nodes cannot be negative; %d is invalid.\nTerminating CGP-Library.\n", numNodes));
         }
 
         params.numNodes = numNodes;
@@ -107,11 +107,9 @@ public class CGPSolver {
      * sets num chromosome outputs in parameters
      */
     private static void setNumOutputs(CartesianGP params, int numOutputs) {
-
         /* error checking */
         if (numOutputs < 0) {
-            System.out.printf("Warning: number of chromosome outputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numOutputs);
-            System.exit(0);
+            throw new IllegalArgumentException(String.format("Warning: number of chromosome outputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numOutputs));
         }
 
         params.numOutputs = numOutputs;
@@ -121,11 +119,9 @@ public class CGPSolver {
      * sets chromosome arity in parameters
      */
     private static void setArity(CartesianGP params, int arity) {
-
         /* error checking */
         if (arity < 0) {
-            System.out.printf("Warning: node arity cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", arity);
-            System.exit(0);
+            throw new IllegalArgumentException(String.format("Warning: node arity cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", arity));
         }
 
         params.arity = arity;
@@ -143,11 +139,10 @@ public class CGPSolver {
      * is invalid a warning is displayed and the mu value is left unchanged.
      */
     public void setMu(int mu) {
-
         if (mu > 0) {
             params.mu = mu;
         } else {
-            System.out.printf("\nWarning: mu value '%d' is invalid. Mu value must have a value of one or greater. Mu value left unchanged as '%d'.\n", mu, params.mu);
+            throw new IllegalArgumentException(String.format("\nWarning: mu value '%d' is invalid. Mu value must have a value of one or greater. Mu value left unchanged as '%d'.\n", mu, params.mu));
         }
     }
 
@@ -157,11 +152,10 @@ public class CGPSolver {
      * is left unchanged.
      */
     public void setLambda(CartesianGP params, int lambda) {
-
         if (lambda > 0) {
             params.lambda = lambda;
         } else {
-            System.out.printf("\nWarning: lambda value '%d' is invalid. Lambda value must have a value of one or greater. Lambda value left unchanged as '%d'.\n", lambda, params.lambda);
+            throw new IllegalArgumentException(String.format("\nWarning: lambda value '%d' is invalid. Lambda value must have a value of one or greater. Lambda value left unchanged as '%d'.\n", lambda, params.lambda));
         }
     }
 
@@ -171,11 +165,10 @@ public class CGPSolver {
      * strategy is left unchanged.
      */
     public void setEvolutionaryStrategy(char evolutionaryStrategy) {
-
         if (evolutionaryStrategy == '+' || evolutionaryStrategy == ',') {
             params.evolutionaryStrategy = evolutionaryStrategy;
         } else {
-            System.out.printf("\nWarning: the evolutionary strategy '%c' is invalid. The evolutionary strategy must be '+' or ','. The evolutionary strategy has been left unchanged as '%c'.\n", evolutionaryStrategy, params.evolutionaryStrategy);
+            throw new IllegalArgumentException(String.format("\nWarning: the evolutionary strategy '%c' is invalid. The evolutionary strategy must be '+' or ','. The evolutionary strategy has been left unchanged as '%c'.\n", evolutionaryStrategy, params.evolutionaryStrategy));
         }
     }
 
@@ -185,11 +178,10 @@ public class CGPSolver {
      * unchanged.
      */
     public void setMutationRate(double mutationRate) {
-
         if (mutationRate >= 0 && mutationRate <= 1) {
             params.mutationRate = mutationRate;
         } else {
-            System.out.printf("\nWarning: mutation rate '%f' is invalid. The mutation rate must be in the range [0,1]. The mutation rate has been left unchanged as '%f'.\n", mutationRate, params.mutationRate);
+            throw new IllegalArgumentException(String.format("\nWarning: mutation rate '%f' is invalid. The mutation rate must be in the range [0,1]. The mutation rate has been left unchanged as '%f'.\n", mutationRate, params.mutationRate));
         }
     }
 
@@ -198,11 +190,10 @@ public class CGPSolver {
      * value is given a warning is displayed and the value is left	unchanged.
      */
     public void setRecurrentConnectionProbability(double recurrentConnectionProbability) {
-
         if (recurrentConnectionProbability >= 0 && recurrentConnectionProbability <= 1) {
             params.recurrentConnectionProbability = recurrentConnectionProbability;
         } else {
-            System.out.printf("\nWarning: recurrent connection probability '%f' is invalid. The recurrent connection probability must be in the range [0,1]. The recurrent connection probability has been left unchanged as '%f'.\n", recurrentConnectionProbability, params.recurrentConnectionProbability);
+            throw new IllegalArgumentException(String.format("\nWarning: recurrent connection probability '%f' is invalid. The recurrent connection probability must be in the range [0,1]. The recurrent connection probability has been left unchanged as '%f'.\n", recurrentConnectionProbability, params.recurrentConnectionProbability));
         }
     }
 
@@ -211,7 +202,6 @@ public class CGPSolver {
      * value is given a warning is displayed and the value is left	unchanged.
      */
     public void setShortcutConnections(int shortcutConnections) {
-
         if (shortcutConnections == 0 || shortcutConnections == 1) {
             params.shortcutConnections = shortcutConnections;
         } else {
@@ -219,12 +209,10 @@ public class CGPSolver {
         }
     }
 
-
     /**
      * Sets the update frequency in generations
      */
     public void setUpdateFrequency(int updateFrequency) {
-
         if (updateFrequency < 0) {
             System.out.printf("Warning: update frequency of %d is invalid. Update frequency must be >= 0. Update frequency is left unchanged as %d.\n", updateFrequency, params.updateFrequency);
         } else {
@@ -239,13 +227,11 @@ public class CGPSolver {
         params.funcSet.numFunctions = 0;
     }
 
-
     /**
      * sets the fitness function to the fitnessFuction passed. If the fitnessFuction is NULL
      * then the default supervisedLearning fitness function is used.
      */
     public void setCustomFitnessFunction(CGPFitness fitnessFunction, String fitnessFunctionName) {
-
         if (fitnessFunction == null) {
             params.fitnessFunction = supervisedLearning;
             params.fitnessFunctionName = "supervisedLearning";
@@ -326,23 +312,23 @@ public class CGPSolver {
     public void initialiseDataSetFromFile(String file) {
 
         int i;
-        data = new DataSet();
+        DataSet data = new DataSet();
         InputStream inputStream = CGPCore.class.getClassLoader().getResourceAsStream(file);
         Scanner scanner = new Scanner(inputStream);
 
         int lineNum = -1;
-
+        String[] dataSet;
         /* for every line in the given file */
         while (scanner.hasNext()) {
 
             /* deal with the first line containing meta data */
             if (lineNum == -1) {
 
-                String[] dataset = scanner.nextLine().split(",");
+                dataSet = scanner.nextLine().split(",");
 
-                data.numInputs = Integer.parseInt(dataset[0]);
-                data.numOutputs = Integer.parseInt(dataset[1]);
-                data.numSamples = Integer.parseInt(dataset[dataset.length - 1]);
+                data.numInputs = Integer.parseInt(dataSet[0]);
+                data.numOutputs = Integer.parseInt(dataSet[1]);
+                data.numSamples = Integer.parseInt(dataSet[dataSet.length - 1]);
 
                 data.inputData = new double[data.numSamples][];
                 data.outputData = new double[data.numSamples][];
@@ -355,29 +341,41 @@ public class CGPSolver {
             /* the other lines contain input outputNodes pairs */
             else {
                 /* get the first value on the given line */
-                String[] dataset = scanner.nextLine().split(",");
+                dataSet = scanner.nextLine().split(",");
 
-                for (int j = 0; j < dataset.length; j++) {
+                for (int j = 0; j < dataSet.length; j++) {
                     if (j < data.numInputs) {
-                        data.inputData[lineNum][j] = Double.parseDouble(dataset[j]);
+                        data.inputData[lineNum][j] = Double.parseDouble(dataSet[j]);
                     } else {
-                        data.outputData[lineNum][j - data.numInputs] = Double.parseDouble(dataset[j]);
+                        data.outputData[lineNum][j - data.numInputs] = Double.parseDouble(dataSet[j]);
                     }
                 }
             }
-
             /* increment the current line index */
             lineNum++;
         }
         scanner.close();
+        this.data = Optional.of(data);
     }
 
     public void evolve(int iteration) {
-        globalBest = Optional.of(runCGP(params, data, iteration));
+        globalBest = Optional.of(runCGP(params, data.orElse(null), iteration));
+    }
+
+    public void repeatEvolve(int numGens, int numRuns) {
+        results = Optional.of(repeatCGP(params, data.orElse(null), numGens, numRuns));
     }
 
     public CGPChromosome getBestGene() {
         return globalBest.orElse(null);
+    }
+
+    public Results getResults() {
+        return results.orElse(null);
+    }
+
+    public CGPChromosome getChromosome(int index) {
+        return results.map(results1 -> results1.bestCGPChromosomes[index]).orElse(null);
     }
 
     /**

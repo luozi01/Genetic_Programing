@@ -27,7 +27,7 @@ public class recurrentCGP {
 
         solver.evolve(numGens);
 
-        printChromosome(solver.getBestGene(), 0);
+        printChromosome(solver.getBestGene(), false);
     }
 }
 
