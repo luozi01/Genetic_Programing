@@ -29,7 +29,7 @@ public class MacroMutation implements MutationPolicy {
     // Macro instruction mutations either insert or delete a single instruction.
     // In doing so, they change absolute program length with minimum step size on the
     // level of full instructions, the macro level. On the functional level , a single
-    // node is inserted in or deleted from the program graph, together with all
+    // node is inserted from or deleted from the program graph, together with all
     // its connecting edges.
     // Exchanging an instruction or change the position of an existing instruction is not
     // regarded as macro mutation. Both of these variants are on average more

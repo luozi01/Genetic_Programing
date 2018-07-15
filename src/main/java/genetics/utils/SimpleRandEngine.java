@@ -30,4 +30,9 @@ public class SimpleRandEngine implements RandEngine {
     public int nextInt(int lower, int upper) {
         return random.nextInt(upper - lower) + lower;
     }
+
+    @Override
+    public double nextDouble(double lower, double upper) {
+        return lower + (upper - lower) * random.nextDouble();
+    }
 }

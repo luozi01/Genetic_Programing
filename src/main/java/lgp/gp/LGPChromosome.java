@@ -76,7 +76,7 @@ public class LGPChromosome extends Chromosome {
 
     /**
      * Structural or data flow introns denote single noneffective instructions that
-     * emerge in a linear program from manipulating noneffective registers.
+     * emerge from a linear program from manipulating noneffective registers.
      *
      * @param stop_point stop point for checking structural introns
      * @param manager    data manager
@@ -87,14 +87,14 @@ public class LGPChromosome extends Chromosome {
 
         Algorithm 3.1 (detection of structural introns)
         1. Let set R_eff always contain all registers that are effective at the current program
-           position. R_eff := { r | r is output register }.
+           position. R_eff := { r | r is numOutputs register }.
            Start at the last program instruction and move backwards.
-        2. Mark the next preceding operation in program with:
+        2. Mark the next preceding operation from program with:
             destination register r_dest element-of R_eff.
            If such an instruction is not found then go to 5.
         3. If the operation directly follows a branch or a sequence of branches then mark these
            instructions too. Otherwise remove r_dest from R_eff .
-        4. Insert each source (operand) register r_op of newly marked instructions in R_eff
+        4. Insert each source (operand) register r_op of newly marked instructions from R_eff
            if not already contained. Go to 2.
         5. Stop. All unmarked instructions are introns.
         */

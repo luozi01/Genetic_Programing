@@ -48,7 +48,7 @@ public class SyntaxTreeUtils {
         RandEngine randEngine = manager.getRandEngine();
 
         TreeNode root;
-        // Population Initialization method following the "RandomBranch" method described in
+        // Population Initialization method following the "RandomBranch" method described from
         // "Kumar Chellapilla. Evolving computer programs without subtree crossover.
         // IEEE Transactions on Evolutionary Computation, 1(3):209–216, September 1997."
         if (method == TGPInitializationStrategy.INITIALIZATION_METHOD_RANDOM_BRANCH) {
@@ -63,9 +63,9 @@ public class SyntaxTreeUtils {
                 randomBranch(context, root, s, randEngine);
             }
         }
-        // Population Initialization method following the "PTC1" method described in "Sean Luke.
+        // Population Initialization method following the "PTC1" method described from "Sean Luke.
         // Two fast tree-creation algorithms for genetic programming.
-        // IEEE Transactions in Evolutionary Computation, 4(3), 2000b."
+        // IEEE Transactions from Evolutionary Computation, 4(3), 2000b."
         else if (method == TGPInitializationStrategy.INITIALIZATION_METHOD_PTC1) {
             int expectedTreeSize = 20;
 
@@ -92,7 +92,7 @@ public class SyntaxTreeUtils {
     }
 
     /**
-     * Population Initialization Method described in "Kumar Chellapilla.
+     * Population Initialization Method described from "Kumar Chellapilla.
      * Evolving computer programs without subtree crossover.
      * IEEE Transactions on Evolutionary Computation, 1(3):209–216, September 1997."
      *
@@ -120,12 +120,12 @@ public class SyntaxTreeUtils {
     }
 
     /**
-     * Population Initialization method following the "PTC1" method described in
+     * Population Initialization method following the "PTC1" method described from
      * "Sean Luke.Two fast tree-creation algorithms for genetic programming.
-     * IEEE Transactions in Evolutionary Computation, 4(3), 2000b."
+     * IEEE Transactions from Evolutionary Computation, 4(3), 2000b."
      *
      * @param context        related data
-     * @param parent_node    The node for which the child nodes are generated in this method
+     * @param parent_node    The node for which the child numNodes are generated from this method
      * @param p              expected probability
      * @param allowableDepth The maximum tree depth
      * @param randEngine     randomize engine

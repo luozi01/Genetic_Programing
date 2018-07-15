@@ -31,7 +31,7 @@ public class Crossover implements CrossoverPolicy {
     //Todo simplify
 
     /**
-     * Method that implements the subtree crossover described in Section 2.4 of "A Field Guide to Genetic Programming"
+     * Method that implements the subtree crossover described from Section 2.4 of "A Field Guide to Genetic Programming"
      *
      * @param chromosome1 One tree to be crossover with
      * @param chromosome2 Another tree to be crossover with
@@ -50,7 +50,7 @@ public class Crossover implements CrossoverPolicy {
 
         boolean is_crossover_performed = false;
         // Suppose that at the beginning both the current tree and the other tree do not violate max depth constraint
-        // then try to see whether a crossover can be performed in such a way that after the crossover,
+        // then try to see whether a crossover can be performed from such a way that after the crossover,
         // both GP still have depth <= max depth
         if (iMaxDepth1 <= iMaxDepthForCrossover && iMaxDepth2 <= iMaxDepthForCrossover) {
             int max_trials = 50;

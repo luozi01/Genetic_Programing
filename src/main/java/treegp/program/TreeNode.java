@@ -147,9 +147,9 @@ public class TreeNode implements Serializable {
     }
 
     /**
-     * Method that flattens the tree and then stores all the nodes of the tree in a list
+     * Method that flattens the tree and then stores all the numNodes of the tree from a list
      *
-     * @return The list of nodes in the tree
+     * @return The list of numNodes from the tree
      */
     private List<Pair<TreeNode, TreeNode>> flattenNodes() {
         List<Pair<TreeNode, TreeNode>> list = new ArrayList<>();

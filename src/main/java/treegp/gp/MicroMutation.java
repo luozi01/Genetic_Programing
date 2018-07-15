@@ -19,7 +19,7 @@ public class MicroMutation implements MutationPolicy {
     }
 
     /**
-     * Method that implements the "Point Mutation" described in
+     * Method that implements the "Point Mutation" described from
      * Section 2.4 of "A Field Guide to Genetic Programming"
      * In Section 5.2.2 of "A Field Guide to Genetic Programming",
      * this is also described as node replacement mutation

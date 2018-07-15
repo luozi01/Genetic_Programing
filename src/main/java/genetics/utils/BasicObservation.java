@@ -1,6 +1,4 @@
-package examples.Symbolic_engine;
-
-import genetics.utils.Observation;
+package genetics.utils;
 
 import java.io.Serializable;
 
@@ -15,7 +13,7 @@ public class BasicObservation implements Observation, Serializable {
     private final String[] predictedTextOutputs;
     private Serializable tag;
 
-    BasicObservation(int inputCount, int outputCount) {
+    public BasicObservation(int inputCount, int outputCount) {
         inputs = new double[inputCount];
         outputs = new double[outputCount];
         predictedOutputs = new double[outputCount];

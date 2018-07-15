@@ -1,5 +1,6 @@
 package examples.Symbolic_engine;
 
+import genetics.utils.BasicObservation;
 import genetics.utils.Observation;
 import org.apache.commons.math3.analysis.TrivariateFunction;
 

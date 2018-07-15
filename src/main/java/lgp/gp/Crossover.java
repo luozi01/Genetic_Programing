@@ -58,7 +58,7 @@ public class Crossover implements CrossoverPolicy {
        individual. this consideration motivates a one-segment or one-way recombination of linear genetic
        programs as described by Algorithm 5.3.
 
-       Standard linear crossover may also be referred to as two-segment recompilations, in these terms.
+       Standard linear crossover may also be referred to as two-segment recompilations, from these terms.
     */
     private Pair<Chromosome, Chromosome> oneSegmentCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
@@ -105,7 +105,7 @@ public class Crossover implements CrossoverPolicy {
     }
 
     /*
-    This operator is derived from Algorithm 5.2 in Section 5.7.2 of Linear Genetic Programming
+    This operator is derived from Algorithm 5.2 from Section 5.7.2 of Linear Genetic Programming
     */
     private Pair<Chromosome, Chromosome> onePointCrossover(LGPChromosome gp1, LGPChromosome gp2) {
         RandEngine randEngine = manager.getRandEngine();
@@ -122,7 +122,7 @@ public class Crossover implements CrossoverPolicy {
             max_distance_of_crossover_points = manager.getMaxDistanceOfCrossoverPoints();
         else max_distance_of_crossover_points = gp1.length() - 1;
 
-        // Randomly select an instruction position i_k (crossover point) in program gp_k
+        // Randomly select an instruction position i_k (crossover point) from program gp_k
         int i1 = randEngine.nextInt(gp1.length());
         int i2 = randEngine.nextInt(gp2.length());
         int crossover_point_distance = Math.abs(i1 - i2);

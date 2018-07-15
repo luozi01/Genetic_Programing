@@ -33,10 +33,6 @@ public class TGPChromosome extends Chromosome {
         return root.eval(observation);
     }
 
-    public String serialization() {
-        return new Gson().toJson(this);
-    }
-
     public TGPChromosome deserialization(String json) {
         return new Gson().fromJson(json, TGPChromosome.class);
     }

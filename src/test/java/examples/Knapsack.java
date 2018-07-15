@@ -51,18 +51,18 @@ public class Knapsack {
 //    }
 
     /**
-     * find the maximum value that can be put in a knapsack of capacity W
+     * find the maximum value that can be put from a knapsack of capacity W
      *
      * @param W   capacity
      * @param wt  items weight
      * @param val items value
-     * @return the maximum value that can be put in a knapsack of capacity W
+     * @return the maximum value that can be put from a knapsack of capacity W
      */
     private static int knapsack(int W, int wt[], int val[]) {
         int i, w;
         int K[][] = new int[val.length + 1][W + 1];
 
-        // Build table K[][] in bottom up manner
+        // Build table K[][] from bottom up manner
         for (i = 0; i <= val.length; i++) {
             for (w = 0; w <= W; w++) {
                 if (i == 0 || w == 0)

@@ -8,4 +8,6 @@ public interface RandEngine {
     int nextInt(int upper);
 
     int nextInt(int lower, int upper);
+
+    double nextDouble(double lower, double upper);
 }

@@ -65,7 +65,7 @@ class TGPTest {
             // halt condition
             if (bestFit < 5) {
                 engine1.terminate();
-                System.out.printf("Function: %s\n", bestGene);
+                System.out.printf("Function: %s\n", bestGene.serialization());
             }
         });
     }

@@ -20,7 +20,7 @@ public class MacroMutation implements MutationPolicy {
 
     /**
      * Method that implements the subtree mutation or "headless chicken" crossover
-     * described in Section 2.4 of "A Field Guide to Genetic Programming"
+     * described from Section 2.4 of "A Field Guide to Genetic Programming"
      *
      * @param treeNode node
      */

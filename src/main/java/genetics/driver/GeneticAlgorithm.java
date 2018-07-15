@@ -26,13 +26,14 @@ public class GeneticAlgorithm {
 
     protected final FitnessCalc fitnessCalc;
     private final RandEngine randEngine = new SimpleRandEngine();
-    private final List<TerminationCheck> terminationChecks = new LinkedList<>();
+    protected final List<TerminationCheck> terminationChecks = new LinkedList<>();
     private final int populationSize;
     @Getter
     @Setter
     protected Population population;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     protected Optional<Chromosome> bestChromosome = Optional.empty();
+    protected Executor executor;
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
     private SelectionPolicy selectionPolicy;
@@ -40,11 +41,10 @@ public class GeneticAlgorithm {
     private double mutationRate;
     private int tournamentSize;
     private int elitism;
-    private boolean terminate;
+    protected boolean terminate;
     @Getter
-    private int generation;
+    protected int generation;
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
-    private Executor executor;
 
     public GeneticAlgorithm(final Initialization initialization,
                             final FitnessCalc fitnessCalc,
@@ -121,9 +121,8 @@ public class GeneticAlgorithm {
         for (int i = 0; (i < populationSize) && (i < elitism); i++) {
             nextGeneration.addChromosome(population.getChromosome(i));
         }
-        Pair<Chromosome, Chromosome> pair;
         while (nextGeneration.size() < populationSize) {
-            pair = selectionPolicy.select(population, tournamentSize, randEngine);
+            Pair<Chromosome, Chromosome> pair = selectionPolicy.select(population, tournamentSize, randEngine);
             if (randEngine.uniform() < uniformRate) {
                 pair = crossoverPolicy.crossover(pair.getOne(), pair.getTwo());
             }
