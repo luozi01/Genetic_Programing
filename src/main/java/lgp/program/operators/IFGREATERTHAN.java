@@ -8,7 +8,7 @@ public class IFGREATERTHAN extends Operator {
 
     public IFGREATERTHAN() {
         super("If>");
-        conditional = true;
+        setConditional(true);
     }
 
 

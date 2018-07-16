@@ -23,17 +23,19 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class GeneticAlgorithm {
-
     protected final FitnessCalc fitnessCalc;
+    private final List<TerminationCheck> terminationChecks = new LinkedList<>();
     private final RandEngine randEngine = new SimpleRandEngine();
-    protected final List<TerminationCheck> terminationChecks = new LinkedList<>();
     private final int populationSize;
     @Getter
     @Setter
     protected Population population;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     protected Optional<Chromosome> bestChromosome = Optional.empty();
-    protected Executor executor;
+    private Executor executor;
+    private boolean terminate;
+    @Getter
+    protected int generation;
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
     private SelectionPolicy selectionPolicy;
@@ -41,9 +43,6 @@ public class GeneticAlgorithm {
     private double mutationRate;
     private int tournamentSize;
     private int elitism;
-    protected boolean terminate;
-    @Getter
-    protected int generation;
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
 
     public GeneticAlgorithm(final Initialization initialization,

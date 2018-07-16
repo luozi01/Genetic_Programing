@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public abstract class Operator {
 
-    protected boolean conditional = false;
+    private boolean conditional = false;
     private int index;
     private String symbol;
 

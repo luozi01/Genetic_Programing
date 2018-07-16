@@ -5,7 +5,7 @@ import cgp.solver.CGPSolver;
 
 import static cgp.gp.CGPCore.printChromosome;
 
-public class recurrentCGP {
+class recurrentCGP {
 
     public static void main(String[] args) {
         int numInputs = 1;

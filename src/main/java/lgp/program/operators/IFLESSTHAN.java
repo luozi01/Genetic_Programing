@@ -8,7 +8,7 @@ public class IFLESSTHAN extends Operator {
 
     public IFLESSTHAN() {
         super("If<");
-        conditional = true;
+        setConditional(true);
     }
 
     @Override

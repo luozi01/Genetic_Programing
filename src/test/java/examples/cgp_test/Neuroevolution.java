@@ -8,7 +8,7 @@ import cgp.solver.CartesianGP;
 
 import static cgp.gp.CGPCore.*;
 
-public class NeuroEvolution {
+public class Neuroevolution {
 
     public static void main(String[] args) {
         int numInputs = 1;

@@ -6,7 +6,7 @@ import genetics.interfaces.FitnessCalc;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
-public class EvaluationThread implements Runnable {
+class EvaluationThread implements Runnable {
     private final BlockingQueue<Optional<Chromosome>> tasks;
     private final BlockingQueue<Optional<Chromosome>> results;
     private final FitnessCalc evaluator;
