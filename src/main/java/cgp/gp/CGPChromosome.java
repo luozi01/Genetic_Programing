@@ -4,12 +4,14 @@ import cgp.program.FunctionSet;
 import cgp.program.Node;
 import cgp.solver.CartesianGP;
 import genetics.chromosome.Chromosome;
+import lombok.Getter;
 
 import java.util.Scanner;
 
 import static cgp.gp.CGPCore.*;
 import static cgp.solver.CGPSolver.initialiseParameters;
 
+@Getter
 public class CGPChromosome extends Chromosome {
     int numInputs;
     int numOutputs;

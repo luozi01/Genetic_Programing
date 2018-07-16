@@ -2,7 +2,6 @@ package examples.cgp_test;
 
 import cgp.solver.CGPSolver;
 
-import static cgp.gp.CGPCore.getAverageFitness;
 import static cgp.gp.CGPCore.printChromosome;
 
 public class AverageBehaviour {
@@ -33,7 +32,7 @@ public class AverageBehaviour {
 
         solver.repeatEvolve(numGens, numRuns);
 
-        averageFitness = getAverageFitness(solver.getResults());
+        averageFitness = solver.getResults().getAverageFitness();
 
         System.out.printf("The average chromosome fitness is: %f\n", averageFitness);
 
