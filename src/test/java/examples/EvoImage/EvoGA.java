@@ -19,13 +19,14 @@ public class EvoGA extends GeneticAlgorithm {
 
     @Override
     protected Population evolvePopulation() {
-        int populationSize = population.size();
-        Population newPopulation = new Population();
+        final int populationSize = population.size();
+        Population nextGeneration = new Population(population.getChromosomes());
 
         for (int i = 0; i < populationSize; i++) {
-            newPopulation.addChromosome(population.getChromosome(i));
-            newPopulation.addChromosome(mutate.mutate(population.getChromosome(i)));
+            nextGeneration.addChromosome(mutate.mutate(population.getChromosome(i)));
         }
-        return newPopulation;
+        executor.evaluate(nextGeneration);
+        updateGlobal(nextGeneration.trim(populationSize));
+        return nextGeneration;
     }
 }

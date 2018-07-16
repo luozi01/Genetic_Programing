@@ -22,9 +22,9 @@ public enum Mutation implements MutationPolicy {
 
         private Chromosome apply(Paintings paintings) {
             EvoManager manager = paintings.manager;
-            RandEngine randEngine = manager.randEngine;
+            RandEngine randEngine = EvoManager.randEngine;
             Polygon[] polygons = paintings.polygons;
-            int CHANGED_SHAPE_INDEX = randEngine.nextInt(manager.ACTUAL_SHAPES - 1);
+            int CHANGED_SHAPE_INDEX = randEngine.nextInt(EvoManager.ACTUAL_SHAPES - 1);
 
             double roulette = randEngine.uniform() * 2.0;
 
@@ -48,18 +48,18 @@ public enum Mutation implements MutationPolicy {
             }
             // mutate shape
             else {
-                int CHANGED_POINT_INDEX = randEngine.nextInt(manager.ACTUAL_POINTS - 1);
+                int CHANGED_POINT_INDEX = randEngine.nextInt(EvoManager.ACTUAL_POINTS - 1);
 
                 // x-coordinate
                 if (roulette < 1.5) {
                     polygons[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] =
-                            CLAMP(polygons[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] + delta, 0, manager.MAX_WIDTH);
+                            CLAMP(polygons[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] + delta, 0, EvoManager.MAX_WIDTH);
                 }
 
                 // y-coordinate
                 else {
                     polygons[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] =
-                            CLAMP(polygons[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] + delta, 0, manager.MAX_HEIGHT);
+                            CLAMP(polygons[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] + delta, 0, EvoManager.MAX_HEIGHT);
                 }
             }
             return paintings;
@@ -79,11 +79,10 @@ public enum Mutation implements MutationPolicy {
         }
 
         private Chromosome apply(Paintings paintings) {
-            EvoManager manager = paintings.manager;
-            RandEngine randEngine = manager.randEngine;
+            RandEngine randEngine = EvoManager.randEngine;
             Polygon[] dna_out = paintings.polygons;
 
-            int CHANGED_SHAPE_INDEX = randEngine.nextInt(manager.ACTUAL_SHAPES - 1);
+            int CHANGED_SHAPE_INDEX = randEngine.nextInt(EvoManager.ACTUAL_SHAPES - 1);
             double roulette = randEngine.uniform() * 2.0;
 
             // mutate color
@@ -100,11 +99,11 @@ public enum Mutation implements MutationPolicy {
             }
             // mutate shape
             else {
-                int CHANGED_POINT_INDEX = randEngine.nextInt(manager.ACTUAL_POINTS - 1);
+                int CHANGED_POINT_INDEX = randEngine.nextInt(EvoManager.ACTUAL_POINTS - 1);
                 if (roulette < 1.5) {
-                    dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(manager.MAX_WIDTH);
+                    dna_out[CHANGED_SHAPE_INDEX].x_points[CHANGED_POINT_INDEX] = randEngine.nextInt(EvoManager.MAX_WIDTH);
                 } else {
-                    dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(manager.MAX_HEIGHT);
+                    dna_out[CHANGED_SHAPE_INDEX].y_points[CHANGED_POINT_INDEX] = randEngine.nextInt(EvoManager.MAX_HEIGHT);
                 }
             }
             return paintings;

@@ -30,21 +30,21 @@ public class EvoImage extends Application {
         BufferedImage img;
         try {
             img = ImageIO.read(new File("Image_input/ml.bmp"));
-            manager.readImage(img);
+            EvoManager.readImage(img);
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
     }
 
     private Paintings run() {
-        EvoGA ga = new EvoGA(new GraphInitialization(manager), new ImageFitness(), manager.method);
+        EvoGA ga = new EvoGA(new GraphInitialization(manager), new ImageFitness(), EvoManager.method);
         ga.addIterationListener(environment -> {
             Chromosome bestGene = environment.getBest();
             FITNESS_TEST = bestGene.fitness;
             // log to console
             if (FITNESS_TEST < FITNESS_BEST) {
                 FITNESS_BEST = FITNESS_TEST;
-                FITNESS_BEST_NORMALIZED = 100 * (1 - FITNESS_BEST / (manager.MAX_WIDTH * manager.MAX_HEIGHT * 3.0));
+                FITNESS_BEST_NORMALIZED = 100 * (1 - FITNESS_BEST / (EvoManager.MAX_WIDTH * EvoManager.MAX_HEIGHT * 3.0));
 
                 System.out.printf("Generation = %s \t fit = %s \t norm = %s\n",
                         COUNTER_BENEFIT++, FITNESS_BEST, FITNESS_BEST_NORMALIZED);
@@ -67,7 +67,7 @@ public class EvoImage extends Application {
         //Creating a Group object
         Group root = new Group();
 
-        Canvas canvas = new Canvas(manager.MAX_WIDTH, manager.MAX_HEIGHT);
+        Canvas canvas = new Canvas(EvoManager.MAX_WIDTH, EvoManager.MAX_HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         for (Polygon p : best.polygons) {
             gc.setFill(p.getColor());
@@ -76,7 +76,7 @@ public class EvoImage extends Application {
 
         root.getChildren().add(canvas);
         //Creating a scene object
-        Scene scene = new Scene(root, manager.MAX_WIDTH, manager.MAX_HEIGHT);
+        Scene scene = new Scene(root, EvoManager.MAX_WIDTH, EvoManager.MAX_HEIGHT);
         //Adding scene to the stage
         stage.setScene(scene);
         //Displaying the contents of the stage

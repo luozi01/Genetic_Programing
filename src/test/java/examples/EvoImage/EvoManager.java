@@ -17,39 +17,18 @@ import java.util.Arrays;
 import java.util.List;
 
 class EvoManager {
+    final static int MAX_SHAPES = 50;    // max capacity
+    final static int MAX_POINTS = 6;
+    final static int ACTUAL_SHAPES = MAX_SHAPES;
+    final static int ACTUAL_POINTS = MAX_POINTS;
+    final static MutationPolicy method = Mutation.MEDIUM;
+    final static Colors choice = ColorChoice.BLACK;
+    final static RandEngine randEngine = new SimpleRandEngine();
+    static int MAX_WIDTH;
+    static int MAX_HEIGHT;
+    static DoubleMatrix image_colors;
 
-    final int MAX_SHAPES = 50;    // max capacity
-    final int MAX_POINTS = 6;
-    final int ACTUAL_SHAPES = MAX_SHAPES;
-    final int ACTUAL_POINTS = MAX_POINTS;
-    final MutationPolicy method = Mutation.MEDIUM;
-    final Colors choice = ColorChoice.BLACK;
-    final RandEngine randEngine = new SimpleRandEngine();
-    int MAX_WIDTH;
-    int MAX_HEIGHT;
-    DoubleMatrix image_colors;
-
-    private List<Double> pixelRGB(int pixel) {
-        double red = (pixel >> 16) & 0xff;
-        double green = (pixel >> 8) & 0xff;
-        double blue = (pixel) & 0xff;
-        return Arrays.asList(red / 255.0, green / 255.0, blue / 255.0);
-    }
-
-    void readImage(BufferedImage image) {
-        MAX_HEIGHT = image.getHeight();
-        MAX_WIDTH = image.getWidth();
-        List<Double> color = new ArrayList<>(MAX_WIDTH * MAX_HEIGHT * 3);
-        for (int i = 0; i < MAX_HEIGHT; i++) {
-            for (int j = 0; j < MAX_WIDTH; j++) {
-                int pixel = image.getRGB(j, i);
-                color.addAll(pixelRGB(pixel));
-            }
-        }
-        image_colors = new DoubleMatrix(color);
-    }
-
-    DoubleMatrix toImage(Polygon[] polygons) {
+    static DoubleMatrix toImage(Polygon[] polygons) {
         Group root = new Group();
 
         Canvas canvas = new Canvas(MAX_WIDTH, MAX_HEIGHT);
@@ -72,5 +51,25 @@ class EvoManager {
             }
         }
         return new DoubleMatrix(colors);
+    }
+
+    private static List<Double> pixelRGB(int pixel) {
+        double red = (pixel >> 16) & 0xff;
+        double green = (pixel >> 8) & 0xff;
+        double blue = (pixel) & 0xff;
+        return Arrays.asList(red / 255.0, green / 255.0, blue / 255.0);
+    }
+
+    static void readImage(BufferedImage image) {
+        MAX_HEIGHT = image.getHeight();
+        MAX_WIDTH = image.getWidth();
+        List<Double> color = new ArrayList<>(MAX_WIDTH * MAX_HEIGHT * 3);
+        for (int i = 0; i < MAX_HEIGHT; i++) {
+            for (int j = 0; j < MAX_WIDTH; j++) {
+                int pixel = image.getRGB(j, i);
+                color.addAll(pixelRGB(pixel));
+            }
+        }
+        image_colors = new DoubleMatrix(color);
     }
 }

@@ -32,10 +32,10 @@ public class GeneticAlgorithm {
     protected Population population;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     protected Optional<Chromosome> bestChromosome = Optional.empty();
-    private Executor executor;
-    private boolean terminate;
+    protected Executor executor;
     @Getter
     protected int generation;
+    private boolean terminate;
     private CrossoverPolicy crossoverPolicy;
     private MutationPolicy mutationPolicy;
     private SelectionPolicy selectionPolicy;
