@@ -5,5 +5,5 @@ import cgp.program.DataSet;
 import cgp.solver.CartesianGP;
 
 public interface CGPFitness {
-    double calc(CartesianGP params, CGPChromosome chromo, DataSet data);
+    double calc(CartesianGP params, CGPChromosome chromosome, DataSet data);
 }

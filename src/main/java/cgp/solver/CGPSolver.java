@@ -39,7 +39,7 @@ public class CGPSolver {
      * Initialises a parameter  with default values. These
      * values can be individually changed via set functions.
      */
-    private static CartesianGP initialiseParameters(int numInputs, int numNodes, int numOutputs, int arity) {
+    public static CartesianGP initialiseParameters(int numInputs, int numNodes, int numOutputs, int arity) {
 
         CartesianGP params = new CartesianGP();
 
@@ -366,7 +366,9 @@ public class CGPSolver {
         results = Optional.of(repeatCGP(params, data.orElse(null), numGens, numRuns));
     }
 
-    public CGPChromosome getBestGene() {
+    public CGPChromosome getBestGene(boolean concise) {
+        if (concise)
+            globalBest.ifPresent(CGPCore::removeInactiveNodes);
         return globalBest.orElse(null);
     }
 

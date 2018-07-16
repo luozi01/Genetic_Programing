@@ -1,5 +1,6 @@
-package examples.Symbolic_engine;
+package examples.cgp_test;
 
+import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 
 import static cgp.gp.CGPCore.printChromosome;
@@ -27,7 +28,13 @@ public class recurrentCGP {
 
         solver.evolve(numGens);
 
-        printChromosome(solver.getBestGene(), false);
+        CGPChromosome gene = solver.getBestGene(true);
+
+        printChromosome(gene, false);
+
+        String serialization = gene.serialization();
+
+        System.out.println(serialization);
     }
 }
 

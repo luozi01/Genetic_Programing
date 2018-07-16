@@ -1,4 +1,4 @@
-package examples.Symbolic_engine;
+package examples.cgp_test;
 
 import cgp.gp.CGPChromosome;
 import cgp.interfaces.CGPFitness;
@@ -9,6 +9,7 @@ import cgp.solver.CartesianGP;
 import static cgp.gp.CGPCore.*;
 
 public class NeuroEvolution {
+
     public static void main(String[] args) {
         int numInputs = 1;
         int numNodes = 20;
@@ -31,12 +32,12 @@ public class NeuroEvolution {
         solver.addNodeFunction("tanh,softsign");
 
         solver.evolve(numGens);
-        printChromosome(solver.getBestGene(), true);
+        printChromosome(solver.getBestGene(false), true);
     }
 
     static class sinWave implements CGPFitness {
         @Override
-        public double calc(CartesianGP params, CGPChromosome chromo, DataSet data) {
+        public double calc(CartesianGP params, CGPChromosome chromosome, DataSet data) {
             double i;
 
             double error = 0;
@@ -49,9 +50,9 @@ public class NeuroEvolution {
 
                 inputs[0] = i;
 
-                executeChromosome(chromo, inputs);
+                executeChromosome(chromosome, inputs);
 
-                error += Math.abs(getChromosomeOutput(chromo, 0) - Math.sin(i));
+                error += Math.abs(getChromosomeOutput(chromosome, 0) - Math.sin(i));
             }
 
             return error;

@@ -46,7 +46,7 @@ public class CGPCore {
      * used as an interface to adding pre-set node functions.
      * returns one if successful, zero otherwise.
      */
-    public static void addPresetFuctionToFunctionSet(CartesianGP params, String functionName) {
+    public static boolean addPresetFuctionToFunctionSet(CartesianGP params, String functionName) {
 
         /* Symbolic functions */
 
@@ -150,14 +150,15 @@ public class CGPCore {
                 break;
             default:
                 System.out.printf("Warning: function '%s' is not known and was not added.\n", functionName);
-                break;
+                return false;
         }
+        return true;
     }
 
     /**
      * Returns a pointer to an initialised chromosome with values obeying the given parameters.
      */
-    private static CGPChromosome initialiseChromosome(CartesianGP params) {
+    protected static CGPChromosome initialiseChromosome(CartesianGP params) {
 
         CGPChromosome chromo = new CGPChromosome();
         int i;
@@ -300,10 +301,10 @@ public class CGPCore {
         return chromo.outputValues[output];
     }
 
-    /*
-        used to access the chromosome node values after executeChromosome
-        has been called
-    */
+    /**
+     * used to access the chromosome node values after executeChromosome
+     * has been called
+     */
     private static double getChromosomeNodeValue(CGPChromosome chromo, int node) {
         if (node < 0 || node > chromo.numNodes) {
             System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from getChromosomeNodeValue.\n");
@@ -499,26 +500,22 @@ public class CGPCore {
     /**
      * set the active nodes in the given chromosome
      */
-    private static void setChromosomeActiveNodes(CGPChromosome chromo) {
-
-        int i;
-
+    static void setChromosomeActiveNodes(CGPChromosome chromo) {
         /* error checking */
         if (chromo == null) {
-            System.out.print("Error: chromosome has not been initialised and so the active nodes cannot be set.\n");
-            return;
+            throw new IllegalArgumentException("Error: chromosome has not been initialised and so the active nodes cannot be set.");
         }
 
         /* set the number of active nodes to zero */
         chromo.numActiveNodes = 0;
 
         /* reset the active nodes */
-        for (i = 0; i < chromo.numNodes; i++) {
+        for (int i = 0; i < chromo.numNodes; i++) {
             chromo.nodes[i].active = false;
         }
 
         /* start the recursive search for active nodes from the outputNodes nodes for the number of outputNodes nodes */
-        for (i = 0; i < chromo.numOutputs; i++) {
+        for (int i = 0; i < chromo.numOutputs; i++) {
 
             /* if the outputNodes connects to a chromosome input, skip */
             if (chromo.outputNodes[i] < chromo.numInputs) {
@@ -1202,10 +1199,60 @@ public class CGPCore {
         System.out.print("\n\n");
     }
 
+    public static void removeInactiveNodes(CGPChromosome chromosome) {
+
+        /* set the active nodes */
+        setChromosomeActiveNodes(chromosome);
+
+        /* for all nodes */
+        for (int i = 0; i < chromosome.numNodes - 1; i++) {
+
+            /* if the node is inactive */
+            if (!chromosome.nodes[i].active) {
+
+                /* set the node to be the next node */
+                for (int j = i; j < chromosome.numNodes - 1; j++) {
+                    copyNode(chromosome.nodes[j], chromosome.nodes[j + 1]);
+                }
+
+                /* */
+                for (int j = 0; j < chromosome.numNodes; j++) {
+                    for (int k = 0; k < chromosome.arity; k++) {
+
+                        if (chromosome.nodes[j].inputs[k] >= i + chromosome.numInputs) {
+                            chromosome.nodes[j].inputs[k]--;
+                        }
+                    }
+                }
+
+                /* for the number of chromosome outputs */
+                for (int j = 0; j < chromosome.numOutputs; j++) {
+
+                    if (chromosome.outputNodes[j] >= i + chromosome.numInputs) {
+                        chromosome.outputNodes[j]--;
+                    }
+                }
+
+                /* de-increment the number of nodes */
+                chromosome.numNodes--;
+
+                /* made the newly assigned node be evaluated */
+                i--;
+            }
+        }
+
+        if (!chromosome.nodes[chromosome.numNodes - 1].active) {
+            chromosome.numNodes--;
+        }
+
+        /* set the active nodes */
+        setChromosomeActiveNodes(chromosome);
+    }
+
     public enum mutationStrategy implements CGPMutationStrategy {
         pointMutation {
             @Override
-            public void mutate(CartesianGP params, CGPChromosome chromo) {
+            public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 int nodeIndex;
                 /* get the number of each type of gene */
                 int numFunctionGenes = params.numNodes;
@@ -1229,29 +1276,29 @@ public class CGPCore {
 
                         nodeIndex = geneToMutate;
 
-                        chromo.nodes[nodeIndex].function = getRandomFunction(chromo.funcSet.numFunctions);
+                        chromosome.nodes[nodeIndex].function = getRandomFunction(chromosome.funcSet.numFunctions);
                     }
 
                     /* mutate node input gene */
                     else if (geneToMutate < numFunctionGenes + numInputGenes) {
 
-                        nodeIndex = (geneToMutate - numFunctionGenes) / chromo.arity;
-                        int nodeInputIndex = (geneToMutate - numFunctionGenes) % chromo.arity;
+                        nodeIndex = (geneToMutate - numFunctionGenes) / chromosome.arity;
+                        int nodeInputIndex = (geneToMutate - numFunctionGenes) % chromosome.arity;
 
-                        chromo.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromo.numInputs, chromo.numNodes, nodeIndex, params.recurrentConnectionProbability);
+                        chromosome.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, nodeIndex, params.recurrentConnectionProbability);
                     }
 
                     /* mutate outputNodes gene */
                     else {
                         nodeIndex = geneToMutate - numFunctionGenes - numInputGenes;
-                        chromo.outputNodes[nodeIndex] = getRandomChromosomeOutput(chromo.numInputs, chromo.numNodes, params.shortcutConnections);
+                        chromosome.outputNodes[nodeIndex] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
                     }
                 }
             }
         },
         pointMutationANN {
             @Override
-            public void mutate(CartesianGP params, CGPChromosome chromo) {
+            public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 int i;
                 int numGenes;
                 int numFunctionGenes, numInputGenes, numWeightGenes, numOutputGenes;
@@ -1283,38 +1330,38 @@ public class CGPCore {
 
                         nodeIndex = geneToMutate;
 
-                        chromo.nodes[nodeIndex].function = getRandomFunction(chromo.funcSet.numFunctions);
+                        chromosome.nodes[nodeIndex].function = getRandomFunction(chromosome.funcSet.numFunctions);
                     }
 
                     /* mutate node input gene */
                     else if (geneToMutate < numFunctionGenes + numInputGenes) {
 
-                        nodeIndex = (geneToMutate - numFunctionGenes) / chromo.arity;
-                        nodeInputIndex = (geneToMutate - numFunctionGenes) % chromo.arity;
+                        nodeIndex = (geneToMutate - numFunctionGenes) / chromosome.arity;
+                        nodeInputIndex = (geneToMutate - numFunctionGenes) % chromosome.arity;
 
-                        chromo.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromo.numInputs, chromo.numNodes, nodeIndex, params.recurrentConnectionProbability);
+                        chromosome.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, nodeIndex, params.recurrentConnectionProbability);
                     }
 
                     /* mutate connection weight */
                     else if (geneToMutate < numFunctionGenes + numInputGenes + numWeightGenes) {
 
-                        nodeIndex = (geneToMutate - numFunctionGenes - numInputGenes) / chromo.arity;
-                        nodeInputIndex = (geneToMutate - numFunctionGenes - numInputGenes) % chromo.arity;
+                        nodeIndex = (geneToMutate - numFunctionGenes - numInputGenes) / chromosome.arity;
+                        nodeInputIndex = (geneToMutate - numFunctionGenes - numInputGenes) % chromosome.arity;
 
-                        chromo.nodes[nodeIndex].weights[nodeInputIndex] = getRandomConnectionWeight(params.connectionWeightRange);
+                        chromosome.nodes[nodeIndex].weights[nodeInputIndex] = getRandomConnectionWeight(params.connectionWeightRange);
                     }
 
                     /* mutate outputNodes gene */
                     else {
                         nodeIndex = geneToMutate - numFunctionGenes - numInputGenes - numWeightGenes;
-                        chromo.outputNodes[nodeIndex] = getRandomChromosomeOutput(chromo.numInputs, chromo.numNodes, params.shortcutConnections);
+                        chromosome.outputNodes[nodeIndex] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
                     }
                 }
             }
         },
         singleMutation {
             @Override
-            public void mutate(CartesianGP params, CGPChromosome chromo) {
+            public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 int numFunctionGenes, numInputGenes, numOutputGenes;
                 int numGenes;
                 int geneToMutate;
@@ -1344,13 +1391,13 @@ public class CGPCore {
 
                         nodeIndex = geneToMutate;
 
-                        previousGeneValue = chromo.nodes[nodeIndex].function;
+                        previousGeneValue = chromosome.nodes[nodeIndex].function;
 
-                        chromo.nodes[nodeIndex].function = getRandomFunction(chromo.funcSet.numFunctions);
+                        chromosome.nodes[nodeIndex].function = getRandomFunction(chromosome.funcSet.numFunctions);
 
-                        newGeneValue = chromo.nodes[nodeIndex].function;
+                        newGeneValue = chromosome.nodes[nodeIndex].function;
 
-                        if ((previousGeneValue != newGeneValue) && (chromo.nodes[nodeIndex].active)) {
+                        if ((previousGeneValue != newGeneValue) && (chromosome.nodes[nodeIndex].active)) {
                             mutatedActive = 1;
                         }
 
@@ -1359,16 +1406,16 @@ public class CGPCore {
                     /* mutate node input gene */
                     else if (geneToMutate < numFunctionGenes + numInputGenes) {
 
-                        nodeIndex = (geneToMutate - numFunctionGenes) / chromo.arity;
-                        nodeInputIndex = (geneToMutate - numFunctionGenes) % chromo.arity;
+                        nodeIndex = (geneToMutate - numFunctionGenes) / chromosome.arity;
+                        nodeInputIndex = (geneToMutate - numFunctionGenes) % chromosome.arity;
 
-                        previousGeneValue = chromo.nodes[nodeIndex].inputs[nodeInputIndex];
+                        previousGeneValue = chromosome.nodes[nodeIndex].inputs[nodeInputIndex];
 
-                        chromo.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromo.numInputs, chromo.numNodes, nodeIndex, params.recurrentConnectionProbability);
+                        chromosome.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, nodeIndex, params.recurrentConnectionProbability);
 
-                        newGeneValue = chromo.nodes[nodeIndex].inputs[nodeInputIndex];
+                        newGeneValue = chromosome.nodes[nodeIndex].inputs[nodeInputIndex];
 
-                        if ((previousGeneValue != newGeneValue) && (chromo.nodes[nodeIndex].active)) {
+                        if ((previousGeneValue != newGeneValue) && (chromosome.nodes[nodeIndex].active)) {
                             mutatedActive = 1;
                         }
                     }
@@ -1377,11 +1424,11 @@ public class CGPCore {
                     else {
                         nodeIndex = geneToMutate - numFunctionGenes - numInputGenes;
 
-                        previousGeneValue = chromo.outputNodes[nodeIndex];
+                        previousGeneValue = chromosome.outputNodes[nodeIndex];
 
-                        chromo.outputNodes[nodeIndex] = getRandomChromosomeOutput(chromo.numInputs, chromo.numNodes, params.shortcutConnections);
+                        chromosome.outputNodes[nodeIndex] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
 
-                        newGeneValue = chromo.outputNodes[nodeIndex];
+                        newGeneValue = chromosome.outputNodes[nodeIndex];
 
                         if (previousGeneValue != newGeneValue) {
                             mutatedActive = 1;
@@ -1392,7 +1439,7 @@ public class CGPCore {
         },
         probabilisticMutation {
             @Override
-            public void mutate(CartesianGP params, CGPChromosome chromo) {
+            public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 int i, j;
 
                 /* for every nodes in the chromosome */
@@ -1400,7 +1447,7 @@ public class CGPCore {
 
                     /* mutate the function gene */
                     if (randEngine.uniform() <= params.mutationRate) {
-                        chromo.nodes[i].function = getRandomFunction(chromo.funcSet.numFunctions);
+                        chromosome.nodes[i].function = getRandomFunction(chromosome.funcSet.numFunctions);
                     }
 
                     /* for every input to each chromosome */
@@ -1408,12 +1455,12 @@ public class CGPCore {
 
                         /* mutate the node input */
                         if (randEngine.uniform() <= params.mutationRate) {
-                            chromo.nodes[i].inputs[j] = getRandomNodeInput(chromo.numInputs, chromo.numNodes, i, params.recurrentConnectionProbability);
+                            chromosome.nodes[i].inputs[j] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, i, params.recurrentConnectionProbability);
                         }
 
                         /* mutate the node connection weight */
                         if (randEngine.uniform() <= params.mutationRate) {
-                            chromo.nodes[i].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
+                            chromosome.nodes[i].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
                         }
                     }
                 }
@@ -1423,25 +1470,25 @@ public class CGPCore {
 
                     /* mutate the chromosome outputNodes */
                     if (randEngine.uniform() <= params.mutationRate) {
-                        chromo.outputNodes[i] = getRandomChromosomeOutput(chromo.numInputs, chromo.numNodes, params.shortcutConnections);
+                        chromosome.outputNodes[i] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
                     }
                 }
             }
         },
         probabilisticMutationOnlyActive {
             @Override
-            public void mutate(CartesianGP params, CGPChromosome chromo) {
+            public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 int i, j;
                 int activeNode;
 
                 /* for every active node in the chromosome */
-                for (i = 0; i < chromo.numActiveNodes; i++) {
+                for (i = 0; i < chromosome.numActiveNodes; i++) {
 
-                    activeNode = chromo.activeNodes[i];
+                    activeNode = chromosome.activeNodes[i];
 
                     /* mutate the function gene */
                     if (randEngine.uniform() <= params.mutationRate) {
-                        chromo.nodes[activeNode].function = getRandomFunction(chromo.funcSet.numFunctions);
+                        chromosome.nodes[activeNode].function = getRandomFunction(chromosome.funcSet.numFunctions);
                     }
 
                     /* for every input to each chromosome */
@@ -1449,12 +1496,12 @@ public class CGPCore {
 
                         /* mutate the node input */
                         if (randEngine.uniform() <= params.mutationRate) {
-                            chromo.nodes[activeNode].inputs[j] = getRandomNodeInput(chromo.numInputs, chromo.numNodes, activeNode, params.recurrentConnectionProbability);
+                            chromosome.nodes[activeNode].inputs[j] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, activeNode, params.recurrentConnectionProbability);
                         }
 
                         /* mutate the node connection weight */
                         if (randEngine.uniform() <= params.mutationRate) {
-                            chromo.nodes[activeNode].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
+                            chromosome.nodes[activeNode].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
                         }
                     }
                 }
@@ -1464,7 +1511,7 @@ public class CGPCore {
 
                     /* mutate the chromosome outputNodes */
                     if (randEngine.uniform() <= params.mutationRate) {
-                        chromo.outputNodes[i] = getRandomChromosomeOutput(chromo.numInputs, chromo.numNodes, params.shortcutConnections);
+                        chromosome.outputNodes[i] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
                     }
                 }
             }
@@ -1858,19 +1905,19 @@ public class CGPCore {
     public enum fitnessCalc implements CGPFitness {
         supervisedLearning {
             @Override
-            public double calc(CartesianGP params, CGPChromosome chromo, DataSet data) {
+            public double calc(CartesianGP params, CGPChromosome chromosome, DataSet data) {
 
                 int i, j;
                 double error = 0;
 
                 /* error checking */
-                if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data)) {
+                if (getNumChromosomeInputs(chromosome) != getNumDataSetInputs(data)) {
                     System.out.print("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
                     System.out.print("Terminating CGP-Library.\n");
                     System.exit(0);
                 }
 
-                if (getNumChromosomeOutputs(chromo) != getNumDataSetOutputs(data)) {
+                if (getNumChromosomeOutputs(chromosome) != getNumDataSetOutputs(data)) {
                     System.out.print("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
                     System.out.print("Terminating CGP-Library.\n");
                     System.exit(0);
@@ -1880,12 +1927,12 @@ public class CGPCore {
                 for (i = 0; i < getNumDataSetSamples(data); i++) {
 
                     /* calculate the chromosome outputs for the set of inputs  */
-                    executeChromosome(chromo, getDataSetSampleInputs(data, i));
+                    executeChromosome(chromosome, getDataSetSampleInputs(data, i));
 
                     /* for each chromosome outputNodes */
-                    for (j = 0; j < getNumChromosomeOutputs(chromo); j++) {
+                    for (j = 0; j < getNumChromosomeOutputs(chromosome); j++) {
 
-                        error += Math.abs(getChromosomeOutput(chromo, j) - getDataSetSampleOutput(data, i, j));
+                        error += Math.abs(getChromosomeOutput(chromosome, j) - getDataSetSampleOutput(data, i, j));
                     }
                 }
 

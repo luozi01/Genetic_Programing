@@ -1,4 +1,4 @@
-package examples.Symbolic_engine;
+package examples.cgp_test;
 
 import cgp.solver.CGPSolver;
 
