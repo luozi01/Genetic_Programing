@@ -6,7 +6,7 @@
 
     <groupId>com.github.zluo01</groupId>
     <artifactId>Genetic_Programing</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
 
     <scm>
         <url>https://github.com/zluo01/Genetic_Programing</url>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.22</version>
+            <version>1.18.0</version>
         </dependency>
         <dependency>
             <groupId>org.jblas</groupId>

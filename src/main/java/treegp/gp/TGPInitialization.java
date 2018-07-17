@@ -14,7 +14,7 @@ public class TGPInitialization implements Initialization {
 
     private final TreeGP manager;
 
-    public TGPInitialization(TreeGP manager) {
+    TGPInitialization(TreeGP manager) {
         this.manager = manager;
     }
 
