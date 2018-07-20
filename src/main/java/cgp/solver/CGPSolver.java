@@ -309,8 +309,6 @@ public class CGPSolver {
      * Initialises data ure and assigns values of given file
      */
     public void initialiseDataSetFromFile(String file) {
-
-        int i;
         DataSet data = new DataSet();
         InputStream inputStream = CGPCore.class.getClassLoader().getResourceAsStream(file);
         Scanner scanner = new Scanner(inputStream);
@@ -332,7 +330,7 @@ public class CGPSolver {
                 data.inputData = new double[data.numSamples][];
                 data.outputData = new double[data.numSamples][];
 
-                for (i = 0; i < data.numSamples; i++) {
+                for (int i = 0; i < data.numSamples; i++) {
                     data.inputData[i] = new double[data.numInputs];
                     data.outputData[i] = new double[data.numOutputs];
                 }

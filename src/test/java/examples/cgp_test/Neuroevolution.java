@@ -6,7 +6,8 @@ import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
 import cgp.solver.CartesianGP;
 
-import static cgp.gp.CGPCore.*;
+import static cgp.gp.CGPCore.executeChromosome;
+import static cgp.gp.CGPCore.printChromosome;
 
 public class Neuroevolution {
 
@@ -52,7 +53,7 @@ public class Neuroevolution {
 
                 executeChromosome(chromosome, inputs);
 
-                error += Math.abs(getChromosomeOutput(chromosome, 0) - Math.sin(i));
+                error += Math.abs(chromosome.getChromosomeOutput(0) - Math.sin(i));
             }
 
             return error;

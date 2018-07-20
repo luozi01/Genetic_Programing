@@ -138,45 +138,6 @@ public class CGPCore {
         }
     }
 
-    /**
-     * used to access the chromosome outputs after executeChromosome
-     * has been called
-     */
-    public static double getChromosomeOutput(CGPChromosome chromo, int output) {
-
-        if (output < 0 || output > chromo.numOutputs) {
-            System.out.print("Error: outputNodes less than or greater than the number of chromosome outputs. Called from getChromosomeOutput.\n");
-            System.exit(0);
-        }
-
-        return chromo.outputValues[output];
-    }
-
-    /**
-     * used to access the chromosome node values after executeChromosome
-     * has been called
-     */
-    private static double getChromosomeNodeValue(CGPChromosome chromo, int node) {
-        if (node < 0 || node > chromo.numNodes) {
-            System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from getChromosomeNodeValue.\n");
-            System.exit(0);
-        }
-        return chromo.nodes[node].output;
-    }
-
-    /*
-        returns whether the specified node is active in the given chromosome
-    */
-    private static boolean isNodeActive(CGPChromosome chromo, int node) {
-
-        if (node < 0 || node > chromo.numNodes) {
-            System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from isNodeActive.\n");
-            System.exit(0);
-        }
-
-        return chromo.nodes[node].active;
-    }
-
     /*
         Mutates the given chromosome using the mutation method described in parameters
     */
@@ -194,48 +155,9 @@ public class CGPCore {
 
         setChromosomeActiveNodes(chromo);
 
-        resetChromosome(chromo);
+        chromo.resetChromosome();
 
         chromo.fitness = params.fitnessFunction.calc(params, chromo, data);
-    }
-
-    /**
-     * reset the outputNodes values of all chromosome nodes to zero
-     */
-    private static void resetChromosome(CGPChromosome chromo) {
-        IntStream.range(0, chromo.numNodes).forEach(i -> chromo.nodes[i].output = 0);
-    }
-
-    /**
-     * Gets the chromosome node arity
-     */
-    private static int getChromosomeNodeArity(CGPChromosome chromo, int index) {
-
-        int chromoArity = chromo.arity;
-        int maxArity = chromo.funcSet.get(chromo.nodes[index].function).arity();
-
-        if (maxArity == -1) {
-            return chromoArity;
-        } else if (maxArity < chromoArity) {
-            return maxArity;
-        } else {
-            return chromoArity;
-        }
-    }
-
-    /*
-        Gets the number of active connections in the given chromosome
-    */
-    static int getNumChromosomeActiveConnections(CGPChromosome chromo) {
-
-        int i;
-        int complexity = 0;
-
-        for (i = 0; i < chromo.numActiveNodes; i++) {
-            complexity += chromo.nodes[chromo.activeNodes[i]].actArity;
-        }
-
-        return complexity;
     }
 
     /**
@@ -291,7 +213,7 @@ public class CGPCore {
         chromo.numActiveNodes++;
 
         /* set the nodes actual arity*/
-        chromo.nodes[nodeIndex - chromo.numInputs].actArity = getChromosomeNodeArity(chromo, nodeIndex - chromo.numInputs);
+        chromo.nodes[nodeIndex - chromo.numInputs].actArity = chromo.getChromosomeNodeArity(nodeIndex - chromo.numInputs);
 
         /* recursively log all the nodes to which the current nodes connect as active */
         for (int i = 0; i < chromo.nodes[nodeIndex - chromo.numInputs].actArity; i++) {
@@ -497,21 +419,15 @@ public class CGPCore {
      * loops through parents and then the children in order for the children to always be selected over the parents
      */
     private static void getBestChromosome(CGPChromosome[] parents, CGPChromosome[] children, int numParents, int numChildren, CGPChromosome best) {
-
-        int i;
         CGPChromosome bestChromoSoFar;
-
         bestChromoSoFar = parents[0];
-
-        for (i = 1; i < numParents; i++) {
-
+        for (int i = 1; i < numParents; i++) {
             if (parents[i].fitness <= bestChromoSoFar.fitness) {
                 bestChromoSoFar = parents[i];
             }
         }
 
-        for (i = 0; i < numChildren; i++) {
-
+        for (int i = 0; i < numChildren; i++) {
             if (children[i].fitness <= bestChromoSoFar.fitness) {
                 bestChromoSoFar = children[i];
             }
@@ -570,13 +486,10 @@ public class CGPCore {
      * returns a random function index
      */
     private static int getRandomFunction(int numFunctions) {
-
         /* check that funcSet contains functions */
         if (numFunctions < 1) {
-            System.out.print("Error: cannot assign the function gene a value as the Fuction Set is empty.\nTerminating CGP-Library.\n");
-            System.exit(0);
+            throw new IllegalArgumentException("Error: cannot assign the function gene a value as the Fuction Set is empty.");
         }
-
         return randEngine.nextInt(numFunctions);
     }
 
@@ -602,12 +515,7 @@ public class CGPCore {
      * Returns the sum of the weighted inputs.
      */
     private static double sumWeightedInputs(int numInputs, double[] inputs, double[] connectionWeights) {
-        double weightedSum = 0;
-
-        for (int i = 0; i < numInputs; i++) {
-            weightedSum += (inputs[i] * connectionWeights[i]);
-        }
-        return weightedSum;
+        return IntStream.range(0, numInputs).mapToDouble(i -> (inputs[i] * connectionWeights[i])).sum();
     }
 
     /**
@@ -658,31 +566,27 @@ public class CGPCore {
      * Prints the given chromosome to the screen
      */
     public static void printChromosome(CGPChromosome chromo, boolean weights) {
-
-        int i, j;
-
         /* error checking */
         if (chromo == null) {
-            System.out.print("Error: chromosome has not been initialised and cannot be printed.\n");
-            return;
+            throw new IllegalArgumentException("Error: chromosome has not been initialised and cannot be printed.");
         }
 
         /* set the active nodes in the given chromosome */
         setChromosomeActiveNodes(chromo);
 
         /* for all the chromo inputs*/
-        for (i = 0; i < chromo.numInputs; i++) {
+        for (int i = 0; i < chromo.numInputs; i++) {
             System.out.printf("(%d):\tinput\n", i);
         }
 
         /* for all the hidden nodes */
-        for (i = 0; i < chromo.numNodes; i++) {
+        for (int i = 0; i < chromo.numNodes; i++) {
 
             /* print the node function */
             System.out.printf("(%d):\t%s\t", chromo.numInputs + i, chromo.funcSet.get(chromo.nodes[i].function).getName());
 
             /* for the arity of the node */
-            for (j = 0; j < getChromosomeNodeArity(chromo, i); j++) {
+            for (int j = 0; j < chromo.getChromosomeNodeArity(i); j++) {
 
                 /* print the node input information */
                 if (weights) {
@@ -702,7 +606,7 @@ public class CGPCore {
 
         /* for all of the outputs */
         System.out.print("outputs: ");
-        for (i = 0; i < chromo.numOutputs; i++) {
+        for (int i = 0; i < chromo.numOutputs; i++) {
 
             /* print the outputNodes node locations */
             System.out.printf("%d ", chromo.outputNodes[i]);
@@ -730,7 +634,6 @@ public class CGPCore {
                 /* */
                 for (int j = 0; j < chromosome.numNodes; j++) {
                     for (int k = 0; k < chromosome.arity; k++) {
-
                         if (chromosome.nodes[j].inputs[k] >= i + chromosome.numInputs) {
                             chromosome.nodes[j].inputs[k]--;
                         }
@@ -739,7 +642,6 @@ public class CGPCore {
 
                 /* for the number of chromosome outputs */
                 for (int j = 0; j < chromosome.numOutputs; j++) {
-
                     if (chromosome.outputNodes[j] >= i + chromosome.numInputs) {
                         chromosome.outputNodes[j]--;
                     }
@@ -1635,15 +1537,11 @@ public class CGPCore {
 
                 /* error checking */
                 if (chromosome.getNumInputs() != data.numInputs) {
-                    System.out.print("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
-                    System.out.print("Terminating CGP-Library.\n");
-                    System.exit(0);
+                    throw new IllegalArgumentException("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.");
                 }
 
                 if (chromosome.getNumOutputs() != data.numOutputs) {
-                    System.out.print("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
-                    System.out.print("Terminating CGP-Library.\n");
-                    System.exit(0);
+                    throw new IllegalArgumentException("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
                 }
 
                 /* for each sample in data */
@@ -1655,7 +1553,7 @@ public class CGPCore {
                     /* for each chromosome outputNodes */
                     for (j = 0; j < chromosome.getNumOutputs(); j++) {
 
-                        error += Math.abs(getChromosomeOutput(chromosome, j) - data.getDataSetSampleOutput(i, j));
+                        error += Math.abs(chromosome.getChromosomeOutput(j) - data.getDataSetSampleOutput(i, j));
                     }
                 }
 

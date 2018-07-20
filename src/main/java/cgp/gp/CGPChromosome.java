@@ -4,10 +4,12 @@ import cgp.interfaces.Function;
 import cgp.program.Node;
 import cgp.solver.CartesianGP;
 import genetics.chromosome.Chromosome;
+import lombok.Cleanup;
 import lombok.Getter;
 import org.eclipse.collections.api.list.MutableList;
 
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 import static cgp.gp.CGPCore.initialiseChromosome;
 import static cgp.gp.CGPCore.setChromosomeActiveNodes;
@@ -32,7 +34,7 @@ public class CGPChromosome extends Chromosome {
         String[] line;
 
         /* open the chromosome file */
-        Scanner scanner = new Scanner(serialize);
+        @Cleanup Scanner scanner = new Scanner(serialize);
 
         /* get num inputs */
         line = scanner.nextLine().split(",");
@@ -82,7 +84,6 @@ public class CGPChromosome extends Chromosome {
         for (int i = 0; i < numOutputs; i++) {
             chromosome.outputNodes[i] = Integer.parseInt(line[i]);
         }
-        scanner.close();
         /* set the active nodes in the copied chromosome */
         setChromosomeActiveNodes(chromosome);
 
@@ -120,7 +121,7 @@ public class CGPChromosome extends Chromosome {
         return sb.toString();
     }
 
-    void copyChromosome(CGPChromosome chromoSrc) {
+    public void copyChromosome(CGPChromosome chromoSrc) {
         /* error checking  */
         if (this.numInputs != chromoSrc.numInputs) {
             throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome inputs do not match.");
@@ -159,5 +160,75 @@ public class CGPChromosome extends Chromosome {
 
         /* copy generation */
         this.generation = chromoSrc.generation;
+    }
+
+    /**
+     * reset the outputNodes values of all chromosome nodes to zero
+     */
+    public void resetChromosome() {
+        IntStream.range(0, this.numNodes).forEach(i -> this.nodes[i].output = 0);
+    }
+
+    /**
+     * used to access the chromosome outputs after executeChromosome
+     * has been called
+     */
+    public double getChromosomeOutput(int output) {
+
+        if (output < 0 || output > this.numOutputs) {
+            System.out.print("Error: outputNodes less than or greater than the number of chromosome outputs. Called from getChromosomeOutput.\n");
+            System.exit(0);
+        }
+
+        return this.outputValues[output];
+    }
+
+    /**
+     * used to access the chromosome node values after executeChromosome
+     * has been called
+     */
+    public double getChromosomeNodeValue(int node) {
+        if (node < 0 || node > this.numNodes) {
+            System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from getChromosomeNodeValue.\n");
+            System.exit(0);
+        }
+        return this.nodes[node].output;
+    }
+
+    /**
+     * returns whether the specified node is active in the given chromosome
+     */
+    public boolean isNodeActive(int node) {
+
+        if (node < 0 || node > this.numNodes) {
+            System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from isNodeActive.\n");
+            System.exit(0);
+        }
+
+        return this.nodes[node].active;
+    }
+
+    /**
+     * Gets the chromosome node arity
+     */
+    public int getChromosomeNodeArity(int index) {
+
+        int chromoArity = this.arity;
+        int maxArity = this.funcSet.get(this.nodes[index].function).arity();
+
+        if (maxArity == -1) {
+            return chromoArity;
+        } else if (maxArity < chromoArity) {
+            return maxArity;
+        } else {
+            return chromoArity;
+        }
+    }
+
+    /**
+     * Gets the number of active connections in the given chromosome
+     */
+    public int getNumChromosomeActiveConnections() {
+        return IntStream.range(0, this.numActiveNodes).map(i -> this.nodes[this.activeNodes[i]].actArity).sum();
     }
 }
