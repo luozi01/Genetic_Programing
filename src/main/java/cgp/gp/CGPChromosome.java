@@ -1,14 +1,16 @@
 package cgp.gp;
 
-import cgp.program.FunctionSet;
+import cgp.interfaces.Function;
 import cgp.program.Node;
 import cgp.solver.CartesianGP;
 import genetics.chromosome.Chromosome;
 import lombok.Getter;
+import org.eclipse.collections.api.list.MutableList;
 
 import java.util.Scanner;
 
-import static cgp.gp.CGPCore.*;
+import static cgp.gp.CGPCore.initialiseChromosome;
+import static cgp.gp.CGPCore.setChromosomeActiveNodes;
 import static cgp.solver.CGPSolver.initialiseParameters;
 
 @Getter
@@ -22,7 +24,7 @@ public class CGPChromosome extends Chromosome {
     int[] outputNodes;
     int[] activeNodes;
     double[] outputValues;
-    FunctionSet funcSet;
+    MutableList<Function> funcSet;
     double[] nodeInputsHold;
     int generation;
 
@@ -54,10 +56,8 @@ public class CGPChromosome extends Chromosome {
         /* for each function name */
         line = scanner.nextLine().split(",");
         for (int k = 0; k < line.length - 1; k++) {
-            if (!addPresetFuctionToFunctionSet(params, line[k + 1])) {
-                System.out.print("Error: cannot load chromosome which contains custom node functions.\n");
-                System.out.print("Terminating CGP-Library.\n");
-                System.exit(0);
+            if (!params.addPresetFunctionToFunctionSet(line[k + 1])) {
+                throw new IllegalArgumentException("Error: cannot load chromosome which contains custom node functions.");
             }
         }
 
@@ -101,8 +101,8 @@ public class CGPChromosome extends Chromosome {
 
         sb.append("FunctionSet");
 
-        for (int i = 0; i < funcSet.numFunctions; i++) {
-            sb.append(String.format(",%s", funcSet.functionNames[i]));
+        for (int i = 0; i < funcSet.size(); i++) {
+            sb.append(String.format(",%s", funcSet.get(i).getName()));
         }
         sb.append("\n");
 
@@ -118,5 +118,46 @@ public class CGPChromosome extends Chromosome {
             sb.append(String.format("%d,", outputNodes[i]));
         }
         return sb.toString();
+    }
+
+    void copyChromosome(CGPChromosome chromoSrc) {
+        /* error checking  */
+        if (this.numInputs != chromoSrc.numInputs) {
+            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome inputs do not match.");
+        }
+
+        if (this.numNodes != chromoSrc.numNodes) {
+            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome nodes do not match.");
+        }
+
+        if (this.numOutputs != chromoSrc.numOutputs) {
+            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome outputs do not match.");
+        }
+
+        if (this.arity != chromoSrc.arity) {
+            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The arity of the chromosome nodes do not match.");
+        }
+
+        /* copy nodes and which are active */
+        for (int i = 0; i < chromoSrc.numNodes; i++) {
+            this.nodes[i].copyNode(chromoSrc.nodes[i]);
+        }
+
+        System.arraycopy(chromoSrc.activeNodes, 0, this.activeNodes, 0, chromoSrc.numNodes);
+
+        /* copy functionSet */
+        this.funcSet = chromoSrc.funcSet.clone();
+
+        /* copy each of the chromosomes outputs */
+        System.arraycopy(chromoSrc.outputNodes, 0, this.outputNodes, 0, chromoSrc.numOutputs);
+
+        /* copy the number of active node */
+        this.numActiveNodes = chromoSrc.numActiveNodes;
+
+        /* copy the fitness */
+        this.fitness = chromoSrc.fitness;
+
+        /* copy generation */
+        this.generation = chromoSrc.generation;
     }
 }

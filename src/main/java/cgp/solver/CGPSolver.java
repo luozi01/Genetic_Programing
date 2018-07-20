@@ -5,17 +5,18 @@ import cgp.gp.CGPCore;
 import cgp.interfaces.CGPFitness;
 import cgp.interfaces.CGPReproductionStrategy;
 import cgp.interfaces.CGPSelectionStrategy;
+import cgp.interfaces.Function;
 import cgp.program.DataSet;
-import cgp.program.FunctionSet;
 import cgp.program.Results;
+import org.eclipse.collections.impl.factory.Lists;
 
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Scanner;
 
-import static cgp.gp.CGPCore.*;
 import static cgp.gp.CGPCore.fitnessCalc.supervisedLearning;
 import static cgp.gp.CGPCore.mutationStrategy.*;
+import static cgp.gp.CGPCore.*;
 import static cgp.gp.CGPCore.reproduction.mutateRandomParent;
 import static cgp.gp.CGPCore.selection.selectFittest;
 
@@ -64,8 +65,7 @@ public class CGPSolver {
         params.mutationType = probabilisticMutation;
         params.mutationTypeName = "probabilistic";
 
-        params.funcSet = new FunctionSet();
-        params.funcSet.numFunctions = 0;
+        params.functions = Lists.mutable.empty();
 
         params.fitnessFunction = supervisedLearning;
         params.fitnessFunctionName = "supervisedLearning";
@@ -123,7 +123,6 @@ public class CGPSolver {
         if (arity < 0) {
             throw new IllegalArgumentException(String.format("Warning: node arity cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", arity));
         }
-
         params.arity = arity;
     }
 
@@ -224,7 +223,7 @@ public class CGPSolver {
      * clears the given function set of functions
      */
     public void clearFunctionSet() {
-        params.funcSet.numFunctions = 0;
+        params.functions.clear();
     }
 
     /**
@@ -388,13 +387,17 @@ public class CGPSolver {
     public void addNodeFunction(String functionNames) {
         String[] func = functionNames.split(",");
         for (String aFunc : func) {
-            addPresetFuctionToFunctionSet(params, aFunc);
+            params.addPresetFunctionToFunctionSet(aFunc);
         }
 
         /* if the function set is empty give warning */
-        if (params.funcSet.numFunctions == 0) {
+        if (params.functions.isEmpty()) {
             System.out.print("Warning: No Functions added to function set.\n");
         }
+    }
+
+    public void addSelfDefineFunction(Function function) {
+        params.addCustomNodeFunction(function);
     }
 
     public void printParams() {

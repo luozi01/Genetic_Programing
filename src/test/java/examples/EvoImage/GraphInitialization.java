@@ -17,13 +17,13 @@ public class GraphInitialization implements Initialization {
     @Override
     public List<Chromosome> generate() {
         Paintings p = new Paintings(manager);
-        for (int i = 0; i < manager.MAX_SHAPES; i++) {
-            Polygon polygon = new Polygon(manager.MAX_POINTS);
-            for (int j = 0; j < manager.MAX_POINTS; j++) {
-                polygon.add(j, manager.randEngine.nextInt(manager.MAX_WIDTH),
-                        manager.randEngine.nextInt(manager.MAX_HEIGHT));
+        for (int i = 0; i < EvoManager.MAX_SHAPES; i++) {
+            Polygon polygon = new Polygon(EvoManager.MAX_POINTS);
+            for (int j = 0; j < EvoManager.MAX_POINTS; j++) {
+                polygon.add(j, EvoManager.randEngine.nextInt(EvoManager.MAX_WIDTH),
+                        EvoManager.randEngine.nextInt(EvoManager.MAX_HEIGHT));
             }
-            manager.choice.apply(polygon);
+            EvoManager.choice.apply(polygon);
             p.polygons[i] = polygon;
         }
         return Collections.singletonList(p);
