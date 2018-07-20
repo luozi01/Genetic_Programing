@@ -22,8 +22,8 @@ public class CGPCore {
     static CGPChromosome initialiseChromosome(CartesianGP params) {
         CGPChromosome chromosome = new CGPChromosome();
         /* check that funcSet contains functions */
-        if (params.functions.size() < 1) {
-            throw new IllegalArgumentException("Error: chromosome not initialised due to empty functionSet.\nTerminating CGP-Library.\n");
+        if (params.functions.isEmpty()) {
+            throw new IllegalArgumentException("Error: chromosome not initialised due to empty functionSet.");
         }
 
         /* allocate memory for nodes */
