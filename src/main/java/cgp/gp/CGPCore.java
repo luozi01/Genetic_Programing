@@ -634,18 +634,14 @@ public class CGPCore {
 
                     /* mutate function gene */
                     if (geneToMutate < numFunctionGenes) {
-
                         nodeIndex = geneToMutate;
-
                         chromosome.nodes[nodeIndex].function = getRandomFunction(chromosome.funcSet.size());
                     }
 
                     /* mutate node input gene */
                     else if (geneToMutate < numFunctionGenes + numInputGenes) {
-
                         nodeIndex = (geneToMutate - numFunctionGenes) / chromosome.arity;
                         int nodeInputIndex = (geneToMutate - numFunctionGenes) % chromosome.arity;
-
                         chromosome.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, nodeIndex, params.recurrentConnectionProbability);
                     }
 
@@ -737,48 +733,31 @@ public class CGPCore {
 
                     /* mutate function gene */
                     if (geneToMutate < numFunctionGenes) {
-
                         nodeIndex = geneToMutate;
-
                         previousGeneValue = chromosome.nodes[nodeIndex].function;
-
                         chromosome.nodes[nodeIndex].function = getRandomFunction(chromosome.funcSet.size());
-
                         newGeneValue = chromosome.nodes[nodeIndex].function;
-
                         if ((previousGeneValue != newGeneValue) && (chromosome.nodes[nodeIndex].active)) {
                             mutatedActive = true;
                         }
-
                     }
-
                     /* mutate node input gene */
                     else if (geneToMutate < numFunctionGenes + numInputGenes) {
-
                         nodeIndex = (geneToMutate - numFunctionGenes) / chromosome.arity;
                         int nodeInputIndex = (geneToMutate - numFunctionGenes) % chromosome.arity;
-
                         previousGeneValue = chromosome.nodes[nodeIndex].inputs[nodeInputIndex];
-
                         chromosome.nodes[nodeIndex].inputs[nodeInputIndex] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, nodeIndex, params.recurrentConnectionProbability);
-
                         newGeneValue = chromosome.nodes[nodeIndex].inputs[nodeInputIndex];
-
                         if ((previousGeneValue != newGeneValue) && (chromosome.nodes[nodeIndex].active)) {
                             mutatedActive = true;
                         }
                     }
-
                     /* mutate outputNodes gene */
                     else {
                         nodeIndex = geneToMutate - numFunctionGenes - numInputGenes;
-
                         previousGeneValue = chromosome.outputNodes[nodeIndex];
-
                         chromosome.outputNodes[nodeIndex] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
-
                         newGeneValue = chromosome.outputNodes[nodeIndex];
-
                         if (previousGeneValue != newGeneValue) {
                             mutatedActive = true;
                         }
