@@ -374,7 +374,7 @@ public class CGPSolver {
     }
 
     public CGPChromosome getChromosome(int index) {
-        return results.map(results1 -> results1.bestCGPChromosomes[index]).orElse(null);
+        return results.map(results1 -> results1.bestCGPChromosomes.get(index)).orElse(null);
     }
 
     /**
