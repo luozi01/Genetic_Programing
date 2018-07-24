@@ -1,5 +1,6 @@
 package examples.cgp_test;
 
+import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 
 import static cgp.gp.CGPCore.printChromosome;
@@ -36,8 +37,8 @@ class AverageBehaviour {
 
         System.out.printf("The average chromosome fitness is: %f\n", averageFitness);
 
-        System.out.println("The best chromosome found on run 4:");
-
-        printChromosome(solver.getChromosome(4), false);
+        CGPChromosome bestGene = solver.getBestGene(true);
+        System.out.println(bestGene.getGeneration());
+        printChromosome(bestGene, false);
     }
 }

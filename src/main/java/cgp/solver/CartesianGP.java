@@ -144,7 +144,7 @@ public class CartesianGP {
                 addCustomNodeFunction(_wire);
                 break;
             default:
-                System.out.printf("Warning: function '%s' is not known and was not added.\n", functionName);
+                System.err.printf("Warning: function '%s' is not known and was not added.\n", functionName);
                 return false;
         }
         return true;

@@ -21,7 +21,7 @@ import java.util.List;
 public class LinearGP {
     private RandEngine randEngine = new SimpleRandEngine();
 
-    private int populationSize = 1000;
+    private int populationSize = 500;
 
     // number of registers of a linear program
     private int registerCount;
@@ -73,12 +73,69 @@ public class LinearGP {
     private int tournamentSize = 3;
     // END
 
-    public static LinearGP defaultConfig(List<Observation> targets, int registerCount) {
+    public static LinearGP defaultConfig(List<Observation> observations, int registerCount) {
         LinearGP lgp = new LinearGP();
-        lgp.getOperatorSet().addAll(Arrays.asList(new ADD(), new SUB(), new DIV(), new MUL(), new POW(), new IFGREATERTHAN()));
         lgp.getConstantSet().addAll(Arrays.asList(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0));
-        lgp.targets.addAll(targets);
+        lgp.getTargets().addAll(observations);
         lgp.setRegisterCount(registerCount);
         return lgp;
+    }
+
+    void addCustomNodeFunction(Operator function) {
+        operatorSet.add(function);
+    }
+
+    public void addFunctions(String name) {
+        String[] func = name.trim().split(",");
+        for (String f : func) {
+            addPresetFunctions(f);
+        }
+
+        if (operatorSet.isEmpty()) {
+            System.err.println("Fail to add function");
+        }
+    }
+
+    private void addPresetFunctions(String functionName) {
+        switch (functionName) {
+            case "add":
+                addCustomNodeFunction(new ADD());
+                break;
+            case "sub":
+                addCustomNodeFunction(new SUB());
+                break;
+            case "cos":
+                addCustomNodeFunction(new COS());
+                break;
+            case "div":
+                addCustomNodeFunction(new DIV());
+                break;
+            case "exp":
+                addCustomNodeFunction(new EXP());
+                break;
+            case "if>":
+                addCustomNodeFunction(new IFGREATERTHAN());
+                break;
+            case "if<":
+                addCustomNodeFunction(new IFLESSTHAN());
+                break;
+            case "log":
+                addCustomNodeFunction(new LOG());
+                break;
+            case "mul":
+                addCustomNodeFunction(new MUL());
+                break;
+            case "pow":
+                addCustomNodeFunction(new POW());
+                break;
+            case "sin":
+                addCustomNodeFunction(new SIN());
+                break;
+            case "sqrt":
+                addCustomNodeFunction(new SQRT());
+                break;
+            default:
+                throw new IllegalStateException(String.format("Function '%s' is not known and was not added.\n", functionName));
+        }
     }
 }

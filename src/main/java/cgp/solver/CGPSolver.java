@@ -85,7 +85,8 @@ public class CGPSolver {
     private static void setNumInputs(CartesianGP params, int numInputs) {
         /* error checking */
         if (numInputs <= 0) {
-            throw new IllegalArgumentException(String.format("Error: number of chromosome inputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numInputs));
+            throw new IllegalArgumentException(String.format("Number of chromosome inputs cannot be less than one; " +
+                    "%d is invalid.", numInputs));
         }
 
         params.numInputs = numInputs;
@@ -97,7 +98,8 @@ public class CGPSolver {
     private static void setNumNodes(CartesianGP params, int numNodes) {
         /* error checking */
         if (numNodes < 0) {
-            throw new IllegalArgumentException(String.format("Warning: number of chromosome nodes cannot be negative; %d is invalid.\nTerminating CGP-Library.\n", numNodes));
+            throw new IllegalArgumentException(String.format("Number of chromosome nodes cannot be negative; " +
+                    "%d is invalid.\n", numNodes));
         }
 
         params.numNodes = numNodes;
@@ -109,7 +111,8 @@ public class CGPSolver {
     private static void setNumOutputs(CartesianGP params, int numOutputs) {
         /* error checking */
         if (numOutputs < 0) {
-            throw new IllegalArgumentException(String.format("Warning: number of chromosome outputs cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", numOutputs));
+            throw new IllegalArgumentException(String.format("Number of chromosome outputs cannot be less than one; " +
+                    "%d is invalid.", numOutputs));
         }
 
         params.numOutputs = numOutputs;
@@ -121,7 +124,7 @@ public class CGPSolver {
     private static void setArity(CartesianGP params, int arity) {
         /* error checking */
         if (arity < 0) {
-            throw new IllegalArgumentException(String.format("Warning: node arity cannot be less than one; %d is invalid.\nTerminating CGP-Library.\n", arity));
+            throw new IllegalArgumentException(String.format("Node arity cannot be less than one; %d is invalid.", arity));
         }
         params.arity = arity;
     }
@@ -141,7 +144,8 @@ public class CGPSolver {
         if (mu > 0) {
             params.mu = mu;
         } else {
-            throw new IllegalArgumentException(String.format("\nWarning: mu value '%d' is invalid. Mu value must have a value of one or greater. Mu value left unchanged as '%d'.\n", mu, params.mu));
+            System.err.printf("Mu value '%d' is invalid. Mu value must have a value of one or greater. " +
+                    "Mu value left unchanged as '%d'.\n", mu, params.mu);
         }
     }
 
@@ -150,11 +154,12 @@ public class CGPSolver {
      * If lambda value is invalid a warning is displayed and the lambda value
      * is left unchanged.
      */
-    public void setLambda(CartesianGP params, int lambda) {
+    public void setLambda(int lambda) {
         if (lambda > 0) {
             params.lambda = lambda;
         } else {
-            throw new IllegalArgumentException(String.format("\nWarning: lambda value '%d' is invalid. Lambda value must have a value of one or greater. Lambda value left unchanged as '%d'.\n", lambda, params.lambda));
+            System.err.printf("Lambda value '%d' is invalid. Lambda value must have a value of one or greater. " +
+                    "Lambda value left unchanged as '%d'.\n", lambda, params.lambda);
         }
     }
 
@@ -167,7 +172,10 @@ public class CGPSolver {
         if (evolutionaryStrategy == '+' || evolutionaryStrategy == ',') {
             params.evolutionaryStrategy = evolutionaryStrategy;
         } else {
-            throw new IllegalArgumentException(String.format("\nWarning: the evolutionary strategy '%c' is invalid. The evolutionary strategy must be '+' or ','. The evolutionary strategy has been left unchanged as '%c'.\n", evolutionaryStrategy, params.evolutionaryStrategy));
+            System.err.printf("\nWarning: the evolutionary strategy '%c' is invalid. " +
+                            "The evolutionary strategy must be '+' or ','. " +
+                            "The evolutionary strategy has been left unchanged as '%c'.\n",
+                    evolutionaryStrategy, params.evolutionaryStrategy);
         }
     }
 
@@ -180,7 +188,9 @@ public class CGPSolver {
         if (mutationRate >= 0 && mutationRate <= 1) {
             params.mutationRate = mutationRate;
         } else {
-            throw new IllegalArgumentException(String.format("\nWarning: mutation rate '%f' is invalid. The mutation rate must be in the range [0,1]. The mutation rate has been left unchanged as '%f'.\n", mutationRate, params.mutationRate));
+            System.err.printf("\nWarning: mutation rate '%f' is invalid. " +
+                    "The mutation rate must be in the range [0,1]. " +
+                    "The mutation rate has been left unchanged as '%f'.\n", mutationRate, params.mutationRate);
         }
     }
 
@@ -192,7 +202,10 @@ public class CGPSolver {
         if (recurrentConnectionProbability >= 0 && recurrentConnectionProbability <= 1) {
             params.recurrentConnectionProbability = recurrentConnectionProbability;
         } else {
-            throw new IllegalArgumentException(String.format("\nWarning: recurrent connection probability '%f' is invalid. The recurrent connection probability must be in the range [0,1]. The recurrent connection probability has been left unchanged as '%f'.\n", recurrentConnectionProbability, params.recurrentConnectionProbability));
+            System.err.print(String.format("\nWarning: recurrent connection probability '%f' is invalid. " +
+                            "The recurrent connection probability must be in the range [0,1]. " +
+                            "The recurrent connection probability has been left unchanged as '%f'.\n",
+                    recurrentConnectionProbability, params.recurrentConnectionProbability));
         }
     }
 
@@ -204,7 +217,10 @@ public class CGPSolver {
         if (shortcutConnections == 0 || shortcutConnections == 1) {
             params.shortcutConnections = shortcutConnections;
         } else {
-            System.out.printf("\nWarning: shortcut connection '%d' is invalid. The shortcut connections takes values 0 or 1. The shortcut connection has been left unchanged as '%d'.\n", shortcutConnections, params.shortcutConnections);
+            System.err.printf("\nWarning: shortcut connection '%d' is invalid. " +
+                            "The shortcut connections takes values 0 or 1. " +
+                            "The shortcut connection has been left unchanged as '%d'.\n",
+                    shortcutConnections, params.shortcutConnections);
         }
     }
 
@@ -213,7 +229,8 @@ public class CGPSolver {
      */
     public void setUpdateFrequency(int updateFrequency) {
         if (updateFrequency < 0) {
-            System.out.printf("Warning: update frequency of %d is invalid. Update frequency must be >= 0. Update frequency is left unchanged as %d.\n", updateFrequency, params.updateFrequency);
+            System.err.printf("Warning: update frequency of %d is invalid. Update frequency must be >= 0. " +
+                    "Update frequency is left unchanged as %d.\n", updateFrequency, params.updateFrequency);
         } else {
             params.updateFrequency = updateFrequency;
         }
@@ -227,7 +244,7 @@ public class CGPSolver {
     }
 
     /**
-     * sets the fitness function to the fitnessFuction passed. If the fitnessFuction is NULL
+     * sets the fitness function to the fitnessFuction passed. If the fitnessFunction is NULL
      * then the default supervisedLearning fitness function is used.
      */
     public void setCustomFitnessFunction(CGPFitness fitnessFunction, String fitnessFunctionName) {
@@ -241,8 +258,8 @@ public class CGPSolver {
     }
 
     /**
-     * sets the selection scheme used to select the parents from the candidate chromosomes. If the selectionScheme is NULL
-     * then the default selectFittest selection scheme is used.
+     * sets the selection scheme used to select the parents from the candidate chromosomes.
+     * If the selectionScheme is NULL then the default selectFittest selection scheme is used.
      */
     public void setCustomSelectionScheme(CGPSelectionStrategy selectionScheme, String selectionSchemeName) {
         if (selectionScheme == null) {
@@ -297,12 +314,30 @@ public class CGPSolver {
                 params.mutationTypeName = "single";
                 break;
             default:
-                throw new IllegalArgumentException(
-                        String.format("\nWarning: mutation type '%s' is invalid. " +
-                                        "The mutation type must be 'probabilistic' or 'point'. " +
-                                        "The mutation type has been left unchanged as '%s'.\n",
-                                mutationType, params.mutationTypeName));
+                System.err.printf("\nWarning: mutation type '%s' is invalid. " +
+                                "The mutation type must be 'probabilistic' or 'point'. " +
+                                "The mutation type has been left unchanged as '%s'.\n",
+                        mutationType, params.mutationTypeName);
         }
+    }
+
+    public void initialiseDataSet(double[][] input, double[][] output, int numSamples, int numInput, int numOutput) {
+        if (input == null || output == null) {
+            throw new NullPointerException("Input or output cannot be null");
+        }
+        DataSet data = new DataSet();
+        data.numInputs = numInput;
+        data.numOutputs = numOutput;
+
+        data.numSamples = numSamples;
+        data.inputData = new double[data.numSamples][];
+        data.outputData = new double[data.numSamples][];
+
+        for (int i = 0; i < input.length; i++) {
+            data.inputData[i] = input[i].clone();
+            data.outputData[i] = output[i].clone();
+        }
+        this.data = Optional.of(data);
     }
 
     /**
@@ -361,6 +396,7 @@ public class CGPSolver {
 
     public void repeatEvolve(int numGens, int numRuns) {
         results = Optional.of(repeatCGP(params, data.orElse(null), numGens, numRuns));
+        results.ifPresent(o -> globalBest = Optional.of(o.getBestChromosome()));
     }
 
     public CGPChromosome getBestGene(boolean concise) {
@@ -390,7 +426,7 @@ public class CGPSolver {
 
         /* if the function set is empty give warning */
         if (params.functions.isEmpty()) {
-            System.out.print("Warning: No Functions added to function set.\n");
+            System.err.print("Warning: No Functions added to function set.\n");
         }
     }
 

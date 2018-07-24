@@ -5,6 +5,7 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.IntStream;
 
 public class Results {
@@ -96,5 +97,9 @@ public class Results {
         int[] array = IntStream.range(0, bestCGPChromosomes.size()).
                 map(i -> bestCGPChromosomes.get(i).getGeneration()).toArray();
         return medianInt(array, bestCGPChromosomes.size());
+    }
+
+    public CGPChromosome getBestChromosome() {
+        return bestCGPChromosomes.stream().min(Comparator.comparingDouble(o -> o.fitness)).orElse(null);
     }
 }

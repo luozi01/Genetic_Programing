@@ -16,12 +16,12 @@ import java.util.*;
 @Setter
 public class LGPChromosome extends Chromosome {
 
+    private transient static int index = 0;
     private List<Register> registerSet = new ArrayList<>(); //variable
     private List<Register> constantSet = new ArrayList<>(); //numbers
     private List<Operator> operatorSet = new ArrayList<>(); //operators
     private List<Instruction> instructions = new ArrayList<>(); //instructions
     private Map<String, Double> variables = new HashMap<>();
-    private int index = 0;
     private LinearGP manager;
 
     LGPChromosome(LinearGP manager) {

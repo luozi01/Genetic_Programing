@@ -93,7 +93,8 @@ public class CGPCore {
             if (Double.isNaN(chromosome.nodes[currentActiveNode].output)) {
                 chromosome.nodes[currentActiveNode].output = 0;
             } else if (Double.isInfinite(chromosome.nodes[currentActiveNode].output)) {
-                chromosome.nodes[currentActiveNode].output = chromosome.nodes[currentActiveNode].output > 0 ? Double.MAX_VALUE : Double.MIN_VALUE;
+                chromosome.nodes[currentActiveNode].output = chromosome.nodes[currentActiveNode].output > 0 ?
+                        Double.MAX_VALUE : Double.MIN_VALUE;
             }
         }
 
@@ -127,7 +128,7 @@ public class CGPCore {
     static void setChromosomeActiveNodes(CGPChromosome chromo) {
         /* error checking */
         if (chromo == null) {
-            throw new IllegalArgumentException("Error: chromosome has not been initialised and so the active nodes cannot be set.");
+            throw new NullPointerException("Chromosome has not been initialised and so the active nodes cannot be set.");
         }
 
         /* set the number of active nodes to zero */
@@ -154,31 +155,32 @@ public class CGPCore {
         Arrays.sort(chromo.activeNodes, 0, chromo.numActiveNodes);
     }
 
-    /*
-        used by setActiveNodes to recursively search for active nodes
-    */
-    private static void recursivelySetActiveNodes(CGPChromosome chromo, int nodeIndex) {
+    /**
+     * used by setActiveNodes to recursively search for active nodes
+     */
+    private static void recursivelySetActiveNodes(CGPChromosome chromosome, int nodeIndex) {
         /* if the given node is an input, stop */
-        if (nodeIndex < chromo.numInputs) {
+        if (nodeIndex < chromosome.numInputs) {
             return;
         }
 
         /* if the given node has already been flagged as active */
-        if (chromo.nodes[nodeIndex - chromo.numInputs].active) {
+        if (chromosome.nodes[nodeIndex - chromosome.numInputs].active) {
             return;
         }
 
         /* log the node as active */
-        chromo.nodes[nodeIndex - chromo.numInputs].active = true;
-        chromo.activeNodes[chromo.numActiveNodes] = nodeIndex - chromo.numInputs;
-        chromo.numActiveNodes++;
+        chromosome.nodes[nodeIndex - chromosome.numInputs].active = true;
+        chromosome.activeNodes[chromosome.numActiveNodes] = nodeIndex - chromosome.numInputs;
+        chromosome.numActiveNodes++;
 
         /* set the nodes actual arity*/
-        chromo.nodes[nodeIndex - chromo.numInputs].actArity = chromo.getChromosomeNodeArity(nodeIndex - chromo.numInputs);
+        chromosome.nodes[nodeIndex - chromosome.numInputs].actArity =
+                chromosome.getChromosomeNodeArity(nodeIndex - chromosome.numInputs);
 
         /* recursively log all the nodes to which the current nodes connect as active */
-        for (int i = 0; i < chromo.nodes[nodeIndex - chromo.numInputs].actArity; i++) {
-            recursivelySetActiveNodes(chromo, chromo.nodes[nodeIndex - chromo.numInputs].inputs[i]);
+        for (int i = 0; i < chromosome.nodes[nodeIndex - chromosome.numInputs].actArity; i++) {
+            recursivelySetActiveNodes(chromosome, chromosome.nodes[nodeIndex - chromosome.numInputs].inputs[i]);
         }
     }
 
@@ -215,7 +217,10 @@ public class CGPCore {
         /* for each run */
         for (int i = 0; i < numRuns; i++) {
             results.bestCGPChromosomes.add(runCGP(params, data, numGens));
-            System.out.printf("%d\t%f\t%d\t\t%d\n", i, results.bestCGPChromosomes.get(i).fitness, results.bestCGPChromosomes.get(i).generation, results.bestCGPChromosomes.get(i).numActiveNodes);
+            System.out.printf("%d\t%f\t%d\t\t%d\n", i,
+                    results.bestCGPChromosomes.get(i).fitness,
+                    results.bestCGPChromosomes.get(i).generation,
+                    results.bestCGPChromosomes.get(i).numActiveNodes);
         }
 
         System.out.print("----------------------------------------------------\n");

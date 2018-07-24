@@ -22,8 +22,24 @@ class LGPTest {
         FunctionFitness fitnessFunction = new FunctionFitness(training);
 
         LinearGP gp = LinearGP.defaultConfig(training, 3);
+        gp.setPopulationSize(1000);
+        gp.addFunctions("add,sub,div,mul,if>,if<");
+
         LGPSolver solver = new LGPSolver(gp, fitnessFunction);
-        addListener(solver);
+        solver.addIterationListener(engine -> {
+            LGPChromosome bestGene = engine.getBestGene();
+
+            double bestFit = engine.fitness(bestGene);
+
+            // log to console
+            System.out.printf("Generation = %s \t fit = %s \n", engine.getIteration(), bestFit);
+
+            // halt condition
+            if (bestFit < 5) {
+                engine.terminate();
+                System.out.println(bestGene);
+            }
+        });
         Long startTime = System.currentTimeMillis();
         solver.evolve();
         System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
@@ -40,24 +56,6 @@ class LGPTest {
             System.out.printf("predicted: %f\t actual: %f\t difference: %f\t\n",
                     predicted, actual, Math.abs(predicted - actual));
         }
-    }
-
-    private static void addListener(LGPSolver engine) {
-        engine.addIterationListener(engine1 -> {
-
-            LGPChromosome bestGene = engine1.getBestGene();
-
-            double bestFit = engine1.fitness(bestGene);
-
-            // log to console
-            System.out.printf("Generation = %s \t fit = %s \n", engine1.getIteration(), bestFit);
-
-            // halt condition
-            if (bestFit < 5) {
-                engine1.terminate();
-                System.out.println(bestGene);
-            }
-        });
     }
 
     private static class FunctionFitness implements LGPFitnessCalc {
