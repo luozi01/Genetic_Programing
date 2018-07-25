@@ -9,7 +9,7 @@ import cgp.solver.CartesianGP;
 import static cgp.gp.CGPCore.executeChromosome;
 import static cgp.gp.CGPCore.printChromosome;
 
-public class Neuroevolution {
+public class NeuroEvolution {
 
     public static void main(String[] args) {
         int numInputs = 1;
@@ -17,7 +17,7 @@ public class Neuroevolution {
         int numOutputs = 1;
         int nodeArity = 5;
 
-        int numGens = 100000;
+        int numGens = 25000;
         double targetFitness = 0.5;
         int updateFrequency = 500;
 
@@ -28,12 +28,23 @@ public class Neuroevolution {
         solver.setTargetFitness(targetFitness);
         solver.setUpdateFrequency(updateFrequency);
         solver.setConnectionWeightRange(weightRange);
-        solver.setCustomFitnessFunction(new sinWave(), "sinWave");
+        solver.setCustomFitnessFunction(new sinWave());
 
         solver.addNodeFunction("tanh,softsign");
 
+        solver.printParams();
+
         solver.evolve(numGens);
-        printChromosome(solver.getBestGene(false), true);
+
+        CGPChromosome bestGene = solver.getBestGene(false);
+
+        // continues training
+        while (bestGene.fitness > targetFitness) {
+            solver.evolve(numGens, bestGene);
+            bestGene = solver.getBestGene(false);
+        }
+
+        printChromosome(bestGene, true);
     }
 
     static class sinWave implements CGPFitness {
@@ -57,6 +68,11 @@ public class Neuroevolution {
             }
 
             return error;
+        }
+
+        @Override
+        public String toString() {
+            return "sinWave";
         }
     }
 }

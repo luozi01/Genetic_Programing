@@ -51,7 +51,7 @@ public class CGPSolver {
         params.mutationRate = 0.05;
         params.recurrentConnectionProbability = 0.0;
         params.connectionWeightRange = 1;
-        params.shortcutConnections = 1;
+        params.shortcutConnections = true;
 
         params.targetFitness = 0;
 
@@ -62,19 +62,15 @@ public class CGPSolver {
         setNumOutputs(params, numOutputs);
         setArity(params, arity);
 
-        params.mutationType = probabilisticMutation;
-        params.mutationTypeName = "probabilistic";
+        params.mutationType = probabilistic;
 
         params.functions = Lists.mutable.empty();
 
         params.fitnessFunction = supervisedLearning;
-        params.fitnessFunctionName = "supervisedLearning";
 
         params.selectionScheme = selectFittest;
-        params.selectionSchemeName = "selectFittest";
 
         params.reproductionScheme = mutateRandomParent;
-        params.reproductionSchemeName = "mutateRandomParent";
 
         return params;
     }
@@ -213,15 +209,8 @@ public class CGPSolver {
      * Sets the whether shortcut connections are used. If an invalid
      * value is given a warning is displayed and the value is left	unchanged.
      */
-    public void setShortcutConnections(int shortcutConnections) {
-        if (shortcutConnections == 0 || shortcutConnections == 1) {
-            params.shortcutConnections = shortcutConnections;
-        } else {
-            System.err.printf("\nWarning: shortcut connection '%d' is invalid. " +
-                            "The shortcut connections takes values 0 or 1. " +
-                            "The shortcut connection has been left unchanged as '%d'.\n",
-                    shortcutConnections, params.shortcutConnections);
-        }
+    public void setShortcutConnections(boolean shortcutConnections) {
+        params.shortcutConnections = shortcutConnections;
     }
 
     /**
@@ -247,38 +236,20 @@ public class CGPSolver {
      * sets the fitness function to the fitnessFuction passed. If the fitnessFunction is NULL
      * then the default supervisedLearning fitness function is used.
      */
-    public void setCustomFitnessFunction(CGPFitness fitnessFunction, String fitnessFunctionName) {
-        if (fitnessFunction == null) {
-            params.fitnessFunction = supervisedLearning;
-            params.fitnessFunctionName = "supervisedLearning";
-        } else {
-            params.fitnessFunction = fitnessFunction;
-            params.fitnessFunctionName = fitnessFunctionName;
-        }
+    public void setCustomFitnessFunction(CGPFitness fitnessFunction) {
+        params.fitnessFunction = fitnessFunction == null ? supervisedLearning : fitnessFunction;
     }
 
     /**
      * sets the selection scheme used to select the parents from the candidate chromosomes.
      * If the selectionScheme is NULL then the default selectFittest selection scheme is used.
      */
-    public void setCustomSelectionScheme(CGPSelectionStrategy selectionScheme, String selectionSchemeName) {
-        if (selectionScheme == null) {
-            params.selectionScheme = selectFittest;
-            params.selectionSchemeName = "selectFittest";
-        } else {
-            params.selectionScheme = selectionScheme;
-            params.selectionSchemeName = selectionSchemeName;
-        }
+    public void setCustomSelectionScheme(CGPSelectionStrategy selectionScheme) {
+        params.selectionScheme = selectionScheme == null ? selectFittest : selectionScheme;
     }
 
-    public void setCustomReproductionScheme(CGPReproductionStrategy reproductionScheme, String reproductionSchemeName) {
-        if (reproductionScheme == null) {
-            params.reproductionScheme = mutateRandomParent;
-            params.reproductionSchemeName = "mutateRandomParent";
-        } else {
-            params.reproductionScheme = reproductionScheme;
-            params.reproductionSchemeName = reproductionSchemeName;
-        }
+    public void setCustomReproductionScheme(CGPReproductionStrategy reproductionScheme) {
+        params.reproductionScheme = reproductionScheme == null ? mutateRandomParent : reproductionScheme;
     }
 
     /**
@@ -294,30 +265,25 @@ public class CGPSolver {
     public void setMutationType(String mutationType) {
         switch (mutationType) {
             case "probabilistic":
-                params.mutationType = probabilisticMutation;
-                params.mutationTypeName = "probabilistic";
+                params.mutationType = probabilistic;
                 break;
             case "point":
-                params.mutationType = pointMutation;
-                params.mutationTypeName = "point";
+                params.mutationType = point;
                 break;
             case "pointANN":
-                params.mutationType = pointMutationANN;
-                params.mutationTypeName = "pointANN";
+                params.mutationType = pointANN;
                 break;
-            case "onlyActive":
-                params.mutationType = probabilisticMutationOnlyActive;
-                params.mutationTypeName = "onlyActive";
+            case "probabilisticOnlyActive":
+                params.mutationType = probabilisticOnlyActive;
                 break;
             case "single":
-                params.mutationType = singleMutation;
-                params.mutationTypeName = "single";
+                params.mutationType = single;
                 break;
             default:
                 System.err.printf("\nWarning: mutation type '%s' is invalid. " +
                                 "The mutation type must be 'probabilistic' or 'point'. " +
                                 "The mutation type has been left unchanged as '%s'.\n",
-                        mutationType, params.mutationTypeName);
+                        mutationType, params.mutationType);
         }
     }
 
@@ -390,15 +356,22 @@ public class CGPSolver {
         this.data = Optional.of(data);
     }
 
-    public void evolve(int iteration) {
-        globalBest = Optional.of(runCGP(params, data.orElse(null), iteration));
+    public void evolve(int iteration, CGPChromosome... chromosomes) {
+        globalBest = Optional.of(runCGP(params, data.orElse(null), iteration, chromosomes));
     }
 
-    public void repeatEvolve(int numGens, int numRuns) {
-        results = Optional.of(repeatCGP(params, data.orElse(null), numGens, numRuns));
+    public void repeatEvolve(int numGens, int numRuns, CGPChromosome... chromosomes) {
+        results = Optional.of(repeatCGP(params, data.orElse(null), numGens, numRuns, chromosomes));
         results.ifPresent(o -> globalBest = Optional.of(o.getBestChromosome()));
     }
 
+    /**
+     * if node needs for continues training, then should not
+     * remove inactive nodes
+     *
+     * @param concise if true, will remove inactive nodes
+     * @return the best gene
+     */
     public CGPChromosome getBestGene(boolean concise) {
         if (concise)
             globalBest.ifPresent(CGPCore::removeInactiveNodes);
@@ -410,7 +383,7 @@ public class CGPSolver {
     }
 
     public CGPChromosome getChromosome(int index) {
-        return results.map(results1 -> results1.bestCGPChromosomes.get(index)).orElse(null);
+        return results.map(o -> o.bestCGPChromosomes.get(index)).orElse(null);
     }
 
     /**

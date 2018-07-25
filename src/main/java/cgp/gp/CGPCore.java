@@ -1,17 +1,21 @@
 package cgp.gp;
 
-import cgp.interfaces.*;
+import cgp.interfaces.CGPFitness;
+import cgp.interfaces.CGPMutationStrategy;
+import cgp.interfaces.CGPReproductionStrategy;
+import cgp.interfaces.CGPSelectionStrategy;
 import cgp.program.DataSet;
 import cgp.program.Node;
 import cgp.program.Results;
 import cgp.solver.CartesianGP;
 import genetics.utils.RandEngine;
 import genetics.utils.SimpleRandEngine;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
-import static java.lang.Math.*;
+import static java.lang.Math.round;
 
 public class CGPCore {
     private final static RandEngine randEngine = new SimpleRandEngine();
@@ -204,7 +208,11 @@ public class CGPCore {
     /**
      * repetitively applies runCGP to obtain average behaviour
      */
-    public static Results repeatCGP(CartesianGP params, DataSet data, int numGens, int numRuns) {
+    public static Results repeatCGP(CartesianGP params,
+                                    DataSet data,
+                                    int numGens,
+                                    int numRuns,
+                                    CGPChromosome... chromosomes) {
         int updateFrequency = params.updateFrequency;
 
         /* set the update frequency so as to to so generational results */
@@ -216,7 +224,7 @@ public class CGPCore {
 
         /* for each run */
         for (int i = 0; i < numRuns; i++) {
-            results.bestCGPChromosomes.add(runCGP(params, data, numGens));
+            results.bestCGPChromosomes.add(runCGP(params, data, numGens, chromosomes));
             System.out.printf("%d\t%f\t%d\t\t%d\n", i,
                     results.bestCGPChromosomes.get(i).fitness,
                     results.bestCGPChromosomes.get(i).generation,
@@ -234,11 +242,8 @@ public class CGPCore {
         return results;
     }
 
-    public static CGPChromosome runCGP(CartesianGP params, DataSet data, int numGens) {
+    public static CGPChromosome runCGP(CartesianGP params, DataSet data, int numGens, CGPChromosome... chromosomes) {
         int gen;
-
-        /* bestChromosome found using runCGP */
-        CGPChromosome bestChromosome;
 
         /* error checking */
         if (numGens < 0) {
@@ -256,19 +261,13 @@ public class CGPCore {
         /* initialise parent chromosomes */
         CGPChromosome[] parents = new CGPChromosome[params.mu];
 
-        for (int i = 0; i < params.mu; i++) {
-            parents[i] = initialiseChromosome(params);
-        }
-
         /* initialise children chromosomes */
         CGPChromosome[] children = new CGPChromosome[params.lambda];
 
-        for (int i = 0; i < params.lambda; i++) {
-            children[i] = initialiseChromosome(params);
-        }
+        initializePopulation(params, parents, children, params.mu, params.lambda, chromosomes);
 
         /* initialize best chromosome */
-        bestChromosome = initialiseChromosome(params);
+        CGPChromosome bestChromosome = initialiseChromosome(params);
 
         /* determine the size of the Candidate Chromos based on the evolutionary Strategy */
         int numCandidate;
@@ -280,7 +279,6 @@ public class CGPCore {
             throw new IllegalArgumentException(String.format("The evolutionary strategy '%c' is not known. ", params.evolutionaryStrategy));
         }
 
-        /* initialise the candidateChromos */
         CGPChromosome[] candidates = new CGPChromosome[numCandidate];
 
         for (int i = 0; i < numCandidate; i++) {
@@ -306,10 +304,9 @@ public class CGPCore {
                 setChromosomeFitness(params, children[i], data);
             }
 
-            /* get best chromosome */
             getBestChromosome(parents, children, params.mu, params.lambda, bestChromosome);
 
-            /* check termination conditions */
+            // check termination conditions
             if (bestChromosome.fitness <= params.targetFitness) {
                 if (params.updateFrequency != 0) {
                     System.out.printf("%d\t%f - Solution Found\n", gen, bestChromosome.fitness);
@@ -317,7 +314,7 @@ public class CGPCore {
                 break;
             }
 
-            /* display progress to the user at the update frequency specified */
+            // display progress to the user at the update frequency specified
             if (params.updateFrequency != 0 && (gen % params.updateFrequency == 0 || gen >= numGens - 1)) {
                 System.out.printf("%d\t%f\n", gen, bestChromosome.fitness);
             }
@@ -355,7 +352,7 @@ public class CGPCore {
 
         /* deal with formatting for displaying progress */
         if (params.updateFrequency != 0) {
-            System.out.print("\n");
+            System.out.println();
         }
 
         /* copy the best best chromosome */
@@ -365,12 +362,38 @@ public class CGPCore {
         return bestChromosome;
     }
 
+    private static void initializePopulation(CartesianGP params,
+                                             CGPChromosome[] parents,
+                                             CGPChromosome[] children,
+                                             int numParents,
+                                             int numChildren,
+                                             CGPChromosome... chromosomes) {
+        MutableList<CGPChromosome> population = Lists.mutable.of(chromosomes);
+
+        final int populationSize = population.size();
+        for (int i = 0; i < numParents + numChildren - populationSize; i++) {
+            population.add(initialiseChromosome(params));
+        }
+
+        for (int i = 0; i < numParents; i++) {
+            parents[i] = population.get(i);
+        }
+
+        for (int i = 0; i < numChildren; i++) {
+            children[i] = population.get(i + numParents);
+        }
+    }
+
     /**
      * returns a pointer to the fittest chromosome in the two arrays of chromosomes
      * <p>
      * loops through parents and then the children in order for the children to always be selected over the parents
      */
-    private static void getBestChromosome(CGPChromosome[] parents, CGPChromosome[] children, int numParents, int numChildren, CGPChromosome best) {
+    private static void getBestChromosome(CGPChromosome[] parents,
+                                          CGPChromosome[] children,
+                                          int numParents,
+                                          int numChildren,
+                                          CGPChromosome best) {
         CGPChromosome bestChromoSoFar;
         bestChromoSoFar = parents[0];
         for (int i = 1; i < numParents; i++) {
@@ -440,7 +463,7 @@ public class CGPCore {
     private static int getRandomFunction(int numFunctions) {
         /* check that funcSet contains functions */
         if (numFunctions < 1) {
-            throw new IllegalArgumentException("Error: cannot assign the function gene a value as the Fuction Set is empty.");
+            throw new IllegalArgumentException("Cannot assign the function gene a value as the Function Set is empty.");
         }
         return randEngine.nextInt(numFunctions);
     }
@@ -448,26 +471,22 @@ public class CGPCore {
     /**
      * returns a random input for the given node
      */
-    private static int getRandomNodeInput(int numChromoInputs, int numNodes, int nodePosition, double recurrentConnectionProbability) {
+    private static int getRandomNodeInput(int numInputs,
+                                          int numNodes,
+                                          int nodePosition,
+                                          double recurrentConnectionProbability) {
         return randEngine.uniform() < recurrentConnectionProbability ?
                 randEngine.nextInt(numNodes - nodePosition) + nodePosition + 1 : /* pick any ahead nodes or the node itself */
-                randEngine.nextInt(numChromoInputs + nodePosition);  /* pick any previous node including inputs */
+                randEngine.nextInt(numInputs + nodePosition);  /* pick any previous node including inputs */
     }
 
     /**
      * returns a random chromosome outputNodes
      */
-    private static int getRandomChromosomeOutput(int numInputs, int numNodes, int shortcutConnections) {
-        return shortcutConnections == 1 ?
+    private static int getRandomChromosomeOutput(int numInputs, int numNodes, boolean shortcutConnections) {
+        return shortcutConnections ?
                 randEngine.nextInt(numInputs + numNodes) :
                 randEngine.nextInt(numNodes) + numInputs;
-    }
-
-    /**
-     * Returns the sum of the weighted inputs.
-     */
-    private static double sumWeightedInputs(int numInputs, double[] inputs, double[] connectionWeights) {
-        return IntStream.range(0, numInputs).mapToDouble(i -> (inputs[i] * connectionWeights[i])).sum();
     }
 
     /**
@@ -501,14 +520,14 @@ public class CGPCore {
         System.out.printf("Outputs:\t\t\t\t%d\n", params.numOutputs);
         System.out.printf("Node Arity:\t\t\t\t%d\n", params.arity);
         System.out.printf("Connection weights range:\t\t+/- %f\n", params.connectionWeightRange);
-        System.out.printf("Mutation Type:\t\t\t\t%s\n", params.mutationTypeName);
+        System.out.printf("Mutation Type:\t\t\t\t%s\n", params.mutationType);
         System.out.printf("Mutation rate:\t\t\t\t%f\n", params.mutationRate);
         System.out.printf("Recurrent Connection Probability:\t%f\n", params.recurrentConnectionProbability);
-        System.out.printf("Shortcut Connections:\t\t\t%d\n", params.shortcutConnections);
-        System.out.printf("Fitness Function:\t\t\t%s\n", params.fitnessFunctionName);
+        System.out.printf("Shortcut Connections:\t\t\t%s\n", params.shortcutConnections);
+        System.out.printf("Fitness Function:\t\t\t%s\n", params.fitnessFunction);
         System.out.printf("Target Fitness:\t\t\t\t%f\n", params.targetFitness);
-        System.out.printf("Selection scheme:\t\t\t%s\n", params.selectionSchemeName);
-        System.out.printf("Reproduction scheme:\t\t\t%s\n", params.reproductionSchemeName);
+        System.out.printf("Selection scheme:\t\t\t%s\n", params.selectionScheme);
+        System.out.printf("Reproduction scheme:\t\t\t%s\n", params.reproductionScheme);
         System.out.printf("Update frequency:\t\t\t%d\n", params.updateFrequency);
         printFunctionSet(params);
         System.out.print("-----------------------------------------------------------\n\n");
@@ -517,39 +536,39 @@ public class CGPCore {
     /**
      * Prints the given chromosome to the screen
      */
-    public static void printChromosome(CGPChromosome chromo, boolean weights) {
+    public static void printChromosome(CGPChromosome chromosome, boolean weights) {
         /* error checking */
-        if (chromo == null) {
+        if (chromosome == null) {
             throw new IllegalArgumentException("Error: chromosome has not been initialised and cannot be printed.");
         }
 
         /* set the active nodes in the given chromosome */
-        setChromosomeActiveNodes(chromo);
+        setChromosomeActiveNodes(chromosome);
 
-        /* for all the chromo inputs*/
-        for (int i = 0; i < chromo.numInputs; i++) {
+        /* for all the chromosome inputs*/
+        for (int i = 0; i < chromosome.numInputs; i++) {
             System.out.printf("(%d):\tinput\n", i);
         }
 
         /* for all the hidden nodes */
-        for (int i = 0; i < chromo.numNodes; i++) {
+        for (int i = 0; i < chromosome.numNodes; i++) {
 
             /* print the node function */
-            System.out.printf("(%d):\t%s\t", chromo.numInputs + i, chromo.funcSet.get(chromo.nodes[i].function).getName());
+            System.out.printf("(%d):\t%s\t", chromosome.numInputs + i, chromosome.funcSet.get(chromosome.nodes[i].function).getName());
 
             /* for the arity of the node */
-            for (int j = 0; j < chromo.getChromosomeNodeArity(i); j++) {
+            for (int j = 0; j < chromosome.getChromosomeNodeArity(i); j++) {
 
                 /* print the node input information */
                 if (weights) {
-                    System.out.printf("%d,%+.1f\t", chromo.nodes[i].inputs[j], chromo.nodes[i].weights[j]);
+                    System.out.printf("%d,%+.1f\t", chromosome.nodes[i].inputs[j], chromosome.nodes[i].weights[j]);
                 } else {
-                    System.out.printf("%d ", chromo.nodes[i].inputs[j]);
+                    System.out.printf("%d ", chromosome.nodes[i].inputs[j]);
                 }
             }
 
             /* Highlight active nodes */
-            if (chromo.nodes[i].active) {
+            if (chromosome.nodes[i].active) {
                 System.out.print("*");
             }
 
@@ -558,10 +577,10 @@ public class CGPCore {
 
         /* for all of the outputs */
         System.out.print("outputs: ");
-        for (int i = 0; i < chromo.numOutputs; i++) {
+        for (int i = 0; i < chromosome.numOutputs; i++) {
 
             /* print the outputNodes node locations */
-            System.out.printf("%d ", chromo.outputNodes[i]);
+            System.out.printf("%d ", chromosome.outputNodes[i]);
         }
 
         System.out.print("\n\n");
@@ -616,7 +635,7 @@ public class CGPCore {
     }
 
     public enum mutationStrategy implements CGPMutationStrategy {
-        pointMutation {
+        point {
             @Override
             public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 int nodeIndex;
@@ -658,7 +677,7 @@ public class CGPCore {
                 }
             }
         },
-        pointMutationANN {
+        pointANN {
             @Override
             public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 int nodeIndex;
@@ -716,7 +735,7 @@ public class CGPCore {
                 }
             }
         },
-        singleMutation {
+        single {
             @Override
             public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 boolean mutatedActive = false;
@@ -770,7 +789,7 @@ public class CGPCore {
                 }
             }
         },
-        probabilisticMutation {
+        probabilistic {
             @Override
             public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 /* for every nodes in the chromosome */
@@ -806,7 +825,7 @@ public class CGPCore {
                 }
             }
         },
-        probabilisticMutationOnlyActive {
+        probabilisticOnlyActive {
             @Override
             public void mutate(CartesianGP params, CGPChromosome chromosome) {
                 /* for every active node in the chromosome */
@@ -874,566 +893,6 @@ public class CGPCore {
                 for (int i = 0; i < numParents; i++) {
                     parents[i].copyChromosome(candidateChromos[i]);
                 }
-            }
-        }
-    }
-
-    public enum operations implements Function {
-        _add {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int i;
-                double sum = inputs[0];
-
-                for (i = 1; i < numInputs; i++) {
-                    sum += inputs[i];
-                }
-
-                return sum;
-            }
-
-            @Override
-            public String getName() {
-                return "add";
-            }
-        },
-        _sub {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int i;
-                double sum = inputs[0];
-
-                for (i = 1; i < numInputs; i++) {
-                    sum -= inputs[i];
-                }
-
-                return sum;
-            }
-
-            @Override
-            public String getName() {
-                return "sub";
-            }
-        },
-        _mul {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int i;
-                double multiplication = inputs[0];
-
-                for (i = 1; i < numInputs; i++) {
-                    multiplication *= inputs[i];
-                }
-
-                return multiplication;
-            }
-
-            @Override
-            public String getName() {
-                return "mul";
-            }
-        },
-        _divide {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int i;
-                double divide = inputs[0];
-
-                for (i = 1; i < numInputs; i++) {
-                    divide /= inputs[i];
-                }
-
-                return divide;
-            }
-
-            @Override
-            public String getName() {
-                return "div";
-            }
-        },
-        _absolute {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return abs(inputs[0]);
-            }
-
-            @Override
-            public String getName() {
-                return "abs";
-            }
-        },
-        _squareRoot {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return sqrt(inputs[0]);
-            }
-
-            @Override
-            public String getName() {
-                return "sqrt";
-            }
-        },
-        _square {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return pow(inputs[0], 2);
-            }
-
-            @Override
-            public String getName() {
-                return "sq";
-            }
-        },
-        _cube {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return pow(inputs[0], 3);
-            }
-
-            @Override
-            public String getName() {
-                return "cube";
-            }
-        },
-        _power {
-            @Override
-            public int arity() {
-                return 2;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return pow(inputs[0], inputs[1]);
-            }
-
-            @Override
-            public String getName() {
-                return "pow";
-            }
-        },
-        _exponential {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return exp(inputs[0]);
-            }
-
-            @Override
-            public String getName() {
-                return "exp";
-            }
-        },
-        _sine {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return sin(inputs[0]);
-            }
-
-            @Override
-            public String getName() {
-                return "sin";
-            }
-        },
-        _cosine {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return Math.cos(inputs[0]);
-            }
-
-            @Override
-            public String getName() {
-                return "cos";
-            }
-        },
-        _tangent {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return Math.tan(inputs[0]);
-            }
-
-            @Override
-            public String getName() {
-                return "tan";
-            }
-        },
-        _One {
-            @Override
-            public int arity() {
-                return 0;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return 1;
-            }
-
-            @Override
-            public String getName() {
-                return "1";
-            }
-        },
-        _Zero {
-            @Override
-            public int arity() {
-                return 0;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return 0;
-            }
-
-            @Override
-            public String getName() {
-                return "0";
-            }
-        },
-        _PI {
-            @Override
-            public int arity() {
-                return 0;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return Math.PI;
-            }
-
-            @Override
-            public String getName() {
-                return "pi";
-            }
-        },
-        _randFloat {
-            @Override
-            public int arity() {
-                return 0;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return randEngine.uniform();
-            }
-
-            @Override
-            public String getName() {
-                return "rand";
-            }
-        },
-        _and {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                for (int i = 0; i < numInputs; i++) {
-                    if (inputs[i] == 0) {
-                        return 0;
-                    }
-                }
-                return 1;
-            }
-
-            @Override
-            public String getName() {
-                return "and";
-            }
-        },
-        _nand {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                for (int i = 0; i < numInputs; i++) {
-                    if (inputs[i] == 0) {
-                        return 1;
-                    }
-                }
-                return 0;
-            }
-
-            @Override
-            public String getName() {
-                return "nand";
-            }
-        },
-        _or {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int i;
-
-                for (i = 0; i < numInputs; i++) {
-
-                    if (inputs[i] == 1) {
-                        return 1;
-                    }
-                }
-
-                return 0;
-            }
-
-            @Override
-            public String getName() {
-                return "or";
-            }
-        },
-        _nor {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                for (int i = 0; i < numInputs; i++) {
-                    if (inputs[i] == 1) {
-                        return 0;
-                    }
-                }
-                return 1;
-            }
-
-            @Override
-            public String getName() {
-                return "nor";
-            }
-        },
-        _xor {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int numOnes = 0;
-                for (int i = 0; i < numInputs; i++) {
-                    if (inputs[i] == 1) {
-                        numOnes++;
-                    }
-                    if (numOnes > 1) {
-                        break;
-                    }
-                }
-                return numOnes == 1 ? 1 : 0;
-            }
-
-            @Override
-            public String getName() {
-                return "xor";
-            }
-        },
-        _xnor {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int numOnes = 0;
-                for (int i = 0; i < numInputs; i++) {
-                    if (inputs[i] == 1) {
-                        numOnes++;
-                    }
-                    if (numOnes > 1) {
-                        break;
-                    }
-                }
-                return numOnes == 1 ? 0 : 1;
-            }
-
-            @Override
-            public String getName() {
-                return "xnor";
-            }
-        },
-        _not {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return (double) (inputs[0] == 0 ? 1 : 0);
-            }
-
-            @Override
-            public String getName() {
-                return "not";
-            }
-        },
-        _wire {
-            @Override
-            public int arity() {
-                return 1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                return inputs[0];
-            }
-
-            @Override
-            public String getName() {
-                return "wire";
-            }
-        },
-        _sigmoid {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
-                return 1 / (1 + exp(-weightedInputSum));
-            }
-
-            @Override
-            public String getName() {
-                return "sig";
-            }
-        },
-        _gaussian {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                int centre = 0;
-                int width = 1;
-                double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
-                return exp(-(Math.pow(weightedInputSum - centre, 2)) / (2 * Math.pow(width, 2)));
-            }
-
-            @Override
-            public String getName() {
-                return "gauss";
-            }
-        },
-        _step {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
-                return (double) (weightedInputSum < 0 ? 0 : 1);
-            }
-
-            @Override
-            public String getName() {
-                return "step";
-            }
-        },
-        _softsign {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
-                return weightedInputSum / (1 + Math.abs(weightedInputSum));
-            }
-
-            @Override
-            public String getName() {
-                return "soft";
-            }
-        },
-        _hyperbolicTangent {
-            @Override
-            public int arity() {
-                return -1;
-            }
-
-            @Override
-            public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-                double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
-                return Math.tanh(weightedInputSum);
-            }
-
-            @Override
-            public String getName() {
-                return "tanh";
             }
         }
     }

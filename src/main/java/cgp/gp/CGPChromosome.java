@@ -121,22 +121,22 @@ public class CGPChromosome extends Chromosome {
         return sb.toString();
     }
 
-    public void copyChromosome(CGPChromosome chromoSrc) {
+    void copyChromosome(CGPChromosome chromoSrc) {
         /* error checking  */
         if (this.numInputs != chromoSrc.numInputs) {
-            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome inputs do not match.");
+            throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome inputs do not match.");
         }
 
         if (this.numNodes != chromoSrc.numNodes) {
-            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome nodes do not match.");
+            throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome nodes do not match.");
         }
 
         if (this.numOutputs != chromoSrc.numOutputs) {
-            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome outputs do not match.");
+            throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome outputs do not match.");
         }
 
         if (this.arity != chromoSrc.arity) {
-            throw new IllegalArgumentException("Error: cannot copy a chromosome to a chromosome of different dimensions. The arity of the chromosome nodes do not match.");
+            throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The arity of the chromosome nodes do not match.");
         }
 
         /* copy nodes and which are active */
@@ -165,7 +165,7 @@ public class CGPChromosome extends Chromosome {
     /**
      * reset the outputNodes values of all chromosome nodes to zero
      */
-    public void resetChromosome() {
+    void resetChromosome() {
         IntStream.range(0, this.numNodes).forEach(i -> this.nodes[i].output = 0);
     }
 
@@ -211,8 +211,7 @@ public class CGPChromosome extends Chromosome {
     /**
      * Gets the chromosome node arity
      */
-    public int getChromosomeNodeArity(int index) {
-
+    int getChromosomeNodeArity(int index) {
         int chromoArity = this.arity;
         int maxArity = this.funcSet.get(this.nodes[index].function).arity();
 

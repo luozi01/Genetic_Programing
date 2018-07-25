@@ -3,7 +3,7 @@ package cgp.solver;
 import cgp.interfaces.*;
 import org.eclipse.collections.api.list.MutableList;
 
-import static cgp.gp.CGPCore.operations.*;
+import static cgp.program.Operators.*;
 
 public class CartesianGP {
     public int mu;
@@ -18,15 +18,11 @@ public class CartesianGP {
     public int arity;
     public double targetFitness;
     public int updateFrequency;
-    public int shortcutConnections;
+    public boolean shortcutConnections;
     public CGPMutationStrategy mutationType;
-    public String mutationTypeName;
     public CGPFitness fitnessFunction;
-    public String fitnessFunctionName;
     public CGPSelectionStrategy selectionScheme;
-    public String selectionSchemeName;
     public CGPReproductionStrategy reproductionScheme;
-    public String reproductionSchemeName;
     public MutableList<Function> functions;
 
     /**
