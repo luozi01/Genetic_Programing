@@ -5,7 +5,7 @@ import cgp.gp.CGPCore;
 import cgp.interfaces.CGPFitness;
 import cgp.interfaces.CGPReproductionStrategy;
 import cgp.interfaces.CGPSelectionStrategy;
-import cgp.interfaces.Function;
+import cgp.interfaces.CGPFunction;
 import cgp.program.DataSet;
 import cgp.program.Results;
 import org.eclipse.collections.impl.factory.Lists;
@@ -14,8 +14,8 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.Scanner;
 
+import static cgp.gp.CGPCore.MutationStrategy.*;
 import static cgp.gp.CGPCore.fitnessCalc.supervisedLearning;
-import static cgp.gp.CGPCore.mutationStrategy.*;
 import static cgp.gp.CGPCore.*;
 import static cgp.gp.CGPCore.reproduction.mutateRandomParent;
 import static cgp.gp.CGPCore.selection.selectFittest;
@@ -403,7 +403,7 @@ public class CGPSolver {
         }
     }
 
-    public void addSelfDefineFunction(Function function) {
+    public void addSelfDefineFunction(CGPFunction function) {
         params.addCustomNodeFunction(function);
     }
 

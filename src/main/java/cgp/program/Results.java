@@ -9,10 +9,14 @@ import java.util.Comparator;
 import java.util.stream.IntStream;
 
 public class Results {
-    public MutableList<CGPChromosome> bestCGPChromosomes;
+    public final MutableList<CGPChromosome> bestCGPChromosomes;
 
-    public Results(int numRuns) {
-        bestCGPChromosomes = Lists.mutable.withInitialCapacity(numRuns);
+    public Results() {
+        bestCGPChromosomes = Lists.mutable.empty();
+    }
+
+    public void add(CGPChromosome cgpChromosome) {
+        bestCGPChromosomes.add(cgpChromosome);
     }
 
     /**

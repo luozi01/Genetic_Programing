@@ -33,7 +33,7 @@ public class Crossover implements CrossoverPolicy {
     /**
      * Method that implements the subtree crossover described from Section 2.4 of "A Field Guide to Genetic Programming"
      *
-     * @param chromosome1 One tree to be crossover with
+     * @param chromosome1 one tree to be crossover with
      * @param chromosome2 Another tree to be crossover with
      */
     private Pair<Chromosome, Chromosome> apply(TGPChromosome chromosome1, TGPChromosome chromosome2) {

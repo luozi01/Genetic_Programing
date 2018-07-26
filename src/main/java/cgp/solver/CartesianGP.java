@@ -23,13 +23,13 @@ public class CartesianGP {
     public CGPFitness fitnessFunction;
     public CGPSelectionStrategy selectionScheme;
     public CGPReproductionStrategy reproductionScheme;
-    public MutableList<Function> functions;
+    public MutableList<CGPFunction> functions;
 
     /**
      * Adds given node function to given function set with given name.
      * Disallows exceeding the function set size.
      */
-    void addCustomNodeFunction(Function function) {
+    void addCustomNodeFunction(CGPFunction function) {
         this.functions.add(function);
     }
 
@@ -43,101 +43,101 @@ public class CartesianGP {
 
         switch (functionName) {
             case "add":
-                addCustomNodeFunction(_add);
+                addCustomNodeFunction(add);
                 break;
             case "sub":
-                addCustomNodeFunction(_sub);
+                addCustomNodeFunction(sub);
                 break;
             case "mul":
-                addCustomNodeFunction(_mul);
+                addCustomNodeFunction(mul);
                 break;
             case "div":
-                addCustomNodeFunction(_divide);
+                addCustomNodeFunction(div);
                 break;
             case "abs":
-                addCustomNodeFunction(_absolute);
+                addCustomNodeFunction(abs);
                 break;
             case "sqrt":
-                addCustomNodeFunction(_squareRoot);
+                addCustomNodeFunction(sqrt);
                 break;
             case "sq":
-                addCustomNodeFunction(_square);
+                addCustomNodeFunction(sq);
                 break;
             case "cube":
-                addCustomNodeFunction(_cube);
+                addCustomNodeFunction(cube);
                 break;
             case "pow":
-                addCustomNodeFunction(_power);
+                addCustomNodeFunction(pow);
                 break;
             case "exp":
-                addCustomNodeFunction(_exponential);
+                addCustomNodeFunction(exp);
                 break;
             case "sin":
-                addCustomNodeFunction(_sine);
+                addCustomNodeFunction(sin);
                 break;
             case "cos":
-                addCustomNodeFunction(_cosine);
+                addCustomNodeFunction(cos);
                 break;
             case "tan":
-                addCustomNodeFunction(_tangent);
+                addCustomNodeFunction(tan);
                 break;
 
 
             /* Boolean logic gates */
             case "and":
-                addCustomNodeFunction(_and);
+                addCustomNodeFunction(and);
                 break;
             case "nand":
-                addCustomNodeFunction(_nand);
+                addCustomNodeFunction(nand);
                 break;
             case "or":
-                addCustomNodeFunction(_or);
+                addCustomNodeFunction(or);
                 break;
             case "nor":
-                addCustomNodeFunction(_nor);
+                addCustomNodeFunction(nor);
                 break;
             case "xor":
-                addCustomNodeFunction(_xor);
+                addCustomNodeFunction(xor);
                 break;
             case "xnor":
-                addCustomNodeFunction(_xnor);
+                addCustomNodeFunction(xnor);
                 break;
             case "not":
-                addCustomNodeFunction(_not);
+                addCustomNodeFunction(not);
                 break;
 
             /* Neuron functions */
             case "sig":
-                addCustomNodeFunction(_sigmoid);
+                addCustomNodeFunction(sig);
                 break;
             case "gauss":
-                addCustomNodeFunction(_gaussian);
+                addCustomNodeFunction(gauss);
                 break;
             case "step":
-                addCustomNodeFunction(_step);
+                addCustomNodeFunction(step);
                 break;
             case "softsign":
-                addCustomNodeFunction(_softsign);
+                addCustomNodeFunction(soft);
                 break;
             case "tanh":
-                addCustomNodeFunction(_hyperbolicTangent);
+                addCustomNodeFunction(tanh);
                 break;
 
             /* other */
             case "rand":
-                addCustomNodeFunction(_randFloat);
+                addCustomNodeFunction(rand);
                 break;
-            case "1":
-                addCustomNodeFunction(_One);
+            case "one":
+                addCustomNodeFunction(one);
                 break;
-            case "0":
-                addCustomNodeFunction(_Zero);
+            case "zero":
+                addCustomNodeFunction(zero);
                 break;
             case "pi":
-                addCustomNodeFunction(_PI);
+                addCustomNodeFunction(pi);
                 break;
             case "wire":
-                addCustomNodeFunction(_wire);
+                addCustomNodeFunction(wire);
                 break;
             default:
                 System.err.printf("Warning: function '%s' is not known and was not added.\n", functionName);

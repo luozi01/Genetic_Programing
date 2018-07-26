@@ -218,13 +218,13 @@ public class CGPCore {
         /* set the update frequency so as to to so generational results */
         params.updateFrequency = 0;
 
-        Results results = new Results(numRuns);
+        Results results = new Results();
 
         System.out.print("Run\tFitness\t\tGenerations\tActive nodes\n");
 
         /* for each run */
         for (int i = 0; i < numRuns; i++) {
-            results.bestCGPChromosomes.add(runCGP(params, data, numGens, chromosomes));
+            results.add(runCGP(params, data, numGens, chromosomes));
             System.out.printf("%d\t%f\t%d\t\t%d\n", i,
                     results.bestCGPChromosomes.get(i).fitness,
                     results.bestCGPChromosomes.get(i).generation,
@@ -496,7 +496,7 @@ public class CGPCore {
     private static void printFunctionSet(CartesianGP params) {
         System.out.print("Function Set:");
         for (int i = 0; i < params.functions.size(); i++) {
-            System.out.printf(" %s", params.functions.get(i).getName());
+            System.out.printf(" %s", params.functions.get(i));
         }
         System.out.printf(" (%d)\n", params.functions.size());
     }
@@ -554,7 +554,7 @@ public class CGPCore {
         for (int i = 0; i < chromosome.numNodes; i++) {
 
             /* print the node function */
-            System.out.printf("(%d):\t%s\t", chromosome.numInputs + i, chromosome.funcSet.get(chromosome.nodes[i].function).getName());
+            System.out.printf("(%d):\t%s\t", chromosome.numInputs + i, chromosome.funcSet.get(chromosome.nodes[i].function));
 
             /* for the arity of the node */
             for (int j = 0; j < chromosome.getChromosomeNodeArity(i); j++) {
@@ -634,7 +634,7 @@ public class CGPCore {
         setChromosomeActiveNodes(chromosome);
     }
 
-    public enum mutationStrategy implements CGPMutationStrategy {
+    public enum MutationStrategy implements CGPMutationStrategy {
         point {
             @Override
             public void mutate(CartesianGP params, CGPChromosome chromosome) {
@@ -888,10 +888,10 @@ public class CGPCore {
     public enum selection implements CGPSelectionStrategy {
         selectFittest {
             @Override
-            public void select(CartesianGP params, CGPChromosome[] parents, CGPChromosome[] candidateChromos, int numParents, int numCandidateChromos) {
-                sortChromosomeArray(candidateChromos, numCandidateChromos);
+            public void select(CartesianGP params, CGPChromosome[] parents, CGPChromosome[] candidate, int numParents, int numCandidate) {
+                sortChromosomeArray(candidate, numCandidate);
                 for (int i = 0; i < numParents; i++) {
-                    parents[i].copyChromosome(candidateChromos[i]);
+                    parents[i].copyChromosome(candidate[i]);
                 }
             }
         }

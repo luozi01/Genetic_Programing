@@ -1,13 +1,13 @@
 package cgp.program;
 
-import cgp.interfaces.Function;
+import cgp.interfaces.CGPFunction;
 
 import java.util.stream.IntStream;
 
 import static java.lang.Math.*;
 
-public enum Operators implements Function {
-    _add {
+public enum Operators implements CGPFunction {
+    add {
         @Override
         public int arity() {
             return -1;
@@ -24,13 +24,8 @@ public enum Operators implements Function {
 
             return sum;
         }
-
-        @Override
-        public String getName() {
-            return "add";
-        }
     },
-    _sub {
+    sub {
         @Override
         public int arity() {
             return -1;
@@ -47,13 +42,8 @@ public enum Operators implements Function {
 
             return sum;
         }
-
-        @Override
-        public String getName() {
-            return "sub";
-        }
     },
-    _mul {
+    mul {
         @Override
         public int arity() {
             return -1;
@@ -70,13 +60,8 @@ public enum Operators implements Function {
 
             return multiplication;
         }
-
-        @Override
-        public String getName() {
-            return "mul";
-        }
     },
-    _divide {
+    div {
         @Override
         public int arity() {
             return 1;
@@ -93,13 +78,8 @@ public enum Operators implements Function {
 
             return divide;
         }
-
-        @Override
-        public String getName() {
-            return "div";
-        }
     },
-    _absolute {
+    abs {
         @Override
         public int arity() {
             return 1;
@@ -109,13 +89,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return abs(inputs[0]);
         }
-
-        @Override
-        public String getName() {
-            return "abs";
-        }
     },
-    _squareRoot {
+    sqrt {
         @Override
         public int arity() {
             return 1;
@@ -125,13 +100,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return sqrt(inputs[0]);
         }
-
-        @Override
-        public String getName() {
-            return "sqrt";
-        }
     },
-    _square {
+    sq {
         @Override
         public int arity() {
             return 1;
@@ -141,13 +111,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return pow(inputs[0], 2);
         }
-
-        @Override
-        public String getName() {
-            return "sq";
-        }
     },
-    _cube {
+    cube {
         @Override
         public int arity() {
             return 1;
@@ -157,13 +122,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return pow(inputs[0], 3);
         }
-
-        @Override
-        public String getName() {
-            return "cube";
-        }
     },
-    _power {
+    pow {
         @Override
         public int arity() {
             return 2;
@@ -173,13 +133,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return pow(inputs[0], inputs[1]);
         }
-
-        @Override
-        public String getName() {
-            return "pow";
-        }
     },
-    _exponential {
+    exp {
         @Override
         public int arity() {
             return 1;
@@ -189,13 +144,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return exp(inputs[0]);
         }
-
-        @Override
-        public String getName() {
-            return "exp";
-        }
     },
-    _sine {
+    sin {
         @Override
         public int arity() {
             return 1;
@@ -205,13 +155,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return sin(inputs[0]);
         }
-
-        @Override
-        public String getName() {
-            return "sin";
-        }
     },
-    _cosine {
+    cos {
         @Override
         public int arity() {
             return 1;
@@ -221,13 +166,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return cos(inputs[0]);
         }
-
-        @Override
-        public String getName() {
-            return "cos";
-        }
     },
-    _tangent {
+    tan {
         @Override
         public int arity() {
             return 1;
@@ -237,13 +177,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return tan(inputs[0]);
         }
-
-        @Override
-        public String getName() {
-            return "tan";
-        }
     },
-    _One {
+    one {
         @Override
         public int arity() {
             return 0;
@@ -253,13 +188,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return 1;
         }
-
-        @Override
-        public String getName() {
-            return "1";
-        }
     },
-    _Zero {
+    zero {
         @Override
         public int arity() {
             return 0;
@@ -269,13 +199,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return 0;
         }
-
-        @Override
-        public String getName() {
-            return "0";
-        }
     },
-    _PI {
+    pi {
         @Override
         public int arity() {
             return 0;
@@ -285,13 +210,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return PI;
         }
-
-        @Override
-        public String getName() {
-            return "pi";
-        }
     },
-    _randFloat {
+    rand {
         @Override
         public int arity() {
             return 0;
@@ -301,13 +221,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return random();
         }
-
-        @Override
-        public String getName() {
-            return "rand";
-        }
     },
-    _and {
+    and {
         @Override
         public int arity() {
             return -1;
@@ -322,13 +237,8 @@ public enum Operators implements Function {
             }
             return 1;
         }
-
-        @Override
-        public String getName() {
-            return "and";
-        }
     },
-    _nand {
+    nand {
         @Override
         public int arity() {
             return -1;
@@ -343,13 +253,8 @@ public enum Operators implements Function {
             }
             return 0;
         }
-
-        @Override
-        public String getName() {
-            return "nand";
-        }
     },
-    _or {
+    or {
         @Override
         public int arity() {
             return -1;
@@ -368,13 +273,8 @@ public enum Operators implements Function {
 
             return 0;
         }
-
-        @Override
-        public String getName() {
-            return "or";
-        }
     },
-    _nor {
+    nor {
         @Override
         public int arity() {
             return -1;
@@ -389,13 +289,8 @@ public enum Operators implements Function {
             }
             return 1;
         }
-
-        @Override
-        public String getName() {
-            return "nor";
-        }
     },
-    _xor {
+    xor {
         @Override
         public int arity() {
             return -1;
@@ -414,13 +309,8 @@ public enum Operators implements Function {
             }
             return numOnes == 1 ? 1 : 0;
         }
-
-        @Override
-        public String getName() {
-            return "xor";
-        }
     },
-    _xnor {
+    xnor {
         @Override
         public int arity() {
             return -1;
@@ -439,13 +329,8 @@ public enum Operators implements Function {
             }
             return numOnes == 1 ? 0 : 1;
         }
-
-        @Override
-        public String getName() {
-            return "xnor";
-        }
     },
-    _not {
+    not {
         @Override
         public int arity() {
             return 1;
@@ -455,13 +340,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return (double) (inputs[0] == 0 ? 1 : 0);
         }
-
-        @Override
-        public String getName() {
-            return "not";
-        }
     },
-    _wire {
+    wire {
         @Override
         public int arity() {
             return 1;
@@ -471,13 +351,8 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             return inputs[0];
         }
-
-        @Override
-        public String getName() {
-            return "wire";
-        }
     },
-    _sigmoid {
+    sig {
         @Override
         public int arity() {
             return -1;
@@ -488,13 +363,8 @@ public enum Operators implements Function {
             double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
             return 1 / (1 + exp(-weightedInputSum));
         }
-
-        @Override
-        public String getName() {
-            return "sig";
-        }
     },
-    _gaussian {
+    gauss {
         @Override
         public int arity() {
             return -1;
@@ -507,13 +377,8 @@ public enum Operators implements Function {
             double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
             return exp(-(pow(weightedInputSum - centre, 2)) / (2 * pow(width, 2)));
         }
-
-        @Override
-        public String getName() {
-            return "gauss";
-        }
     },
-    _step {
+    step {
         @Override
         public int arity() {
             return -1;
@@ -524,13 +389,8 @@ public enum Operators implements Function {
             double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
             return (double) (weightedInputSum < 0 ? 0 : 1);
         }
-
-        @Override
-        public String getName() {
-            return "step";
-        }
     },
-    _softsign {
+    soft {
         @Override
         public int arity() {
             return -1;
@@ -541,13 +401,8 @@ public enum Operators implements Function {
             double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
             return weightedInputSum / (1 + abs(weightedInputSum));
         }
-
-        @Override
-        public String getName() {
-            return "soft";
-        }
     },
-    _hyperbolicTangent {
+    tanh {
         @Override
         public int arity() {
             return -1;
@@ -557,11 +412,6 @@ public enum Operators implements Function {
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
             return tanh(weightedInputSum);
-        }
-
-        @Override
-        public String getName() {
-            return "tanh";
         }
     };
 

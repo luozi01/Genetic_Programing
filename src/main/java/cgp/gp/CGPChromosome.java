@@ -1,6 +1,6 @@
 package cgp.gp;
 
-import cgp.interfaces.Function;
+import cgp.interfaces.CGPFunction;
 import cgp.program.Node;
 import cgp.solver.CartesianGP;
 import genetics.chromosome.Chromosome;
@@ -26,7 +26,7 @@ public class CGPChromosome extends Chromosome {
     int[] outputNodes;
     int[] activeNodes;
     double[] outputValues;
-    MutableList<Function> funcSet;
+    MutableList<CGPFunction> funcSet;
     double[] nodeInputsHold;
     int generation;
 
@@ -103,7 +103,7 @@ public class CGPChromosome extends Chromosome {
         sb.append("FunctionSet");
 
         for (int i = 0; i < funcSet.size(); i++) {
-            sb.append(String.format(",%s", funcSet.get(i).getName()));
+            sb.append(String.format(",%s", funcSet.get(i)));
         }
         sb.append("\n");
 
@@ -121,45 +121,45 @@ public class CGPChromosome extends Chromosome {
         return sb.toString();
     }
 
-    void copyChromosome(CGPChromosome chromoSrc) {
+    void copyChromosome(CGPChromosome src) {
         /* error checking  */
-        if (this.numInputs != chromoSrc.numInputs) {
+        if (this.numInputs != src.numInputs) {
             throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome inputs do not match.");
         }
 
-        if (this.numNodes != chromoSrc.numNodes) {
+        if (this.numNodes != src.numNodes) {
             throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome nodes do not match.");
         }
 
-        if (this.numOutputs != chromoSrc.numOutputs) {
+        if (this.numOutputs != src.numOutputs) {
             throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The number of chromosome outputs do not match.");
         }
 
-        if (this.arity != chromoSrc.arity) {
+        if (this.arity != src.arity) {
             throw new IllegalArgumentException("Cannot copy a chromosome to a chromosome of different dimensions. The arity of the chromosome nodes do not match.");
         }
 
         /* copy nodes and which are active */
-        for (int i = 0; i < chromoSrc.numNodes; i++) {
-            this.nodes[i].copyNode(chromoSrc.nodes[i]);
+        for (int i = 0; i < src.numNodes; i++) {
+            this.nodes[i].copyNode(src.nodes[i]);
         }
 
-        System.arraycopy(chromoSrc.activeNodes, 0, this.activeNodes, 0, chromoSrc.numNodes);
+        System.arraycopy(src.activeNodes, 0, this.activeNodes, 0, src.numNodes);
 
         /* copy functionSet */
-        this.funcSet = chromoSrc.funcSet.clone();
+        this.funcSet = src.funcSet.clone();
 
         /* copy each of the chromosomes outputs */
-        System.arraycopy(chromoSrc.outputNodes, 0, this.outputNodes, 0, chromoSrc.numOutputs);
+        System.arraycopy(src.outputNodes, 0, this.outputNodes, 0, src.numOutputs);
 
         /* copy the number of active node */
-        this.numActiveNodes = chromoSrc.numActiveNodes;
+        this.numActiveNodes = src.numActiveNodes;
 
         /* copy the fitness */
-        this.fitness = chromoSrc.fitness;
+        this.fitness = src.fitness;
 
         /* copy generation */
-        this.generation = chromoSrc.generation;
+        this.generation = src.generation;
     }
 
     /**
