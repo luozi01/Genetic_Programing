@@ -11,6 +11,10 @@ public abstract class Chromosome {
         return Double.compare(fitness, another.fitness) < 0;
     }
 
+    public boolean notEvaluated() {
+        return Double.isNaN(fitness);
+    }
+
     public String serialization() {
         return new Gson().toJson(this);
     }

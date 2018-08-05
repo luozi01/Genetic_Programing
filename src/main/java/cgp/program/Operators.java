@@ -390,7 +390,7 @@ public enum Operators implements CGPFunction {
             return (double) (weightedInputSum < 0 ? 0 : 1);
         }
     },
-    soft {
+    softsign {
         @Override
         public int arity() {
             return -1;

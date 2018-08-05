@@ -6,8 +6,10 @@ import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
 import cgp.solver.CartesianGP;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
 import static cgp.gp.CGPCore.executeChromosome;
-import static cgp.gp.CGPCore.printChromosome;
 
 public class NeuroEvolution {
 
@@ -36,30 +38,40 @@ public class NeuroEvolution {
 
         solver.evolve(numGens);
 
-
         CGPChromosome bestGene = solver.getBestGene(false);
 
+        // save to file
+        String serialize = bestGene.serialization();
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream("serialize.txt"), StandardCharsets.UTF_8))) {
+            writer.write(serialize);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // reconstruct
+        bestGene = CGPChromosome.deserialization("serialize.txt");
+        System.out.println(bestGene);
+
         // continues training
-        while (bestGene.fitness > targetFitness) {
+        while (bestGene.fitness > targetFitness || bestGene.notEvaluated()) {
             solver.evolve(numGens, bestGene);
             bestGene = solver.getBestGene(false);
         }
 
-        printChromosome(bestGene, true);
+        System.out.println(bestGene.toString(true));
     }
 
     static class sinWave implements CGPFitness {
         @Override
         public double calc(CartesianGP params, CGPChromosome chromosome, DataSet data) {
-            double i;
-
             double error = 0;
             double range = 6;
             double stepSize = 0.5;
 
             double[] inputs = new double[1];
 
-            for (i = 0; i < range; i += stepSize) {
+            for (double i = 0; i < range; i += stepSize) {
 
                 inputs[0] = i;
 

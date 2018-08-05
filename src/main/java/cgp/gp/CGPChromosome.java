@@ -8,6 +8,8 @@ import lombok.Cleanup;
 import lombok.Getter;
 import org.eclipse.collections.api.list.MutableList;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
@@ -30,7 +32,24 @@ public class CGPChromosome extends Chromosome {
     double[] nodeInputsHold;
     int generation;
 
-    public static CGPChromosome deserialization(String serialize) {
+    public static CGPChromosome deserialization(String fileName) {
+        File file = new File(fileName);
+        StringBuilder serial = new StringBuilder();
+        try {
+            @Cleanup Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine())
+                serial.append(scanner.nextLine()).append("\n");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (serial.length() == 0)
+            throw new IllegalStateException("File is empty, cannot reconstruct chromosome from it");
+        else
+            return reconstruct(serial.toString());
+    }
+
+    public static CGPChromosome reconstruct(String serialize) {
         String[] line;
 
         /* open the chromosome file */
@@ -86,7 +105,6 @@ public class CGPChromosome extends Chromosome {
         }
         /* set the active nodes in the copied chromosome */
         setChromosomeActiveNodes(chromosome);
-
         return chromosome;
     }
 
@@ -101,7 +119,6 @@ public class CGPChromosome extends Chromosome {
         sb.append(String.format("arity,%d\n", arity));
 
         sb.append("FunctionSet");
-
         for (int i = 0; i < funcSet.size(); i++) {
             sb.append(String.format(",%s", funcSet.get(i)));
         }
@@ -229,5 +246,43 @@ public class CGPChromosome extends Chromosome {
      */
     public int getNumChromosomeActiveConnections() {
         return IntStream.range(0, this.numActiveNodes).map(i -> this.nodes[this.activeNodes[i]].actArity).sum();
+    }
+
+    public String toString(boolean weights) {
+        StringBuilder sb = new StringBuilder();
+        /* set the active nodes in the given chromosome */
+        setChromosomeActiveNodes(this);
+
+        /* for all the chromosome inputs*/
+        for (int i = 0; i < this.numInputs; i++) {
+            sb.append(String.format("(%d):\tinput\n", i));
+        }
+
+        /* for all the hidden nodes */
+        for (int i = 0; i < this.numNodes; i++) {
+            /* print the node function */
+            sb.append(String.format("(%d):\t%s\t", this.numInputs + i, this.funcSet.get(this.nodes[i].function)));
+            /* for the arity of the node */
+            for (int j = 0; j < this.getChromosomeNodeArity(i); j++) {
+                /* print the node input information */
+                if (weights) {
+                    sb.append(String.format("%d,%+.1f\t", this.nodes[i].inputs[j], this.nodes[i].weights[j]));
+                } else {
+                    sb.append(String.format("%d ", this.nodes[i].inputs[j]));
+                }
+            }
+            /* Highlight active nodes */
+            if (this.nodes[i].active) {
+                sb.append("*");
+            }
+            sb.append("\n");
+        }
+        /* for all of the outputs */
+        sb.append("outputs: ");
+        for (int i = 0; i < this.numOutputs; i++) {
+            /* print the outputNodes node locations */
+            sb.append(String.format("%d ", this.outputNodes[i]));
+        }
+        return sb.append("\n\n").toString();
     }
 }

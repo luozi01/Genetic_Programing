@@ -3,8 +3,6 @@ package cgp_examples;
 import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 
-import static cgp.gp.CGPCore.printChromosome;
-
 class AverageBehaviour {
 
     public static void main(String[] args) {
@@ -39,6 +37,6 @@ class AverageBehaviour {
 
         CGPChromosome bestGene = solver.getBestGene(true);
         System.out.println(bestGene.getGeneration());
-        printChromosome(bestGene, false);
+        System.out.println(bestGene.toString(false));
     }
 }

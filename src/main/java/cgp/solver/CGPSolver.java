@@ -3,9 +3,9 @@ package cgp.solver;
 import cgp.gp.CGPChromosome;
 import cgp.gp.CGPCore;
 import cgp.interfaces.CGPFitness;
+import cgp.interfaces.CGPFunction;
 import cgp.interfaces.CGPReproductionStrategy;
 import cgp.interfaces.CGPSelectionStrategy;
-import cgp.interfaces.CGPFunction;
 import cgp.program.DataSet;
 import cgp.program.Results;
 import org.eclipse.collections.impl.factory.Lists;
@@ -16,8 +16,9 @@ import java.util.Scanner;
 
 import static cgp.gp.CGPCore.MutationStrategy.*;
 import static cgp.gp.CGPCore.fitnessCalc.supervisedLearning;
-import static cgp.gp.CGPCore.*;
+import static cgp.gp.CGPCore.repeatCGP;
 import static cgp.gp.CGPCore.reproduction.mutateRandomParent;
+import static cgp.gp.CGPCore.runCGP;
 import static cgp.gp.CGPCore.selection.selectFittest;
 
 public class CGPSolver {
@@ -408,6 +409,6 @@ public class CGPSolver {
     }
 
     public void printParams() {
-        printParameters(params);
+        System.out.println(params);
     }
 }

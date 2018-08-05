@@ -117,7 +117,7 @@ public class CartesianGP {
                 addCustomNodeFunction(step);
                 break;
             case "softsign":
-                addCustomNodeFunction(soft);
+                addCustomNodeFunction(softsign);
                 break;
             case "tanh":
                 addCustomNodeFunction(tanh);
@@ -144,5 +144,35 @@ public class CartesianGP {
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("-----------------------------------------------------------\n");
+        sb.append("                       Parameters                          \n");
+        sb.append("-----------------------------------------------------------\n");
+        sb.append(String.format("Evolutionary Strategy:\t\t\t(%d%c%d)-ES\n", mu, evolutionaryStrategy, lambda));
+        sb.append(String.format("Inputs:\t\t\t\t\t%d\n", numInputs));
+        sb.append(String.format("nodes:\t\t\t\t\t%d\n", numNodes));
+        sb.append(String.format("Outputs:\t\t\t\t%d\n", numOutputs));
+        sb.append(String.format("Node Arity:\t\t\t\t%d\n", arity));
+        sb.append(String.format("Connection weights range:\t\t+/- %f\n", connectionWeightRange));
+        sb.append(String.format("Mutation Type:\t\t\t\t%s\n", mutationType));
+        sb.append(String.format("Mutation rate:\t\t\t\t%f\n", mutationRate));
+        sb.append(String.format("Recurrent Connection Probability:\t%f\n", recurrentConnectionProbability));
+        sb.append(String.format("Shortcut Connections:\t\t\t%s\n", shortcutConnections));
+        sb.append(String.format("Fitness Function:\t\t\t%s\n", fitnessFunction));
+        sb.append(String.format("Target Fitness:\t\t\t\t%f\n", targetFitness));
+        sb.append(String.format("Selection scheme:\t\t\t%s\n", selectionScheme));
+        sb.append(String.format("Reproduction scheme:\t\t\t%s\n", reproductionScheme));
+        sb.append(String.format("Update frequency:\t\t\t%d\n", updateFrequency));
+        sb.append("Function Set:");
+        for (int i = 0; i < this.functions.size(); i++) {
+            sb.append(String.format(" %s", this.functions.get(i)));
+        }
+        sb.append(String.format(" (%d)\n", this.functions.size()));
+        sb.append("-----------------------------------------------------------\n\n");
+        return sb.toString();
     }
 }

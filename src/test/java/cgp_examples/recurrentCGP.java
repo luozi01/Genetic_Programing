@@ -3,8 +3,6 @@ package cgp_examples;
 import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 
-import static cgp.gp.CGPCore.printChromosome;
-
 class recurrentCGP {
 
     public static void main(String[] args) {
@@ -30,7 +28,7 @@ class recurrentCGP {
 
         CGPChromosome gene = solver.getBestGene(true);
 
-        printChromosome(gene, false);
+        System.out.println(gene.toString(false));
 
         String serialization = gene.serialization();
 
