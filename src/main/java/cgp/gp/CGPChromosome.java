@@ -49,6 +49,12 @@ public class CGPChromosome extends Chromosome {
             return reconstruct(serial.toString());
     }
 
+    /**
+     * reconstruct chromosome from serialize string representation
+     *
+     * @param serialize serialize representation of a chromosome
+     * @return chromosome
+     */
     public static CGPChromosome reconstruct(String serialize) {
         String[] line;
 

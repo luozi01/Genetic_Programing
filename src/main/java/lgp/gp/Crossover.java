@@ -16,7 +16,7 @@ public class Crossover implements CrossoverPolicy {
 
     private final LinearGP manager;
 
-    public Crossover(LinearGP manager) {
+    Crossover(LinearGP manager) {
         this.manager = manager;
     }
 
@@ -97,8 +97,8 @@ public class Crossover implements CrossoverPolicy {
 
             int i1 = randEngine.nextInt(gp1.length() - s);
 
-            for (int j = s - 1; j >= i1; j--) {
-                gp1.getInstructions().remove(j);
+            if (s > i1) {
+                gp1.getInstructions().subList(i1, s).clear();
             }
         }
         return Tuples.pair(gp1, gp2);

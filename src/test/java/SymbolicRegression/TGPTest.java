@@ -32,7 +32,7 @@ class TGPTest {
         env.setReplacementStrategy(TGPEvolveStrategy.MU_PLUS_LAMBDA);
         TGPSolver solver = new TGPSolver(env, fitnessFunction);
         addListener(solver);
-        Long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         solver.evolve();
         System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
 

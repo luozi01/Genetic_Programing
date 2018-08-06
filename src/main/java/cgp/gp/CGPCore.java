@@ -269,7 +269,7 @@ public class CGPCore {
         /* initialize best chromosome */
         CGPChromosome bestChromosome = initialiseChromosome(params);
 
-        /* determine the size of the Candidate Chromos based on the evolutionary Strategy */
+        /* determine the size of the candidate chromosome based on the evolutionary Strategy */
         int numCandidate;
         if (params.evolutionaryStrategy == '+') {
             numCandidate = params.mu + params.lambda;

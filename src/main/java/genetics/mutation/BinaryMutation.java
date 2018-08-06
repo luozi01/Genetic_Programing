@@ -8,8 +8,6 @@ import org.apache.commons.math3.exception.MathIllegalArgumentException;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.eclipse.collections.api.list.MutableList;
 
-import java.util.List;
-
 /**
  * Copy paste and modified from apache genetic library
  */
@@ -20,13 +18,13 @@ public class BinaryMutation implements MutationPolicy {
         }
 
         BinaryChromosome origChrom = (BinaryChromosome) original;
-        List<Integer> newRepr = origChrom.getRepresentation();
+        MutableList<Integer> newRepr = origChrom.getRepresentation();
 
         // randomly select a gene
         int geneIndex = new SimpleRandEngine().nextInt(origChrom.getLength());
         // and change it
         newRepr.set(geneIndex, origChrom.getRepresentation().get(geneIndex) == 0 ? 1 : 0);
 
-        return origChrom.newCopy(((MutableList<Integer>) newRepr));
+        return origChrom.newCopy(newRepr);
     }
 }

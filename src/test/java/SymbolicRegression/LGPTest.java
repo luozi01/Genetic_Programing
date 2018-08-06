@@ -40,7 +40,7 @@ class LGPTest {
                 System.out.println(bestGene);
             }
         });
-        Long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         solver.evolve();
         System.out.println((System.currentTimeMillis() - startTime) / 1000.0);
 
