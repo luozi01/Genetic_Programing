@@ -3,8 +3,8 @@ package genetics.common;
 
 import genetics.chromosome.Chromosome;
 import genetics.interfaces.Initialization;
+import lombok.NonNull;
 import org.eclipse.collections.impl.list.mutable.FastList;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -65,7 +65,7 @@ public class Population implements Iterable<Chromosome> {
         return chromosomes.get(0);
     }
 
-    @NotNull
+    @NonNull
     @Override
     public Iterator<Chromosome> iterator() {
         return chromosomes.iterator();
