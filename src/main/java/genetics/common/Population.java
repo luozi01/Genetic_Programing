@@ -6,7 +6,6 @@ import genetics.interfaces.Initialization;
 import lombok.NonNull;
 import org.eclipse.collections.impl.list.mutable.FastList;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -23,7 +22,7 @@ public class Population implements Iterable<Chromosome> {
     }
 
     public Population() {
-        chromosomes = new ArrayList<>();
+        chromosomes = FastList.newList();
     }
 
     public Population(List<Chromosome> chromosomes) {

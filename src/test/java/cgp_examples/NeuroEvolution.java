@@ -6,9 +6,6 @@ import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
 import cgp.solver.CartesianGP;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
 import static cgp.gp.CGPCore.executeChromosome;
 
 public class NeuroEvolution {
@@ -42,15 +39,16 @@ public class NeuroEvolution {
 
         // save to file
         String serialize = bestGene.serialization();
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream("serialize.txt"), StandardCharsets.UTF_8))) {
-            writer.write(serialize);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+        //                new FileOutputStream("serialize.txt"), StandardCharsets.UTF_8))) {
+        //            writer.write(serialize);
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
 
         // reconstruct
-        bestGene = CGPChromosome.deserialization("serialize.txt");
+        //        bestGene = CGPChromosome.deserialization("serialize.txt");
+        bestGene = CGPChromosome.reconstruct(serialize);
         System.out.println(bestGene);
 
         // continues training

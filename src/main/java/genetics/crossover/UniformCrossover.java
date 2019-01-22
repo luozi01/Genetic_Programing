@@ -51,11 +51,9 @@ public class UniformCrossover<T> implements CrossoverPolicy {
     /**
      * {@inheritDoc}
      *
-     * @throws MathIllegalArgumentException iff one of the chromosomes is
-     *                                      not an instance of {@link AbstractListChromosome}
+     * @throws MathIllegalArgumentException iff one of the chromosomes is not an instance of {@link AbstractListChromosome}
      * @throws DimensionMismatchException   if the length of the two chromosomes is different
      */
-    @SuppressWarnings("unchecked")
     public Pair<Chromosome, Chromosome> crossover(final Chromosome first, final Chromosome second)
             throws DimensionMismatchException, MathIllegalArgumentException {
 
@@ -90,7 +88,6 @@ public class UniformCrossover<T> implements CrossoverPolicy {
         final RandEngine random = new SimpleRandEngine();
 
         for (int index = 0; index < length; index++) {
-
             if (random.uniform() < ratio) {
                 // swap the bits -> take other parent
                 child1Rep.add(parent2Rep.get(index));

@@ -5,7 +5,7 @@ import genetics.utils.SimpleRandEngine;
 import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.apache.commons.math3.genetics.InvalidRepresentationException;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.factory.Lists;
 
 /**
  * Copy paste and modified from apache genetic library
@@ -40,7 +40,7 @@ public abstract class BinaryChromosome extends IntegerChromosome {
      */
     public static MutableList<Integer> randomBinaryRepresentation(int length) {
         // random binary list
-        MutableList<Integer> rList = FastList.newList(length);
+        MutableList<Integer> rList = Lists.mutable.withInitialCapacity(length);
         RandEngine randEngine = new SimpleRandEngine();
         for (int j = 0; j < length; j++) {
             rList.add(randEngine.nextInt(2));
@@ -53,10 +53,8 @@ public abstract class BinaryChromosome extends IntegerChromosome {
      */
     @Override
     protected void checkValidity(MutableList<Integer> chromosomeRepresentation) throws InvalidRepresentationException {
-        for (int i : chromosomeRepresentation) {
-            if (i < 0 || i > 1) {
+        for (int i : chromosomeRepresentation)
+            if (i < 0 || i > 1)
                 throw new InvalidRepresentationException(LocalizedFormats.INVALID_BINARY_DIGIT, i);
-            }
-        }
     }
 }

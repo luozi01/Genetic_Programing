@@ -704,18 +704,7 @@ public class CGPCore {
                     }
 
                     /* for every input to each chromosome */
-                    for (int j = 0; j < params.arity; j++) {
-
-                        /* mutate the node input */
-                        if (randEngine.uniform() <= params.mutationRate) {
-                            chromosome.nodes[i].inputs[j] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, i, params.recurrentConnectionProbability);
-                        }
-
-                        /* mutate the node connection weight */
-                        if (randEngine.uniform() <= params.mutationRate) {
-                            chromosome.nodes[i].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
-                        }
-                    }
+                    mutation_helper(params, chromosome, i);
                 }
 
                 /* for every chromosome outputNodes */
@@ -742,18 +731,7 @@ public class CGPCore {
                     }
 
                     /* for every input to each chromosome */
-                    for (int j = 0; j < params.arity; j++) {
-
-                        /* mutate the node input */
-                        if (randEngine.uniform() <= params.mutationRate) {
-                            chromosome.nodes[activeNode].inputs[j] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, activeNode, params.recurrentConnectionProbability);
-                        }
-
-                        /* mutate the node connection weight */
-                        if (randEngine.uniform() <= params.mutationRate) {
-                            chromosome.nodes[activeNode].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
-                        }
-                    }
+                    mutation_helper(params, chromosome, activeNode);
                 }
 
                 /* for every chromosome outputNodes */
@@ -763,6 +741,21 @@ public class CGPCore {
                     if (randEngine.uniform() <= params.mutationRate) {
                         chromosome.outputNodes[i] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
                     }
+                }
+            }
+        };
+
+        private static void mutation_helper(CartesianGP params, CGPChromosome chromosome, int i) {
+            for (int j = 0; j < params.arity; j++) {
+
+                /* mutate the node input */
+                if (randEngine.uniform() <= params.mutationRate) {
+                    chromosome.nodes[i].inputs[j] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, i, params.recurrentConnectionProbability);
+                }
+
+                /* mutate the node connection weight */
+                if (randEngine.uniform() <= params.mutationRate) {
+                    chromosome.nodes[i].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
                 }
             }
         }

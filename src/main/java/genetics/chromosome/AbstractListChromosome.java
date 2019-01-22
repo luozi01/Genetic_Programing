@@ -21,9 +21,7 @@ public abstract class AbstractListChromosome<E> extends Chromosome {
 
     public AbstractListChromosome(final MutableList<E> representation, final boolean copyList) {
         checkValidity(representation);
-        if (copyList)
-            this.representation = representation.toList();
-        else this.representation = representation;
+        this.representation = copyList ? representation.clone() : representation;
     }
 
     protected abstract void checkValidity(MutableList<E> chromosomeRepresentation);

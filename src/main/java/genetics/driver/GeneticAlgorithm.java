@@ -32,7 +32,7 @@ public class GeneticAlgorithm {
     protected Population population;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     protected Optional<Chromosome> bestChromosome = Optional.empty();
-    protected Executor executor;
+    private Executor executor;
     @Getter
     protected int generation;
     private boolean terminate;
@@ -45,6 +45,20 @@ public class GeneticAlgorithm {
     private int elitism;
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
 
+    /**
+     * Constructor for ga execution
+     *
+     * @param initialization  initialization function object
+     * @param fitnessCalc     fitness function object
+     * @param crossoverPolicy crossover function object
+     * @param uniformRate     uniform rate
+     * @param mutationPolicy  mutation function object
+     * @param mutationRate    mutation rate for mutation function
+     * @param selectionPolicy select function
+     * @param tournamentSize  tournament size for select function depends on select function
+     * @param elitism         number of elites to keep during evolve
+     * @throws OutOfRangeException check if rates are out of bound
+     */
     public GeneticAlgorithm(final Initialization initialization,
                             final FitnessCalc fitnessCalc,
                             final CrossoverPolicy crossoverPolicy,
@@ -72,6 +86,10 @@ public class GeneticAlgorithm {
         this.populationSize = population.size();
     }
 
+    /**
+     * @param initialization initialization function object
+     * @param fitnessCalc    fitness function object
+     */
     protected GeneticAlgorithm(final Initialization initialization,
                                final FitnessCalc fitnessCalc) {
         this.population = new Population(initialization);
@@ -79,6 +97,9 @@ public class GeneticAlgorithm {
         this.populationSize = population.size();
     }
 
+    /**
+     * @param iteration fix iteration evolution
+     */
     public void evolve(int iteration) {
         initExecutor();
         terminate = false;
@@ -97,6 +118,9 @@ public class GeneticAlgorithm {
             ((GlobalDistributionExecutor) executor).killAll();
     }
 
+    /**
+     * evolve until termination conditions fulfill
+     */
     public void evolve() {
         initExecutor();
         terminate = false;
@@ -113,6 +137,9 @@ public class GeneticAlgorithm {
             ((GlobalDistributionExecutor) executor).killAll();
     }
 
+    /**
+     * @return next evolved population
+     */
     protected Population evolvePopulation() {
         Population nextGeneration = new Population();
 
@@ -160,23 +187,38 @@ public class GeneticAlgorithm {
         }
     }
 
+    /**
+     * @param chromosome global best chromosome
+     */
     protected void updateGlobal(Chromosome chromosome) {
         if (!bestChromosome.isPresent() || chromosome.betterThan(bestChromosome.get()))
             bestChromosome = Optional.of(chromosome);
     }
 
+    /**
+     * @param listener termination condition check listener
+     */
     public void addIterationListener(TerminationCheck listener) {
         terminationChecks.add(listener);
     }
 
+    /**
+     * terminate the program
+     */
     public void terminate() {
         terminate = true;
     }
 
+    /**
+     * @return global best chromosome
+     */
     public Chromosome getBest() {
         return bestChromosome.orElse(null);
     }
 
+    /**
+     * helping api to allow program run in parallel
+     */
     public void runInGlobal() {
         executionType = ExecutionType.GLOBAL_MODEL;
     }
