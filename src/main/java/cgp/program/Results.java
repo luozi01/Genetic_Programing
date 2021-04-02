@@ -1,6 +1,7 @@
 package cgp.program;
 
 import cgp.gp.CGPChromosome;
+import genetics.chromosome.Chromosome;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -48,9 +49,9 @@ public class Results {
         /* sort the copy array */
         Arrays.sort(copyArray, 0, length);
 
-        return (double) (length % 2 == 0 ?
+        return length % 2 == 0 ?
                 (copyArray[(length / 2)] + copyArray[(length / 2) - 1]) / 2 :  /* if even */
-                copyArray[(length - 1) / 2]);  /* if odd */
+                copyArray[(length - 1) / 2];  /* if odd */
     }
 
     private double medianDouble(double[] anArray, int length) {
@@ -73,7 +74,7 @@ public class Results {
      */
     public double getMedianFitness() {
         double[] array = IntStream.range(0, bestCGPChromosomes.size())
-                .mapToDouble(i -> bestCGPChromosomes.get(i).fitness).toArray();
+                .mapToDouble(i -> bestCGPChromosomes.get(i).getFitness()).toArray();
         return medianDouble(array, bestCGPChromosomes.size());
     }
 
@@ -90,7 +91,7 @@ public class Results {
      * run results specified in results.
      */
     public double getAverageFitness() {
-        double avgFit = IntStream.range(0, bestCGPChromosomes.size()).mapToDouble(i -> bestCGPChromosomes.get(i).fitness).sum();
+        double avgFit = IntStream.range(0, bestCGPChromosomes.size()).mapToDouble(i -> bestCGPChromosomes.get(i).getFitness()).sum();
         return avgFit / bestCGPChromosomes.size();
     }
 
@@ -104,6 +105,6 @@ public class Results {
     }
 
     public CGPChromosome getBestChromosome() {
-        return bestCGPChromosomes.stream().min(Comparator.comparingDouble(o -> o.fitness)).orElse(null);
+        return bestCGPChromosomes.stream().min(Comparator.comparingDouble(Chromosome::getFitness)).orElse(null);
     }
 }

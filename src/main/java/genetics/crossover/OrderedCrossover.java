@@ -1,86 +1,75 @@
 package genetics.crossover;
 
 import genetics.chromosome.AbstractListChromosome;
-import genetics.chromosome.Chromosome;
 import genetics.interfaces.CrossoverPolicy;
-import genetics.utils.RandEngine;
-import genetics.utils.SimpleRandEngine;
-import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.exception.MathIllegalArgumentException;
-import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.util.FastMath;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.tuple.Tuples;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
-/**
- * A direct transfer and modified from apache math3 library
- */
-public class OrderedCrossover<T> implements CrossoverPolicy {
+public class OrderedCrossover<T extends AbstractListChromosome<?>> implements CrossoverPolicy<T> {
+    private final Random random = new Random(System.currentTimeMillis());
 
     @Override
-    public Pair<Chromosome, Chromosome> crossover(Chromosome var1, Chromosome var2) throws MathIllegalArgumentException {
-        if (var1 instanceof AbstractListChromosome<?> && var2 instanceof AbstractListChromosome<?>) {
-            return mate((AbstractListChromosome<T>) var1, (AbstractListChromosome<T>) var2);
-        } else {
-            throw new MathIllegalArgumentException(LocalizedFormats.INVALID_FIXED_LENGTH_CHROMOSOME);
-        }
+    public Pair<T, T> crossover(T var1, T var2) {
+        return mate(var1, var2);
     }
 
-    private Pair<Chromosome, Chromosome> mate(final AbstractListChromosome<T> first,
-                                              final AbstractListChromosome<T> second) throws DimensionMismatchException {
-        int length = first.getLength();
-        if (length != second.getLength()) {
-            throw new DimensionMismatchException(second.getLength(), length);
-        } else {
-            final MutableList<T> parent1Rep = first.getRepresentation();
-            final MutableList<T> parent2Rep = second.getRepresentation();
-            // children
-            MutableList<T> child1 = Lists.mutable.withInitialCapacity(length);
-            MutableList<T> child2 = Lists.mutable.withInitialCapacity(length);
+    /**
+     * Performs order crossover on two parents
+     *
+     * @param first  first parent
+     * @param second second parent
+     * @return two new offspring
+     */
+    // Handle wildcard
+    private Pair<T, T> mate(final T first, final T second) {
+        if (first.length() != second.length()) {
+            throw new IllegalArgumentException(String.format("Length for both chromosome should be the same, but chromosome1 has %d, chromosome2 has %d", first.length(), second.length()));
+        }
 
-            MutableSet<T> child1Set = Sets.mutable.withInitialCapacity(length);
-            MutableSet<T> child2Set = Sets.mutable.withInitialCapacity(length);
-            RandEngine random = new SimpleRandEngine();
+        int length = first.length();
+        // parent presentations
+        final List parent1Rep = first.getRepresentation();
+        final List parent2Rep = second.getRepresentation();
+        // children
+        MutableList child1 = Lists.mutable.withInitialCapacity(length);
+        MutableList child2 = Lists.mutable.withInitialCapacity(length);
 
-            int a = random.nextInt(length);
+        int a = random.nextInt(length);
+        int b;
+        do {
+            b = random.nextInt(length);
+        } while (a == b);
 
-            int b;
-            do {
-                b = random.nextInt(length);
-            } while (a == b);
+        final int start = Math.min(a, b);
+        final int end = Math.max(a, b);
 
-            int lb = FastMath.min(a, b);
-            int ub = FastMath.max(a, b);
+        child1.addAll(parent1Rep.subList(start, end));
+        child2.addAll(parent2Rep.subList(start, end));
 
-            child1.addAll(parent1Rep.subList(lb, ub + 1));
-            child1Set.addAll(child1);
-            child2.addAll(parent2Rep.subList(lb, ub + 1));
-            child2Set.addAll(child2);
+        int index;
+        Object c1, c2;
+        for (int i = 1; i <= length; ++i) {
+            // get the index of the current city
+            index = (end + i) % length;
 
-            for (int i = 1; i <= length; ++i) {
-                int idx = (ub + i) % length;
-                T item1 = parent1Rep.get(idx);
-                T item2 = parent2Rep.get(idx);
-                if (!child1Set.contains(item2)) {
-                    child1.add(item2);
-                    child1Set.add(item2);
-                }
-
-                if (!child2Set.contains(item1)) {
-                    child2.add(item1);
-                    child2Set.add(item1);
-                }
+            c1 = parent1Rep.get(index);
+            c2 = parent2Rep.get(index);
+            if (!child1.contains(c2)) {
+                child1.add(c2);
             }
 
-            Collections.rotate(child1, lb);
-            Collections.rotate(child2, lb);
-            return Tuples.pair(first.newCopy(child1), second.newCopy(child2));
+            if (!child2.contains(c1)) {
+                child2.add(c1);
+            }
         }
+        Collections.rotate(child1, start);
+        Collections.rotate(child2, start);
+        return Tuples.pair((T) first.newCopy(child1), (T) second.newCopy(child2));
     }
 }

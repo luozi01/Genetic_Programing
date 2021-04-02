@@ -1,30 +1,26 @@
 package genetics.mutation;
 
 import genetics.chromosome.BinaryChromosome;
-import genetics.chromosome.Chromosome;
 import genetics.interfaces.MutationPolicy;
-import genetics.utils.SimpleRandEngine;
-import org.apache.commons.math3.exception.MathIllegalArgumentException;
-import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
-/**
- * Copy paste and modified from apache genetic library
- */
-public class BinaryMutation implements MutationPolicy {
-    public Chromosome mutate(Chromosome original) throws MathIllegalArgumentException {
-        if (!(original instanceof BinaryChromosome)) {
-            throw new MathIllegalArgumentException(LocalizedFormats.INVALID_BINARY_CHROMOSOME);
+import java.util.List;
+import java.util.Random;
+
+public class BinaryMutation<T extends BinaryChromosome> implements MutationPolicy<T> {
+    public T mutate(T original) {
+        if (original == null) {
+            throw new NullPointerException();
         }
 
-        BinaryChromosome origChrom = (BinaryChromosome) original;
-        MutableList<Integer> newRepr = origChrom.getRepresentation();
+        // make sure does not modify the original chromosome
+        List<Integer> newRepr = Lists.mutable.ofAll(original.getRepresentation());
 
         // randomly select a gene
-        int geneIndex = new SimpleRandEngine().nextInt(origChrom.getLength());
+        int geneIndex = new Random().nextInt(original.length());
         // and change it
-        newRepr.set(geneIndex, origChrom.getRepresentation().get(geneIndex) == 0 ? 1 : 0);
+        newRepr.set(geneIndex, original.getRepresentation().get(geneIndex) == 0 ? 1 : 0);
 
-        return origChrom.newCopy(newRepr);
+        return (T) original.newCopy(newRepr);
     }
 }

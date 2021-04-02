@@ -8,22 +8,27 @@ import cgp.interfaces.CGPReproductionStrategy;
 import cgp.interfaces.CGPSelectionStrategy;
 import cgp.program.DataSet;
 import cgp.program.Results;
+import lombok.Setter;
 import org.eclipse.collections.impl.factory.Lists;
 
-import java.io.InputStream;
 import java.util.Optional;
-import java.util.Scanner;
 
-import static cgp.gp.CGPCore.MutationStrategy.*;
+import static cgp.gp.CGPCore.MutationStrategy.point;
+import static cgp.gp.CGPCore.MutationStrategy.pointANN;
+import static cgp.gp.CGPCore.MutationStrategy.probabilistic;
+import static cgp.gp.CGPCore.MutationStrategy.probabilisticOnlyActive;
+import static cgp.gp.CGPCore.MutationStrategy.single;
 import static cgp.gp.CGPCore.fitnessCalc.supervisedLearning;
 import static cgp.gp.CGPCore.repeatCGP;
 import static cgp.gp.CGPCore.reproduction.mutateRandomParent;
 import static cgp.gp.CGPCore.runCGP;
 import static cgp.gp.CGPCore.selection.selectFittest;
 
+
 public class CGPSolver {
     private final CartesianGP params;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @Setter
     private Optional<DataSet> data = Optional.empty();
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<CGPChromosome> globalBest = Optional.empty();
@@ -304,56 +309,6 @@ public class CGPSolver {
             data.inputData[i] = input[i].clone();
             data.outputData[i] = output[i].clone();
         }
-        this.data = Optional.of(data);
-    }
-
-    /**
-     * Initialises data ure and assigns values of given file
-     */
-    public void initialiseDataSetFromFile(String file) {
-        DataSet data = new DataSet();
-        InputStream inputStream = CGPCore.class.getClassLoader().getResourceAsStream(file);
-        Scanner scanner = new Scanner(inputStream);
-
-        int lineNum = -1;
-        String[] dataSet;
-        /* for every line in the given file */
-        while (scanner.hasNext()) {
-
-            /* deal with the first line containing meta data */
-            if (lineNum == -1) {
-
-                dataSet = scanner.nextLine().split(",");
-
-                data.numInputs = Integer.parseInt(dataSet[0]);
-                data.numOutputs = Integer.parseInt(dataSet[1]);
-                data.numSamples = Integer.parseInt(dataSet[dataSet.length - 1]);
-
-                data.inputData = new double[data.numSamples][];
-                data.outputData = new double[data.numSamples][];
-
-                for (int i = 0; i < data.numSamples; i++) {
-                    data.inputData[i] = new double[data.numInputs];
-                    data.outputData[i] = new double[data.numOutputs];
-                }
-            }
-            /* the other lines contain input outputNodes pairs */
-            else {
-                /* get the first value on the given line */
-                dataSet = scanner.nextLine().split(",");
-
-                for (int j = 0; j < dataSet.length; j++) {
-                    if (j < data.numInputs) {
-                        data.inputData[lineNum][j] = Double.parseDouble(dataSet[j]);
-                    } else {
-                        data.outputData[lineNum][j - data.numInputs] = Double.parseDouble(dataSet[j]);
-                    }
-                }
-            }
-            /* increment the current line index */
-            lineNum++;
-        }
-        scanner.close();
         this.data = Optional.of(data);
     }
 

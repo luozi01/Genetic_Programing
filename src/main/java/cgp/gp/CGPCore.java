@@ -8,17 +8,16 @@ import cgp.program.DataSet;
 import cgp.program.Node;
 import cgp.program.Results;
 import cgp.solver.CartesianGP;
-import genetics.utils.RandEngine;
-import genetics.utils.SimpleRandEngine;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import static java.lang.Math.round;
 
 public class CGPCore {
-    private final static RandEngine randEngine = new SimpleRandEngine();
+    private final static Random randEngine = new Random();
 
     /**
      * Returns a pointer to an initialised chromosome with values obeying the given parameters.
@@ -123,7 +122,7 @@ public class CGPCore {
     private static void setChromosomeFitness(CartesianGP params, CGPChromosome chromo, DataSet data) {
         setChromosomeActiveNodes(chromo);
         chromo.resetChromosome();
-        chromo.fitness = params.fitnessFunction.calc(params, chromo, data);
+        chromo.setFitness(params.fitnessFunction.calc(params, chromo, data));
     }
 
     /**
@@ -196,7 +195,7 @@ public class CGPCore {
         CGPChromosome chromoTmp;
         for (int i = 0; i < numChromos; i++) {
             for (int j = i; j < numChromos; j++) {
-                if (chromoArray[i].fitness > chromoArray[j].fitness) {
+                if (chromoArray[i].getFitness() > chromoArray[j].getFitness()) {
                     chromoTmp = chromoArray[i];
                     chromoArray[i] = chromoArray[j];
                     chromoArray[j] = chromoTmp;
@@ -226,7 +225,7 @@ public class CGPCore {
         for (int i = 0; i < numRuns; i++) {
             results.add(runCGP(params, data, numGens, chromosomes));
             System.out.printf("%d\t%f\t%d\t\t%d\n", i,
-                    results.bestCGPChromosomes.get(i).fitness,
+                    results.bestCGPChromosomes.get(i).getFitness(),
                     results.bestCGPChromosomes.get(i).generation,
                     results.bestCGPChromosomes.get(i).numActiveNodes);
         }
@@ -307,16 +306,16 @@ public class CGPCore {
             getBestChromosome(parents, children, params.mu, params.lambda, bestChromosome);
 
             // check termination conditions
-            if (bestChromosome.fitness <= params.targetFitness) {
+            if (bestChromosome.getFitness() <= params.targetFitness) {
                 if (params.updateFrequency != 0) {
-                    System.out.printf("%d\t%f - Solution Found\n", gen, bestChromosome.fitness);
+                    System.out.printf("%d\t%f - Solution Found\n", gen, bestChromosome.getFitness());
                 }
                 break;
             }
 
             // display progress to the user at the update frequency specified
             if (params.updateFrequency != 0 && (gen % params.updateFrequency == 0 || gen >= numGens - 1)) {
-                System.out.printf("%d\t%f\n", gen, bestChromosome.fitness);
+                System.out.printf("%d\t%f\n", gen, bestChromosome.getFitness());
             }
 
             // Set the chromosomes which will be used by the selection scheme
@@ -397,13 +396,13 @@ public class CGPCore {
         CGPChromosome bestChromoSoFar;
         bestChromoSoFar = parents[0];
         for (int i = 1; i < numParents; i++) {
-            if (parents[i].fitness <= bestChromoSoFar.fitness) {
+            if (parents[i].getFitness() <= bestChromoSoFar.getFitness()) {
                 bestChromoSoFar = parents[i];
             }
         }
 
         for (int i = 0; i < numChildren; i++) {
-            if (children[i].fitness <= bestChromoSoFar.fitness) {
+            if (children[i].getFitness() <= bestChromoSoFar.getFitness()) {
                 bestChromoSoFar = children[i];
             }
         }
@@ -454,7 +453,7 @@ public class CGPCore {
      * returns a random connection weight value
      */
     private static double getRandomConnectionWeight(double weightRange) {
-        return (randEngine.uniform() * 2 * weightRange) - weightRange;
+        return (randEngine.nextDouble() * 2 * weightRange) - weightRange;
     }
 
     /**
@@ -475,7 +474,7 @@ public class CGPCore {
                                           int numNodes,
                                           int nodePosition,
                                           double recurrentConnectionProbability) {
-        return randEngine.uniform() < recurrentConnectionProbability ?
+        return randEngine.nextDouble() < recurrentConnectionProbability ?
                 randEngine.nextInt(numNodes - nodePosition) + nodePosition + 1 : /* pick any ahead nodes or the node itself */
                 randEngine.nextInt(numInputs + nodePosition);  /* pick any previous node including inputs */
     }
@@ -699,7 +698,7 @@ public class CGPCore {
                 for (int i = 0; i < params.numNodes; i++) {
 
                     /* mutate the function gene */
-                    if (randEngine.uniform() <= params.mutationRate) {
+                    if (randEngine.nextDouble() <= params.mutationRate) {
                         chromosome.nodes[i].function = getRandomFunction(chromosome.funcSet.size());
                     }
 
@@ -711,7 +710,7 @@ public class CGPCore {
                 for (int i = 0; i < params.numOutputs; i++) {
 
                     /* mutate the chromosome outputNodes */
-                    if (randEngine.uniform() <= params.mutationRate) {
+                    if (randEngine.nextDouble() <= params.mutationRate) {
                         chromosome.outputNodes[i] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
                     }
                 }
@@ -726,7 +725,7 @@ public class CGPCore {
                     int activeNode = chromosome.activeNodes[i];
 
                     /* mutate the function gene */
-                    if (randEngine.uniform() <= params.mutationRate) {
+                    if (randEngine.nextDouble() <= params.mutationRate) {
                         chromosome.nodes[activeNode].function = getRandomFunction(chromosome.funcSet.size());
                     }
 
@@ -738,7 +737,7 @@ public class CGPCore {
                 for (int i = 0; i < params.numOutputs; i++) {
 
                     /* mutate the chromosome outputNodes */
-                    if (randEngine.uniform() <= params.mutationRate) {
+                    if (randEngine.nextDouble() <= params.mutationRate) {
                         chromosome.outputNodes[i] = getRandomChromosomeOutput(chromosome.numInputs, chromosome.numNodes, params.shortcutConnections);
                     }
                 }
@@ -749,12 +748,12 @@ public class CGPCore {
             for (int j = 0; j < params.arity; j++) {
 
                 /* mutate the node input */
-                if (randEngine.uniform() <= params.mutationRate) {
+                if (randEngine.nextDouble() <= params.mutationRate) {
                     chromosome.nodes[i].inputs[j] = getRandomNodeInput(chromosome.numInputs, chromosome.numNodes, i, params.recurrentConnectionProbability);
                 }
 
                 /* mutate the node connection weight */
-                if (randEngine.uniform() <= params.mutationRate) {
+                if (randEngine.nextDouble() <= params.mutationRate) {
                     chromosome.nodes[i].weights[j] = getRandomConnectionWeight(params.connectionWeightRange);
                 }
             }

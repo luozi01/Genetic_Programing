@@ -114,7 +114,6 @@ public class CGPChromosome extends Chromosome {
         return chromosome;
     }
 
-    @Override
     public String serialization() {
         StringBuilder sb = new StringBuilder();
 
@@ -179,7 +178,7 @@ public class CGPChromosome extends Chromosome {
         this.numActiveNodes = src.numActiveNodes;
 
         /* copy the fitness */
-        this.fitness = src.fitness;
+        this.setFitness(src.getFitness());
 
         /* copy generation */
         this.generation = src.generation;

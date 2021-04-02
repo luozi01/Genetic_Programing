@@ -3,44 +3,32 @@ package genetics.selection;
 import genetics.chromosome.Chromosome;
 import genetics.common.Population;
 import genetics.interfaces.SelectionPolicy;
-import genetics.utils.RandEngine;
-import org.apache.commons.math3.exception.MathIllegalArgumentException;
-import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.block.factory.Predicates;
 import org.eclipse.collections.impl.factory.Lists;
-import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.tuple.Tuples;
 
 import java.util.Comparator;
+import java.util.Random;
 
-public class TournamentSelection implements SelectionPolicy {
+public class TournamentSelection<T extends Chromosome> implements SelectionPolicy<T> {
+    private final Random random = new Random(System.currentTimeMillis());
 
     @Override
-    public Pair<Chromosome, Chromosome> select(final Population population,
-                                               final int arity,
-                                               final RandEngine randEngine) throws MathIllegalArgumentException {
-        Chromosome c1 = tournament(population, arity, randEngine);
-        Chromosome c2 = tournament(population, arity, randEngine);
-        return c1.fitness < c2.fitness ? Tuples.pair(c1, c2) : Tuples.pair(c2, c1);
+    public Pair<T, T> select(final Population<T> population, final int arity) {
+        // create a copy of population
+        MutableList<T> chromosomes = Lists.mutable.ofAll(population.getChromosomes());
+        T c1 = tournament(chromosomes, arity);
+        // exclude c1 from the population
+        T c2 = tournament(chromosomes.select(Predicates.notEqual(c1)), arity);
+        return c1.betterThan(c2) ? Tuples.pair(c1, c2) : Tuples.pair(c2, c1);
     }
 
-    private Chromosome tournament(final Population population,
-                                  final int arity,
-                                  final RandEngine randEngine) throws MathIllegalArgumentException {
+    private T tournament(final MutableList<T> population, final int arity) {
         if (population.size() < arity) {
-            throw new MathIllegalArgumentException(LocalizedFormats.TOO_LARGE_TOURNAMENT_ARITY,
-                    arity, population.size());
+            throw new IllegalArgumentException(String.format("Population size (%d) should be greater than arity (%d).", population.size(), arity));
         }
-
-        // create a copy of the chromosome list
-        MutableList<Chromosome> copy = FastList.newList(population.getChromosomes());
-        MutableList<Chromosome> selection = Lists.mutable.empty();
-        for (int i = 0; i < arity; i++) {
-            int rind = randEngine.nextInt(copy.size());
-            selection.add(copy.get(rind));
-            copy.remove(rind);
-        }
-        return selection.min(Comparator.comparingDouble(o -> o.fitness));
+        return population.shuffleThis(random).take(arity).min(Comparator.comparingDouble(Chromosome::getFitness));
     }
 }

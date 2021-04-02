@@ -1,25 +1,16 @@
 package genetics.crossover;
 
 import genetics.chromosome.AbstractListChromosome;
-import genetics.chromosome.Chromosome;
 import genetics.interfaces.CrossoverPolicy;
-import genetics.utils.RandEngine;
-import genetics.utils.SimpleRandEngine;
-import org.apache.commons.math3.exception.DimensionMismatchException;
-import org.apache.commons.math3.exception.MathIllegalArgumentException;
-import org.apache.commons.math3.exception.OutOfRangeException;
-import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.tuple.Tuples;
 
-/**
- * Copy paste and modified from apache genetic library
- *
- * @param <T> Chromosome type
- */
-public class UniformCrossover<T> implements CrossoverPolicy {
+import java.util.List;
+import java.util.Random;
+
+public class UniformCrossover<T extends AbstractListChromosome<?>> implements CrossoverPolicy<T> {
 
     /**
      * The mixing ratio.
@@ -27,69 +18,50 @@ public class UniformCrossover<T> implements CrossoverPolicy {
     private final double ratio;
 
     /**
-     * Creates a new {@link UniformCrossover} policy using the given mixing ratio.
-     *
-     * @param ratio the mixing ratio
-     * @throws OutOfRangeException if the mixing ratio is outside the [0, 1] range
+     * @param ratio Crossover ratio
      */
-    public UniformCrossover(final double ratio) throws OutOfRangeException {
-        if (ratio < 0.0d || ratio > 1.0d) {
-            throw new OutOfRangeException(LocalizedFormats.CROSSOVER_RATE, ratio, 0.0d, 1.0d);
-        }
+    public UniformCrossover(final double ratio) {
+        if (ratio < 0.0d || ratio > 1.0d)
+            throw new IllegalArgumentException(String.format("Ratio should be [0, 1] but found %f", ratio));
         this.ratio = ratio;
     }
 
     /**
-     * Returns the mixing ratio used by this {@link CrossoverPolicy}.
-     *
-     * @return the mixing ratio
+     * @param first  first parent
+     * @param second second parent
+     * @return two children crossover from two parents
      */
-    public double getRatio() {
-        return ratio;
+    public Pair<T, T> crossover(final T first, final T second) {
+        if (first == null || second == null) {
+            throw new NullPointerException(); // Todo
+        }
+        return mate(first, second);
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @throws MathIllegalArgumentException iff one of the chromosomes is not an instance of {@link AbstractListChromosome}
-     * @throws DimensionMismatchException   if the length of the two chromosomes is different
+     * @param first  first parent
+     * @param second second parent
+     * @return two children crossover from two parents
      */
-    public Pair<Chromosome, Chromosome> crossover(final Chromosome first, final Chromosome second)
-            throws DimensionMismatchException, MathIllegalArgumentException {
-
-        if (!(first instanceof AbstractListChromosome<?> && second instanceof AbstractListChromosome<?>)) {
-            throw new MathIllegalArgumentException(LocalizedFormats.INVALID_FIXED_LENGTH_CHROMOSOME);
-        }
-        return mate((AbstractListChromosome<T>) first, (AbstractListChromosome<T>) second);
-    }
-
-    /**
-     * Helper for {@link #crossover(Chromosome, Chromosome)}. Performs the actual crossover.
-     *
-     * @param first  the first chromosome
-     * @param second the second chromosome
-     * @return the pair of new chromosomes that resulted from the crossover
-     * @throws DimensionMismatchException if the length of the two chromosomes is different
-     */
-    private Pair<Chromosome, Chromosome> mate(final AbstractListChromosome<T> first,
-                                              final AbstractListChromosome<T> second) throws DimensionMismatchException {
-        final int length = first.getLength();
-        if (length != second.getLength()) {
-            throw new DimensionMismatchException(second.getLength(), length);
+    // Todo handle wildcard
+    private Pair<T, T> mate(final T first,
+                            final T second) {
+        if (first.length() != second.length()) {
+            throw new IllegalArgumentException(String.format("Length for both chromosome should be the same, but chromosome1 has %d, chromosome2 has %d", first.length(), second.length()));
         }
 
+        final int length = first.length();
         // array representations of the parents
-        final MutableList<T> parent1Rep = first.getRepresentation();
-        final MutableList<T> parent2Rep = second.getRepresentation();
+        final List parent1Rep = first.getRepresentation();
+        final List parent2Rep = second.getRepresentation();
         // and of the children
-        final MutableList<T> child1Rep = FastList.newList(length);
-        final MutableList<T> child2Rep = FastList.newList(length);
+        final MutableList child1Rep = Lists.mutable.ofInitialCapacity(length);
+        final MutableList child2Rep = Lists.mutable.ofInitialCapacity(length);
 
-        final RandEngine random = new SimpleRandEngine();
+        final Random random = new Random();
 
         for (int index = 0; index < length; index++) {
-            if (random.uniform() < ratio) {
-                // swap the bits -> take other parent
+            if (random.nextDouble() < ratio) {
                 child1Rep.add(parent2Rep.get(index));
                 child2Rep.add(parent1Rep.get(index));
             } else {
@@ -98,6 +70,6 @@ public class UniformCrossover<T> implements CrossoverPolicy {
             }
         }
 
-        return Tuples.pair(first.newCopy(child1Rep), second.newCopy(child2Rep));
+        return Tuples.pair((T) first.newCopy(child1Rep), (T) second.newCopy(child2Rep));
     }
 }

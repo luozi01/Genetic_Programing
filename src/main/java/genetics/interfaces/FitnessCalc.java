@@ -2,6 +2,6 @@ package genetics.interfaces;
 
 import genetics.chromosome.Chromosome;
 
-public interface FitnessCalc {
-    double calc(Chromosome chromosome);
+public interface FitnessCalc<T extends Chromosome> {
+    double calc(T chromosome);
 }

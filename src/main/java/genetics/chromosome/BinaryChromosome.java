@@ -1,24 +1,19 @@
 package genetics.chromosome;
 
-import genetics.utils.RandEngine;
-import genetics.utils.SimpleRandEngine;
-import org.apache.commons.math3.exception.util.LocalizedFormats;
-import org.apache.commons.math3.genetics.InvalidRepresentationException;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-/**
- * Copy paste and modified from apache genetic library
- */
 public abstract class BinaryChromosome extends IntegerChromosome {
+    private static final Random randEngine = new Random();
 
     /**
      * Constructor.
      *
      * @param representation list of {0,1} values representing the chromosome
-     * @throws InvalidRepresentationException iff the <code>representation</code> can not represent a valid chromosome
      */
-    public BinaryChromosome(MutableList<Integer> representation) throws InvalidRepresentationException {
+    public BinaryChromosome(List<Integer> representation) {
         super(representation);
     }
 
@@ -26,9 +21,8 @@ public abstract class BinaryChromosome extends IntegerChromosome {
      * Constructor.
      *
      * @param representation array of {0,1} values representing the chromosome
-     * @throws InvalidRepresentationException iff the <code>representation</code> can not represent a valid chromosome
      */
-    public BinaryChromosome(Integer[] representation) throws InvalidRepresentationException {
+    public BinaryChromosome(Integer[] representation) {
         super(representation);
     }
 
@@ -38,23 +32,21 @@ public abstract class BinaryChromosome extends IntegerChromosome {
      * @param length length of the array
      * @return a random binary array of length <code>length</code>
      */
-    public static MutableList<Integer> randomBinaryRepresentation(int length) {
-        // random binary list
-        MutableList<Integer> rList = Lists.mutable.withInitialCapacity(length);
-        RandEngine randEngine = new SimpleRandEngine();
-        for (int j = 0; j < length; j++) {
-            rList.add(randEngine.nextInt(2));
-        }
-        return rList;
+    public static List<Integer> randomBinaryRepresentation(int length) {
+        return IntStream.range(0, length)
+                .mapToObj(j -> randEngine.nextInt(2))
+                .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void checkValidity(MutableList<Integer> chromosomeRepresentation) throws InvalidRepresentationException {
-        for (int i : chromosomeRepresentation)
-            if (i < 0 || i > 1)
-                throw new InvalidRepresentationException(LocalizedFormats.INVALID_BINARY_DIGIT, i);
+    protected void checkValidity(List<Integer> chromosomeRepresentation) {
+        for (int i : chromosomeRepresentation) {
+            if (i < 0 || i > 1) {
+                throw new IllegalArgumentException(String.format("All number should be either 0 or 1, but %s found", i));
+            }
+        }
     }
 }

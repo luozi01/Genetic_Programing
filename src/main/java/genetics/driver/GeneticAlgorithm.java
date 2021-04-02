@@ -4,167 +4,177 @@ import genetics.chromosome.Chromosome;
 import genetics.common.Population;
 import genetics.executor.ExecutionType;
 import genetics.executor.Executor;
+import genetics.executor.GlobalDistributionExecutor;
 import genetics.executor.SequentialExecutor;
-import genetics.executor.global.GlobalDistributionExecutor;
-import genetics.interfaces.*;
-import genetics.utils.RandEngine;
-import genetics.utils.SimpleRandEngine;
+import genetics.interfaces.CrossoverPolicy;
+import genetics.interfaces.FitnessCalc;
+import genetics.interfaces.Initialization;
+import genetics.interfaces.MutationPolicy;
+import genetics.interfaces.SelectionPolicy;
+import genetics.interfaces.TerminationCheck;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.math3.exception.OutOfRangeException;
-import org.apache.commons.math3.exception.util.LocalizedFormats;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.tuple.Tuples;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Random;
 
-public class GeneticAlgorithm {
-    protected final FitnessCalc fitnessCalc;
-    private final List<TerminationCheck> terminationChecks = new LinkedList<>();
-    private final RandEngine randEngine = new SimpleRandEngine();
+public class GeneticAlgorithm<T extends Chromosome> {
+    protected final FitnessCalc<T> fitnessCalc;
+    protected final CrossoverPolicy<T> crossoverPolicy;
     private final int populationSize;
-    @Getter
-    @Setter
-    protected Population population;
+    protected final MutationPolicy<T> mutationPolicy;
+    protected final SelectionPolicy<T> selectionPolicy;
+
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     protected Optional<Chromosome> bestChromosome = Optional.empty();
-    private Executor executor;
+    private final List<TerminationCheck<T>> terminationChecks = Lists.mutable.empty();
+    private final Random random = new Random(System.currentTimeMillis());
     @Getter
-    protected int generation;
-    private boolean terminate;
-    private CrossoverPolicy crossoverPolicy;
-    private MutationPolicy mutationPolicy;
-    private SelectionPolicy selectionPolicy;
+    @Setter
+    protected Population<T> population;
+    @Getter
+    private int generation;
+    private Executor<T> executor;
+    private ExecutionType executionType = ExecutionType.SEQUENTIAL;
     private double uniformRate;
     private double mutationRate;
     private int tournamentSize;
     private int elitism;
-    private ExecutionType executionType = ExecutionType.SEQUENTIAL;
+    private boolean terminate;
 
     /**
-     * Constructor for ga execution
+     * Constructor
      *
      * @param initialization  initialization function object
      * @param fitnessCalc     fitness function object
      * @param crossoverPolicy crossover function object
-     * @param uniformRate     uniform rate
+     * @param uniformRate     uniform rate for crossover if needed, [0, 1]
      * @param mutationPolicy  mutation function object
-     * @param mutationRate    mutation rate for mutation function
+     * @param mutationRate    mutation rate for mutation function, [0, 1]
      * @param selectionPolicy select function
      * @param tournamentSize  tournament size for select function depends on select function
      * @param elitism         number of elites to keep during evolve
-     * @throws OutOfRangeException check if rates are out of bound
      */
-    public GeneticAlgorithm(final Initialization initialization,
-                            final FitnessCalc fitnessCalc,
-                            final CrossoverPolicy crossoverPolicy,
+    public GeneticAlgorithm(final Initialization<T> initialization,
+                            final FitnessCalc<T> fitnessCalc,
+                            final CrossoverPolicy<T> crossoverPolicy,
                             final double uniformRate,
-                            final MutationPolicy mutationPolicy,
+                            final MutationPolicy<T> mutationPolicy,
                             final double mutationRate,
-                            final SelectionPolicy selectionPolicy,
+                            final SelectionPolicy<T> selectionPolicy,
                             final int tournamentSize,
-                            final int elitism) throws OutOfRangeException {
+                            final int elitism) {
         if (uniformRate < 0 || uniformRate > 1) {
-            throw new OutOfRangeException(LocalizedFormats.CROSSOVER_RATE, uniformRate, 0, 1);
+            throw new IllegalArgumentException(String.format("Uniform rate should be [0, 1] but %f found", uniformRate));
         }
         if (mutationRate < 0 || mutationRate > 1) {
-            throw new OutOfRangeException(LocalizedFormats.MUTATION_RATE, mutationRate, 0, 1);
+            throw new IllegalArgumentException(String.format("Mutation rate should be [0, 1] but %f found", mutationRate));
         }
-        this.population = new Population(initialization);
-        this.fitnessCalc = fitnessCalc;
+        // population
+        this.population = new Population<>(initialization);
+        this.populationSize = population.size();
+        // crossover
         this.crossoverPolicy = crossoverPolicy;
         this.uniformRate = uniformRate;
+        // mutation
         this.mutationPolicy = mutationPolicy;
         this.mutationRate = mutationRate;
+        // selection
         this.selectionPolicy = selectionPolicy;
         this.tournamentSize = tournamentSize;
         this.elitism = elitism;
-        this.populationSize = population.size();
+        // evaluation
+        this.fitnessCalc = fitnessCalc;
     }
 
-    /**
-     * @param initialization initialization function object
-     * @param fitnessCalc    fitness function object
-     */
-    protected GeneticAlgorithm(final Initialization initialization,
-                               final FitnessCalc fitnessCalc) {
-        this.population = new Population(initialization);
+    protected GeneticAlgorithm(final Initialization<T> initialization,
+                               final CrossoverPolicy<T> crossoverPolicy,
+                               final MutationPolicy<T> mutationPolicy,
+                               final SelectionPolicy<T> selectionPolicy,
+                               final FitnessCalc<T> fitnessCalc) {
+        this.population = new Population<>(initialization);
+        this.populationSize = this.population.size();
+        this.crossoverPolicy = crossoverPolicy;
+        this.mutationPolicy = mutationPolicy;
+        this.selectionPolicy = selectionPolicy;
         this.fitnessCalc = fitnessCalc;
-        this.populationSize = population.size();
     }
 
     /**
      * @param iteration fix iteration evolution
      */
     public void evolve(int iteration) {
+        // reset variable
         initExecutor();
         terminate = false;
+
+        // initial evaluation
         bestChromosome = Optional.of(executor.evaluate(population));
-        for (int i = 0; i < iteration; i++) {
+
+        // evolve for given iterations
+        for (generation = 0; generation < iteration; generation++) {
             if (terminate) {
                 break;
             }
             population = evolvePopulation();
-            generation = i;
-            for (TerminationCheck l : terminationChecks) {
-                l.update(this);
-            }
+            terminationChecks.forEach(o -> o.update(this));
         }
-        if (executor instanceof GlobalDistributionExecutor)
-            ((GlobalDistributionExecutor) executor).killAll();
+        executor.shutDown();
     }
 
     /**
      * evolve until termination conditions fulfill
      */
     public void evolve() {
+        // reset variable
         initExecutor();
         terminate = false;
         generation = 0;
+
+        // initial evaluation
         bestChromosome = Optional.of(executor.evaluate(population));
         while (!terminate) {
             population = evolvePopulation();
             generation++;
-            for (TerminationCheck l : terminationChecks) {
-                l.update(this);
-            }
+            terminationChecks.forEach(o -> o.update(this));
         }
-        if (executor instanceof GlobalDistributionExecutor)
-            ((GlobalDistributionExecutor) executor).killAll();
+        executor.shutDown();
     }
 
     /**
      * @return next evolved population
      */
-    protected Population evolvePopulation() {
-        Population nextGeneration = new Population();
-
+    protected Population<T> evolvePopulation() {
         // Keep our best individual, reproduction
-        for (int i = 0; (i < populationSize) && (i < elitism); i++) {
-            nextGeneration.addChromosome(population.getChromosome(i));
-        }
+        Population<T> nextGeneration = population.nextGeneration(Math.min(populationSize, elitism));
+        // generate new generation
         while (nextGeneration.size() < populationSize) {
-            Pair<Chromosome, Chromosome> pair = selectionPolicy.select(population, tournamentSize, randEngine);
-            if (randEngine.uniform() < uniformRate) {
+            // tournament selection
+            Pair<T, T> pair = selectionPolicy.select(population, tournamentSize);
+            // crossover
+            if (random.nextDouble() < uniformRate) {
                 pair = crossoverPolicy.crossover(pair.getOne(), pair.getTwo());
             }
-
-            if (randEngine.uniform() < mutationRate) {
+            // mutation
+            if (random.nextDouble() < mutationRate) {
                 pair = Tuples.pair(
                         mutationPolicy.mutate(pair.getOne()),
                         mutationPolicy.mutate(pair.getTwo()));
             }
 
+            // add to new generation
             nextGeneration.addChromosome(pair.getOne());
             if (nextGeneration.size() < populationSize) {
                 nextGeneration.addChromosome(pair.getTwo());
             }
         }
+        // evaluate new generation
         updateGlobal(executor.evaluate(nextGeneration));
+
         return nextGeneration;
     }
 
@@ -172,16 +182,12 @@ public class GeneticAlgorithm {
     private void initExecutor() {
         switch (executionType) {
             case SEQUENTIAL:
-                executor = new SequentialExecutor(fitnessCalc);
+                executor = new SequentialExecutor<>(fitnessCalc);
                 break;
             case GLOBAL_MODEL:
-                final int MAX_THREAD = Runtime.getRuntime().availableProcessors();
-                BlockingQueue<Optional<Chromosome>> tasks = new LinkedBlockingQueue<>();
-                BlockingQueue<Optional<Chromosome>> results = new LinkedBlockingQueue<>();
-                executor = new GlobalDistributionExecutor(MAX_THREAD, tasks, results, fitnessCalc);
+                executor = new GlobalDistributionExecutor<>(fitnessCalc);
                 break;
             case ISLAND_MODEL:
-                break;
             case DIFFUSION_MODEL:
                 break;
         }
@@ -198,7 +204,7 @@ public class GeneticAlgorithm {
     /**
      * @param listener termination condition check listener
      */
-    public void addIterationListener(TerminationCheck listener) {
+    public void addTerminateListener(TerminationCheck<T> listener) {
         terminationChecks.add(listener);
     }
 

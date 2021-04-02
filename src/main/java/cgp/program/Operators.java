@@ -4,7 +4,16 @@ import cgp.interfaces.CGPFunction;
 
 import java.util.stream.IntStream;
 
-import static java.lang.Math.*;
+import static java.lang.Math.PI;
+import static java.lang.Math.abs;
+import static java.lang.Math.cos;
+import static java.lang.Math.exp;
+import static java.lang.Math.pow;
+import static java.lang.Math.random;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.tan;
+import static java.lang.Math.tanh;
 
 public enum Operators implements CGPFunction {
     add {
@@ -338,7 +347,7 @@ public enum Operators implements CGPFunction {
 
         @Override
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
-            return (double) (inputs[0] == 0 ? 1 : 0);
+            return inputs[0] == 0 ? 1 : 0;
         }
     },
     wire {
@@ -387,7 +396,7 @@ public enum Operators implements CGPFunction {
         @Override
         public double calc(int numInputs, double[] inputs, double[] connectionWeights) {
             double weightedInputSum = sumWeightedInputs(numInputs, inputs, connectionWeights);
-            return (double) (weightedInputSum < 0 ? 0 : 1);
+            return weightedInputSum < 0 ? 0 : 1;
         }
     },
     softsign {

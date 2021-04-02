@@ -27,7 +27,6 @@ public class BasicObservation implements Observation, Serializable {
         inputs[index] = value;
     }
 
-
     @Override
     public void setPredictedOutput(int index, double value) {
         predictedOutputs[index] = value;

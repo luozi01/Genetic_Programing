@@ -1,17 +1,20 @@
 package genetics.chromosome;
 
-import org.eclipse.collections.api.list.MutableList;
+import lombok.Getter;
 import org.eclipse.collections.impl.factory.Lists;
+
+import java.util.List;
 
 /**
  * Copy paste and modified from apache genetic library
  *
  * @param <E> Data type
  */
+@Getter
 public abstract class AbstractListChromosome<E> extends Chromosome {
-    private final MutableList<E> representation;
+    private final List<E> representation;
 
-    public AbstractListChromosome(final MutableList<E> representation) {
+    public AbstractListChromosome(final List<E> representation) {
         this(representation, true);
     }
 
@@ -19,20 +22,28 @@ public abstract class AbstractListChromosome<E> extends Chromosome {
         this(Lists.mutable.of(representation));
     }
 
-    public AbstractListChromosome(final MutableList<E> representation, final boolean copyList) {
+    public AbstractListChromosome(final List<E> representation, final boolean copyList) {
         checkValidity(representation);
-        this.representation = copyList ? representation.clone() : representation;
+        this.representation = copyList ? Lists.mutable.ofAll(representation) : representation;
     }
 
-    protected abstract void checkValidity(MutableList<E> chromosomeRepresentation);
+    /**
+     * Check if presentation is in valid format
+     *
+     * @param chromosomeRepresentation chromosome to be checked
+     */
+    protected abstract void checkValidity(List<E> chromosomeRepresentation);
 
-    public MutableList<E> getRepresentation() {
-        return representation;
-    }
-
-    public int getLength() {
+    /**
+     * @return length of the chromosome
+     */
+    public int length() {
         return getRepresentation().size();
     }
 
-    public abstract AbstractListChromosome<E> newCopy(final MutableList<E> representation);
+    /**
+     * @param representation new representation of the chromosome
+     * @return new instance of chromosome
+     */
+    public abstract AbstractListChromosome<E> newCopy(List<E> representation);
 }

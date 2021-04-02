@@ -52,7 +52,7 @@ public class NeuroEvolution {
         System.out.println(bestGene);
 
         // continues training
-        while (bestGene.fitness > targetFitness || bestGene.notEvaluated()) {
+        while (bestGene.getFitness() > targetFitness || bestGene.notEvaluated()) {
             solver.evolve(numGens, bestGene);
             bestGene = solver.getBestGene(false);
         }

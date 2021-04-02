@@ -1,9 +1,59 @@
 package cgp_examples;
 
 import cgp.gp.CGPChromosome;
+import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
 class AverageBehaviour {
+
+    static Optional<DataSet> initialiseDataSetFromFile(String file) {
+        DataSet data = new DataSet();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            int lineNum = -1;
+            String[] dataSet;
+            while (true) {
+                String line = reader.readLine();
+                if (line == null)
+                    break;
+
+                dataSet = line.split(",");
+                if (lineNum == -1) {
+
+                    data.numInputs = Integer.parseInt(dataSet[0]);
+                    data.numOutputs = Integer.parseInt(dataSet[1]);
+                    data.numSamples = Integer.parseInt(dataSet[dataSet.length - 1]);
+
+                    data.inputData = new double[data.numSamples][];
+                    data.outputData = new double[data.numSamples][];
+
+                    for (int i = 0; i < data.numSamples; i++) {
+                        data.inputData[i] = new double[data.numInputs];
+                        data.outputData[i] = new double[data.numOutputs];
+                    }
+                } else { //the other lines contain input outputNodes pairs
+                    // get the first value on the given line
+
+                    for (int j = 0; j < dataSet.length; j++) {
+                        if (j < data.numInputs) {
+                            data.inputData[lineNum][j] = Double.parseDouble(dataSet[j]);
+                        } else {
+                            data.outputData[lineNum][j - data.numInputs] = Double.parseDouble(dataSet[j]);
+                        }
+                    }
+                }
+                // increment the current line index
+                lineNum++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Optional.of(data);
+    }
 
     public static void main(String[] args) {
         int numInputs = 1;
@@ -27,7 +77,7 @@ class AverageBehaviour {
 
         solver.setUpdateFrequency(updateFrequency);
 
-        solver.initialiseDataSetFromFile("symbolic.data");
+        solver.setData(initialiseDataSetFromFile("problems/cgp/symbolic.data"));
 
         solver.repeatEvolve(numGens, numRuns);
 

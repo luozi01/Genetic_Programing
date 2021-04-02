@@ -1,7 +1,8 @@
 package genetics.interfaces;
 
+import genetics.chromosome.Chromosome;
 import genetics.driver.GeneticAlgorithm;
 
-public interface TerminationCheck {
-    void update(GeneticAlgorithm environment);
+public interface TerminationCheck<T extends Chromosome> {
+    void update(GeneticAlgorithm<T> environment);
 }

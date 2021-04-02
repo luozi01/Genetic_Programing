@@ -4,69 +4,118 @@ package genetics.common;
 import genetics.chromosome.Chromosome;
 import genetics.interfaces.Initialization;
 import lombok.NonNull;
-import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.impl.factory.Lists;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class Population implements Iterable<Chromosome> {
+public class Population<T extends Chromosome> implements Iterable<T> {
 
-    private List<Chromosome> chromosomes;
+    private MutableList<T> chromosomes;
 
-    public Population(Initialization initialization) {
+    /**
+     * @param initialization initialize function
+     */
+    public Population(Initialization<T> initialization) {
         if (initialization == null)
-            throw new IllegalStateException("Initialization method cannot be null");
-        chromosomes = initialization.generate();
+            throw new IllegalArgumentException("Initialization method cannot be null");
+        this.chromosomes = Lists.mutable.ofAll(initialization.generate());
     }
 
+    /**
+     * empty population instance
+     */
     public Population() {
-        chromosomes = FastList.newList();
+        this.chromosomes = Lists.mutable.empty();
     }
 
-    public Population(List<Chromosome> chromosomes) {
-        this.chromosomes = FastList.newList(chromosomes);
+    /**
+     * @param chromosomes collection of chromosomes
+     */
+    public Population(List<T> chromosomes) {
+        this.chromosomes = Lists.mutable.ofAll(chromosomes);
     }
 
-    public Chromosome getChromosome(int index) {
-        return chromosomes.get(index);
+    /**
+     * @param index position to get
+     * @return index in the population
+     */
+    public T getChromosome(int index) {
+        return this.chromosomes.get(index);
     }
 
-    public void setChromosome(int index, Chromosome chromosome) {
+    /**
+     * @param index      position to set
+     * @param chromosome target to set
+     */
+    public void setChromosome(int index, T chromosome) {
         this.chromosomes.set(index, chromosome);
     }
 
-    public int indexOf(Chromosome chromosome) {
-        return chromosomes.indexOf(chromosome);
+    /**
+     * @param chromosome target
+     * @return -1 if not in the population, index otherwise
+     */
+    public int indexOf(T chromosome) {
+        return this.chromosomes.indexOf(chromosome);
     }
 
-    public void addChromosome(Chromosome chromosome) {
-        chromosomes.add(chromosome);
+    /**
+     * @param chromosome target to add
+     */
+    public void addChromosome(T chromosome) {
+        this.chromosomes.add(chromosome);
     }
 
-    public void addChromosomes(List<Chromosome> chromosomes) {
+    /**
+     * @param chromosomes collection of chromosomes to add
+     */
+    public void addChromosomes(List<T> chromosomes) {
         this.chromosomes.addAll(chromosomes);
     }
 
+    /**
+     * @return size of the population
+     */
     public int size() {
-        return chromosomes.size();
+        return this.chromosomes.size();
     }
 
-    public List<Chromosome> getChromosomes() {
-        return chromosomes;
+    /**
+     * @return population
+     */
+    public List<T> getChromosomes() {
+        return this.chromosomes;
     }
 
+    /**
+     * Generate the next generation
+     *
+     * @param elitism the number of chromosomes will inherit by next generation
+     * @return new population
+     */
+    public Population<T> nextGeneration(int elitism) {
+        return new Population<>(this.chromosomes.sortThisByDouble(Chromosome::getFitness).take(elitism));
+    }
+
+    /**
+     * Sort and trim the population to given length and return the best child
+     *
+     * @param length size of the population to be kept
+     * @return the best child
+     */
     public Chromosome trim(int length) {
-        chromosomes = chromosomes.stream()
-                .sorted(Comparator.comparingDouble(o -> o.fitness))
-                .limit(length).collect(Collectors.toList());
+        this.chromosomes = this.chromosomes.sortThisByDouble(Chromosome::getFitness).take(length);
         return chromosomes.get(0);
     }
 
+    /**
+     * @return iterator object
+     */
     @NonNull
     @Override
-    public Iterator<Chromosome> iterator() {
+    public Iterator<T> iterator() {
         return chromosomes.iterator();
     }
 }

@@ -2,9 +2,8 @@ package genetics.interfaces;
 
 import genetics.chromosome.Chromosome;
 import genetics.common.Population;
-import genetics.utils.RandEngine;
 import org.eclipse.collections.api.tuple.Pair;
 
-public interface SelectionPolicy {
-    Pair<Chromosome, Chromosome> select(Population population, int arity, RandEngine randEngine);
+public interface SelectionPolicy<T extends Chromosome> {
+    Pair<T, T> select(Population<T> population, int arity);
 }

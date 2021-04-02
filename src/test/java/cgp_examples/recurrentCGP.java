@@ -3,6 +3,8 @@ package cgp_examples;
 import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 
+import static cgp_examples.AverageBehaviour.initialiseDataSetFromFile;
+
 class recurrentCGP {
 
     public static void main(String[] args) {
@@ -22,7 +24,7 @@ class recurrentCGP {
         solver.setRecurrentConnectionProbability(recurrentConnectionProbability);
         solver.printParams();
 
-        solver.initialiseDataSetFromFile("fibonacci.data");
+        solver.setData(initialiseDataSetFromFile("problems/cgp/fibonacci.data"));
 
         solver.evolve(numGens);
 

@@ -6,22 +6,22 @@ import genetics.interfaces.FitnessCalc;
 
 import java.util.Optional;
 
-public class SequentialExecutor extends Executor {
+public class SequentialExecutor<T extends Chromosome> extends Executor<T> {
 
-    private final FitnessCalc fitnessCalc;
+    private final FitnessCalc<T> fitnessCalc;
 
-    public SequentialExecutor(FitnessCalc fitnessCalc) {
+    public SequentialExecutor(FitnessCalc<T> fitnessCalc) {
         this.fitnessCalc = fitnessCalc;
     }
 
     @Override
-    public Chromosome evaluate(Population population) {
+    public T evaluate(Population<T> population) {
         double bestFitness = Double.MAX_VALUE;
-        Optional<Chromosome> bestChromosome = Optional.empty();
-        for (Chromosome chromosome : population) {
-            chromosome.fitness = fitnessCalc.calc(chromosome);
-            if (chromosome.fitness < bestFitness) {
-                bestFitness = chromosome.fitness;
+        Optional<T> bestChromosome = Optional.empty();
+        for (T chromosome : population) {
+            chromosome.setFitness(fitnessCalc.calc(chromosome));
+            if (chromosome.getFitness() < bestFitness) {
+                bestFitness = chromosome.getFitness();
                 bestChromosome = Optional.of(chromosome);
             }
         }
