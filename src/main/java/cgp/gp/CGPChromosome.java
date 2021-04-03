@@ -471,19 +471,19 @@ public class CGPChromosome extends Chromosome {
         return this.outputNodes[index];
     }
 
-    public int getActiveNode(int index) {
-        if (index < 0 || index >= this.activeNodes.length) {
-            throw new IndexOutOfBoundsException(String.format("Active Nodes have size %s but get index %s", this.activeNodes.length, index));
-        }
-        return this.activeNodes[index];
-    }
-
     /**
      * @param index
      * @param outputNodeIndex
      */
     public void setOutputNode(int index, int outputNodeIndex) {
         this.outputNodes[index] = outputNodeIndex;
+    }
+
+    public int getActiveNode(int index) {
+        if (index < 0 || index >= this.activeNodes.length) {
+            throw new IndexOutOfBoundsException(String.format("Active Nodes have size %s but get index %s", this.activeNodes.length, index));
+        }
+        return this.activeNodes[index];
     }
 
     /**

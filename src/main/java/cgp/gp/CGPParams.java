@@ -228,7 +228,7 @@ public class CGPParams {
      * used as an interface to adding pre-set node functions.
      * returns one if successful, zero otherwise.
      */
-    public boolean addPresetFunctionToFunctionSet(String functionName) {
+    public void addPresetFunctionToFunctionSet(String functionName) {
 
         /* Symbolic functions */
         switch (functionName.toLowerCase(Locale.ROOT)) {
@@ -332,7 +332,6 @@ public class CGPParams {
             default:
                 throw new IllegalArgumentException(String.format("Warning: function '%s' is not known which can be custom functions.", functionName));
         }
-        return true;
     }
 
     @Override

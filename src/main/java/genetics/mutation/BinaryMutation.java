@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Random;
 
 public class BinaryMutation<T extends BinaryChromosome> implements MutationPolicy<T> {
+    /**
+     * Randomly flip value on each position
+     *
+     * @param original chromosome
+     * @return mutated chromosome
+     */
     public T mutate(@NonNull T original) {
         // make sure does not modify the original chromosome
         List<Integer> newRepr = Lists.mutable.ofAll(original.getRepresentation());

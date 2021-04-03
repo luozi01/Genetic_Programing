@@ -20,6 +20,12 @@ public class SwapMutation<T extends AbstractListChromosome<?>> implements Mutati
         this.ratio = ratio;
     }
 
+    /**
+     * Randomly swap position of two values for each position in the chromosome
+     *
+     * @param original original chromosome
+     * @return mutated chromosome
+     */
     @Override
     public T mutate(@NonNull T original) {
         final List representation = Lists.mutable.ofAll(original.getRepresentation());

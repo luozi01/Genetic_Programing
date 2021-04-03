@@ -117,7 +117,7 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
 
         /* set fitness of the parents */
         for (int i = 0; i < params.getMu(); i++) {
-            parents.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(params, parents.get(i), data));
+            parents.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(parents.get(i), data));
         }
 
         /* show the user whats going on */
@@ -131,7 +131,7 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
 
             /* set fitness of the children of the population */
             for (int i = 0; i < params.getLambda(); i++) {
-                children.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(params, children.get(i), data));
+                children.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(children.get(i), data));
             }
 
             getBestChromosome(parents, children, params.getMu(), params.getLambda(), bestChromosome);
@@ -174,7 +174,7 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
             }
 
             /* select the parents from the candidateChromos */
-            ((CGPSelection) this.getSelectionPolicy()).select(params, parents, candidates, params.getMu(), numCandidate);
+            ((CGPSelection) this.getSelectionPolicy()).select(parents, candidates, params.getMu(), numCandidate);
 
             /* create the children from the parents */
             this.reproduction.reproduce(params, parents, children, params.getMu(), params.getLambda());

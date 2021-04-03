@@ -18,6 +18,11 @@ public class Results {
         bestCGPChromosomes = Lists.mutable.empty();
     }
 
+    /**
+     * Add chromosome
+     *
+     * @param cgpChromosome chromosome
+     */
     public void add(CGPChromosome cgpChromosome) {
         bestCGPChromosomes.add(cgpChromosome);
     }
@@ -106,6 +111,11 @@ public class Results {
         return medianInt(array, bestCGPChromosomes.size());
     }
 
+    /**
+     * Get the best chromosome so far
+     *
+     * @return best chromosome
+     */
     public CGPChromosome getBestChromosome() {
         return bestCGPChromosomes.stream().min(Comparator.comparingDouble(Chromosome::getFitness)).orElse(null);
     }

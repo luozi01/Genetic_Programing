@@ -7,6 +7,11 @@ import cgp.interfaces.CGPMutation;
 import static java.lang.Math.round;
 
 public class PointANNMutation implements CGPMutation {
+    /**
+     * @param params hyper parameters
+     * @param c      chromosome
+     * @return mutated chromosome
+     */
     @Override
     public CGPChromosome mutate(CGPParams params, CGPChromosome c) {
         CGPChromosome copy = c.copy();
@@ -68,6 +73,12 @@ public class PointANNMutation implements CGPMutation {
         return copy;
     }
 
+    /**
+     * Not used in CGP
+     *
+     * @param var1 chromosome
+     * @return null
+     */
     @Override
     public CGPChromosome mutate(CGPChromosome var1) {
         return null;

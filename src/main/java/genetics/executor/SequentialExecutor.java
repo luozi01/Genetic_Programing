@@ -14,6 +14,12 @@ public class SequentialExecutor<T extends Chromosome> extends Executor<T> {
         this.fitnessCalc = fitnessCalc;
     }
 
+    /**
+     * Compute fitness for each child in population in sequential order
+     *
+     * @param population population
+     * @return best child
+     */
     @Override
     public T evaluate(Population<T> population) {
         double bestFitness = Double.MAX_VALUE;

@@ -15,6 +15,13 @@ import java.util.Random;
 public class TournamentSelection<T extends Chromosome> implements SelectionPolicy<T> {
     private final Random random = new Random(System.currentTimeMillis());
 
+    /**
+     * Random select two groups of children based on arity and return the best from each group
+     *
+     * @param population population
+     * @param arity      complete group size
+     * @return best children from each tournament group
+     */
     @Override
     public Pair<T, T> select(final Population<T> population, final int arity) {
         // create a copy of population

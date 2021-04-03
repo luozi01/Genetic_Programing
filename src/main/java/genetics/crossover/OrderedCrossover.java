@@ -2,6 +2,7 @@ package genetics.crossover;
 
 import genetics.chromosome.AbstractListChromosome;
 import genetics.interfaces.CrossoverPolicy;
+import lombok.NonNull;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
@@ -14,11 +15,6 @@ import java.util.Random;
 public class OrderedCrossover<T extends AbstractListChromosome<?>> implements CrossoverPolicy<T> {
     private final Random random = new Random(System.currentTimeMillis());
 
-    @Override
-    public Pair<T, T> crossover(T var1, T var2) {
-        return mate(var1, var2);
-    }
-
     /**
      * Performs order crossover on two parents
      *
@@ -26,8 +22,8 @@ public class OrderedCrossover<T extends AbstractListChromosome<?>> implements Cr
      * @param second second parent
      * @return two new offspring
      */
-    // Handle wildcard
-    private Pair<T, T> mate(final T first, final T second) {
+    @Override
+    public Pair<T, T> crossover(@NonNull T first, @NonNull T second) {
         if (first.length() != second.length()) {
             throw new IllegalArgumentException(String.format("Length for both chromosome should be the same, but chromosome1 has %d, chromosome2 has %d", first.length(), second.length()));
         }

@@ -24,6 +24,14 @@ public class GlobalDistributionExecutor<T extends Chromosome> extends Executor<T
         this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
+    /**
+     * Compute fitness for each child in population in parallel
+     *
+     * @param population population
+     * @return best child
+     * @throws InterruptedException interrupted exception
+     * @throws ExecutionException   execution exception
+     */
     @Override
     public T evaluate(Population<T> population) throws InterruptedException, ExecutionException {
         Collection<Callable<T>> callable = Lists.mutable.ofInitialCapacity(population.size());
@@ -44,6 +52,9 @@ public class GlobalDistributionExecutor<T extends Chromosome> extends Executor<T
         return bestChromosome.orElse(null);
     }
 
+    /**
+     * Shut down the executor service
+     */
     @Override
     public void shutDown() {
         executorService.shutdown();
