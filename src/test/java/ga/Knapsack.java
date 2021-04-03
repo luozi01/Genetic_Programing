@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Mike on 2016/11/3.
@@ -54,7 +55,7 @@ public class Knapsack {
         return K[val.length][W];
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         System.out.println("Initialization");
 
         int defaultGeneLength = 40;

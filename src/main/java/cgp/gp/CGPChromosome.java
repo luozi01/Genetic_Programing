@@ -15,22 +15,33 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
-@Getter
-@Setter
 @NoArgsConstructor
 public class CGPChromosome extends Chromosome {
+    @Getter
+    @Setter
     private int numInputs;
+    @Getter
+    @Setter
     private int numOutputs;
+    @Getter
+    @Setter
     private int numNodes;
+    @Getter
+    @Setter
     private int numActiveNodes;
+    @Getter
+    @Setter
     private int arity;
+    @Getter
+    @Setter
+    private int generation;
+    @Getter
+    private MutableList<CGPFunction> funcSet;
     private Node[] nodes;
     private int[] outputNodes;
     private int[] activeNodes;
     private double[] outputValues;
-    private MutableList<CGPFunction> funcSet;
     private double[] nodeInputsHold;
-    private int generation;
 
     public CGPChromosome(CGPParams params) {
         this.numNodes = params.getNumNodes();
@@ -107,9 +118,7 @@ public class CGPChromosome extends Chromosome {
         /* for each function name */
         line = scanner.nextLine().split(",");
         for (int k = 0; k < line.length - 1; k++) {
-            if (!params.addPresetFunctionToFunctionSet(line[k + 1])) {
-                throw new IllegalArgumentException("Error: cannot load chromosome which contains custom node functions.");
-            }
+            params.addPresetFunctionToFunctionSet(line[k + 1]);
         }
 
         /* initialise a chromosome based on the parameters associated with given chromosome */
@@ -118,13 +127,13 @@ public class CGPChromosome extends Chromosome {
         /* set the node parameters */
         for (int i = 0; i < numNodes; i++) {
             /* get the function gene */
-            chromosome.nodes[i].function = scanner.nextInt();
+            chromosome.nodes[i].setFunction(scanner.nextInt());
 
             scanner.nextLine();
             for (int j = 0; j < arity; j++) {
                 line = scanner.nextLine().split(",");
-                chromosome.nodes[i].inputs[j] = Integer.parseInt(line[0]);
-                chromosome.nodes[i].weights[j] = Double.parseDouble(line[1]);
+                chromosome.nodes[i].setInput(j, Integer.parseInt(line[0]));
+                chromosome.nodes[i].setWeight(j, Double.parseDouble(line[1]));
             }
         }
 
@@ -138,6 +147,20 @@ public class CGPChromosome extends Chromosome {
         return chromosome;
     }
 
+    public static CGPChromosome deserialization(String fileName) throws FileNotFoundException {
+        File file = new File(fileName);
+        StringBuilder serial = new StringBuilder();
+        @Cleanup Scanner scanner = new Scanner(file);
+        while (scanner.hasNextLine()) {
+            serial.append(scanner.nextLine()).append("\n");
+        }
+
+        if (serial.length() == 0) {
+            throw new IllegalStateException("File is empty, cannot reconstruct chromosome from it");
+        }
+        return reconstruct(serial.toString());
+    }
+
     public void removeInactiveNodes() {
 
         /* set the active nodes */
@@ -147,7 +170,7 @@ public class CGPChromosome extends Chromosome {
         for (int i = 0; i < this.numNodes - 1; i++) {
 
             /* if the node is inactive */
-            if (!this.nodes[i].active) {
+            if (!this.nodes[i].isActive()) {
 
                 /* set the node to be the next node */
                 for (int j = i; j < this.numNodes - 1; j++) {
@@ -157,8 +180,8 @@ public class CGPChromosome extends Chromosome {
                 /* */
                 for (int j = 0; j < this.numNodes; j++) {
                     for (int k = 0; k < this.arity; k++) {
-                        if (this.nodes[j].inputs[k] >= i + this.numInputs) {
-                            this.nodes[j].inputs[k]--;
+                        if (this.nodes[j].getInput(k) >= i + this.numInputs) {
+                            this.nodes[j].setInput(k, this.nodes[j].getInput(k) - 1);
                         }
                     }
                 }
@@ -178,12 +201,18 @@ public class CGPChromosome extends Chromosome {
             }
         }
 
-        if (!this.nodes[this.numNodes - 1].active) {
+        if (!this.nodes[this.numNodes - 1].isActive()) {
             this.numNodes--;
         }
 
         /* set the active nodes */
         setChromosomeActiveNodes();
+    }
+
+    public void updateFitness(double value) {
+        this.setChromosomeActiveNodes();
+        this.resetChromosome();
+        this.setFitness(value);
     }
 
     /**
@@ -195,7 +224,7 @@ public class CGPChromosome extends Chromosome {
 
         /* reset the active nodes */
         for (int i = 0; i < this.numNodes; i++) {
-            nodes[i].active = false;
+            nodes[i].setActive(false);
         }
 
         /* start the recursive search for active nodes from the outputNodes nodes for the number of outputNodes nodes */
@@ -214,12 +243,6 @@ public class CGPChromosome extends Chromosome {
         Arrays.sort(activeNodes, 0, numActiveNodes);
     }
 
-    public void updateFitness(double value) {
-        this.setChromosomeActiveNodes();
-        this.resetChromosome();
-        this.setFitness(value);
-    }
-
     /**
      * used by setActiveNodes to recursively search for active nodes
      */
@@ -235,18 +258,23 @@ public class CGPChromosome extends Chromosome {
         }
 
         /* log the node as active */
-        chromosome.nodes[nodeIndex - chromosome.numInputs].active = true;
+        chromosome.nodes[nodeIndex - chromosome.numInputs].setActive(true);
         chromosome.activeNodes[chromosome.numActiveNodes] = nodeIndex - chromosome.numInputs;
         chromosome.numActiveNodes++;
 
         /* set the nodes actual arity*/
-        chromosome.nodes[nodeIndex - chromosome.numInputs].actArity =
-                chromosome.getChromosomeNodeArity(nodeIndex - chromosome.numInputs);
+        chromosome.nodes[nodeIndex - chromosome.numInputs].setActArity(
+                chromosome.getChromosomeNodeArity(nodeIndex - chromosome.numInputs));
 
         /* recursively log all the nodes to which the current nodes connect as active */
-        for (int i = 0; i < chromosome.nodes[nodeIndex - chromosome.numInputs].actArity; i++) {
+        for (int i = 0; i < chromosome.nodes[nodeIndex - chromosome.numInputs].getActArity(); i++) {
             recursivelySetActiveNodes(chromosome, chromosome.nodes[nodeIndex - chromosome.numInputs].getInput(i));
         }
+    }
+
+    public void mutate(CGPParams params) {
+        this.copyChromosome(params.getMutationPolicy().mutate(params, this));
+        this.setChromosomeActiveNodes();
     }
 
     /**
@@ -262,7 +290,7 @@ public class CGPChromosome extends Chromosome {
             int currentActiveNode = this.activeNodes[i];
 
             /* get the arity of the current node */
-            int nodeArity = this.nodes[currentActiveNode].actArity;
+            int nodeArity = this.nodes[currentActiveNode].getActArity();
 
             /* for each of the active nodes inputs */
             for (int j = 0; j < nodeArity; j++) {
@@ -273,55 +301,34 @@ public class CGPChromosome extends Chromosome {
                 if (nodeInputLocation < numInputs) {
                     this.nodeInputsHold[j] = inputs[nodeInputLocation];
                 } else {
-                    this.nodeInputsHold[j] = this.nodes[nodeInputLocation - numInputs].output;
+                    this.nodeInputsHold[j] = this.nodes[nodeInputLocation - numInputs].getOutput();
                 }
             }
 
             /* get the functionality of the active node under evaluation */
-            int currentActiveNodeFunction = this.nodes[currentActiveNode].function;
+            int currentActiveNodeFunction = this.nodes[currentActiveNode].getFunction();
 
             /* calculate the outputNodes of the active node under evaluation */
-            this.nodes[currentActiveNode].output = this.funcSet.get(currentActiveNodeFunction)
-                    .calc(nodeArity, this.nodeInputsHold, this.nodes[currentActiveNode].weights);
+            this.nodes[currentActiveNode].setOutput(this.funcSet.get(currentActiveNodeFunction)
+                    .calc(nodeArity, this.nodeInputsHold, this.nodes[currentActiveNode].getWeights()));
 
             /* deal with doubles becoming NAN */
-            if (Double.isNaN(this.nodes[currentActiveNode].output)) {
-                this.nodes[currentActiveNode].output = 0;
-            } else if (Double.isInfinite(this.nodes[currentActiveNode].output)) {
-                this.nodes[currentActiveNode].output = this.nodes[currentActiveNode].output > 0 ?
-                        Double.MAX_VALUE : Double.MIN_VALUE;
+            if (Double.isNaN(this.nodes[currentActiveNode].getOutput())) {
+                this.nodes[currentActiveNode].setOutput(0);
+            } else if (Double.isInfinite(this.nodes[currentActiveNode].getOutput())) {
+                this.nodes[currentActiveNode].setOutput(this.nodes[currentActiveNode].getOutput() > 0 ?
+                        Double.MAX_VALUE : Double.MIN_VALUE);
             }
         }
 
         /* Set the chromosome outputs */
         for (int i = 0; i < numOutputs; i++) {
-            if (this.outputNodes[i] < numInputs)
+            if (this.outputNodes[i] < numInputs) {
                 this.outputValues[i] = inputs[this.outputNodes[i]];
-            else
-                this.outputValues[i] = this.nodes[this.outputNodes[i] - numInputs].output;
+            } else {
+                this.outputValues[i] = this.nodes[this.outputNodes[i] - numInputs].getOutput();
+            }
         }
-    }
-
-    public void mutate(CGPParams params) {
-        this.copyChromosome(params.getMutationPolicy().mutate(params, this));
-        this.setChromosomeActiveNodes();
-    }
-
-    public static CGPChromosome deserialization(String fileName) {
-        File file = new File(fileName);
-        StringBuilder serial = new StringBuilder();
-        try {
-            @Cleanup Scanner scanner = new Scanner(file);
-            while (scanner.hasNextLine())
-                serial.append(scanner.nextLine()).append("\n");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (serial.length() == 0)
-            throw new IllegalStateException("File is empty, cannot reconstruct chromosome from it");
-        else
-            return reconstruct(serial.toString());
     }
 
     public void mutate(CGPParams params, int i) {
@@ -356,9 +363,9 @@ public class CGPChromosome extends Chromosome {
 
         /* save the chromosome structure */
         for (int i = 0; i < numNodes; i++) {
-            sb.append(String.format("%d\n", nodes[i].function));
+            sb.append(String.format("%d\n", nodes[i].getFunction()));
             for (int j = 0; j < arity; j++) {
-                sb.append(String.format("%d,%f\n", nodes[i].inputs[j], nodes[i].weights[j]));
+                sb.append(String.format("%d,%f\n", nodes[i].getInput(j), nodes[i].getWeight(j)));
             }
         }
 
@@ -483,46 +490,41 @@ public class CGPChromosome extends Chromosome {
      * reset the outputNodes values of all chromosome nodes to zero
      */
     void resetChromosome() {
-        IntStream.range(0, this.numNodes).forEach(i -> this.nodes[i].output = 0);
+        IntStream.range(0, this.numNodes).forEach(i -> this.nodes[i].setOutput(0));
     }
 
     /**
      * used to access the chromosome outputs after executeChromosome
      * has been called
      */
-    public double getChromosomeOutput(int output) {
-
-        if (output < 0 || output > this.numOutputs) {
-            System.out.print("Error: outputNodes less than or greater than the number of chromosome outputs. Called from getChromosomeOutput.\n");
-            System.exit(0);
+    public double getChromosomeOutput(int index) {
+        if (index < 0 || index > this.numOutputs) {
+            throw new IndexOutOfBoundsException("Error: outputNodes less than or greater than the number of chromosome outputs. Called from getChromosomeOutput.");
         }
 
-        return this.outputValues[output];
+        return this.outputValues[index];
     }
 
     /**
      * used to access the chromosome node values after executeChromosome
      * has been called
      */
-    public double getChromosomeNodeValue(int node) {
-        if (node < 0 || node > this.numNodes) {
-            System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from getChromosomeNodeValue.\n");
-            System.exit(0);
+    public double getChromosomeNodeValue(int index) {
+        if (index < 0 || index > this.numNodes) {
+            throw new IndexOutOfBoundsException("Error: node less than or greater than the number of nodes  in chromosome. Called from getChromosomeNodeValue.");
         }
-        return this.nodes[node].output;
+        return this.nodes[index].getOutput();
     }
 
     /**
      * returns whether the specified node is active in the given chromosome
      */
-    public boolean isNodeActive(int node) {
-
-        if (node < 0 || node > this.numNodes) {
-            System.out.print("Error: node less than or greater than the number of nodes  in chromosome. Called from isNodeActive.\n");
-            System.exit(0);
+    public boolean isNodeActive(int index) {
+        if (index < 0 || index > this.numNodes) {
+            throw new IllegalArgumentException("Error: node less than or greater than the number of nodes  in chromosome. Called from isNodeActive.");
         }
 
-        return this.nodes[node].active;
+        return this.nodes[index].isActive();
     }
 
     /**
@@ -530,19 +532,16 @@ public class CGPChromosome extends Chromosome {
      */
     int getChromosomeNodeArity(int index) {
         int chromoArity = this.arity;
-        int maxArity = this.funcSet.get(this.nodes[index].function).arity();
+        int maxArity = this.funcSet.get(this.nodes[index].getFunction()).arity();
 
-        if (maxArity == -1) {
-            return chromoArity;
-        } else
-            return Math.min(maxArity, chromoArity);
+        return maxArity == -1 ? chromoArity : Math.min(maxArity, chromoArity);
     }
 
     /**
      * Gets the number of active connections in the given chromosome
      */
     public int getNumChromosomeActiveConnections() {
-        return IntStream.range(0, this.numActiveNodes).map(i -> this.nodes[this.activeNodes[i]].actArity).sum();
+        return IntStream.range(0, this.numActiveNodes).map(i -> this.nodes[this.activeNodes[i]].getActArity()).sum();
     }
 
     public String toString(boolean weights) {
@@ -558,18 +557,18 @@ public class CGPChromosome extends Chromosome {
         /* for all the hidden nodes */
         for (int i = 0; i < this.numNodes; i++) {
             /* print the node function */
-            sb.append(String.format("(%d):\t%s\t", this.numInputs + i, this.funcSet.get(this.nodes[i].function)));
+            sb.append(String.format("(%d):\t%s\t", this.numInputs + i, this.funcSet.get(this.nodes[i].getFunction())));
             /* for the arity of the node */
             for (int j = 0; j < this.getChromosomeNodeArity(i); j++) {
                 /* print the node input information */
                 if (weights) {
-                    sb.append(String.format("%d,%+.1f\t", this.nodes[i].inputs[j], this.nodes[i].weights[j]));
+                    sb.append(String.format("%d,%+.1f\t", this.nodes[i].getInput(j), this.nodes[i].getWeight(j)));
                 } else {
-                    sb.append(String.format("%d ", this.nodes[i].inputs[j]));
+                    sb.append(String.format("%d ", this.nodes[i].getInput(j)));
                 }
             }
             /* Highlight active nodes */
-            if (this.nodes[i].active) {
+            if (this.nodes[i].isActive()) {
                 sb.append("*");
             }
             sb.append("\n");

@@ -20,7 +20,7 @@ public class ProbabilisticOnlyActiveMutation implements CGPMutation {
 
             /* mutate the function gene */
             if (params.uniform() <= params.getMutationRate()) {
-                copy.getNode(activeNode).function = params.getRandomFunction(copy.getFuncSet().size());
+                copy.getNode(activeNode).setFunction(params.getRandomFunction(copy.getFuncSet().size()));
             }
 
             /* for every input to each chromosome */

@@ -21,20 +21,21 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 @Getter
 @Setter
 public class GeneticAlgorithm<T extends Chromosome> {
-    protected FitnessCalc<T> fitnessCalc;
-    protected CrossoverPolicy<T> crossoverPolicy;
-    protected MutationPolicy<T> mutationPolicy;
-    protected SelectionPolicy<T> selectionPolicy;
+    private FitnessCalc<T> fitnessCalc;
+    private CrossoverPolicy<T> crossoverPolicy;
+    private MutationPolicy<T> mutationPolicy;
+    private SelectionPolicy<T> selectionPolicy;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    protected Optional<T> bestChromosome = Optional.empty();
+    private Optional<T> bestChromosome = Optional.empty();
     private int populationSize;
     private final List<TerminationCheck<T>> terminationChecks = Lists.mutable.empty();
     private final Random random = new Random(System.currentTimeMillis());
-    protected Population<T> population;
+    private Population<T> population;
     private int generation;
     private Executor<T> executor;
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
@@ -105,7 +106,7 @@ public class GeneticAlgorithm<T extends Chromosome> {
     /**
      * @param iteration fix iteration evolution
      */
-    public void evolve(int iteration) {
+    public void evolve(int iteration) throws ExecutionException, InterruptedException {
         // reset variable
         initExecutor();
         terminate = false;
@@ -127,7 +128,7 @@ public class GeneticAlgorithm<T extends Chromosome> {
     /**
      * evolve until termination conditions fulfill
      */
-    public void evolve() {
+    public void evolve() throws ExecutionException, InterruptedException {
         // reset variable
         initExecutor();
         terminate = false;
@@ -146,7 +147,7 @@ public class GeneticAlgorithm<T extends Chromosome> {
     /**
      * @return next evolved population
      */
-    protected Population<T> evolvePopulation() {
+    protected Population<T> evolvePopulation() throws ExecutionException, InterruptedException {
         // Keep our best individual, reproduction
         Population<T> nextGeneration = population.nextGeneration(Math.min(populationSize, elitism));
         // generate new generation
@@ -195,8 +196,9 @@ public class GeneticAlgorithm<T extends Chromosome> {
      * @param chromosome global best chromosome
      */
     public void updateGlobal(T chromosome) {
-        if (!bestChromosome.isPresent() || chromosome.betterThan(bestChromosome.get()))
+        if (!bestChromosome.isPresent() || chromosome.betterThan(bestChromosome.get())) {
             bestChromosome = Optional.of(chromosome);
+        }
     }
 
     /**

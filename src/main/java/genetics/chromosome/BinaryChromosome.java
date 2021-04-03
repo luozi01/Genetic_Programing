@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public abstract class BinaryChromosome extends IntegerChromosome {
-    private static final Random randEngine = new Random();
+    private static final Random RAND_ENGINE = new Random();
 
     /**
      * Constructor.
@@ -34,7 +34,7 @@ public abstract class BinaryChromosome extends IntegerChromosome {
      */
     public static List<Integer> randomBinaryRepresentation(int length) {
         return IntStream.range(0, length)
-                .mapToObj(j -> randEngine.nextInt(2))
+                .mapToObj(j -> RAND_ENGINE.nextInt(2))
                 .collect(Collectors.toList());
     }
 

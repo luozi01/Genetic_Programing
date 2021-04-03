@@ -33,9 +33,9 @@ public class SingleMutation implements CGPMutation {
             /* mutate function gene */
             if (geneToMutate < numFunctionGenes) {
                 nodeIndex = geneToMutate;
-                previousGeneValue = copy.getNode(nodeIndex).function;
-                copy.getNode(nodeIndex).function = params.getRandomFunction(copy.getFuncSet().size());
-                newGeneValue = copy.getNode(nodeIndex).function;
+                previousGeneValue = copy.getNode(nodeIndex).getFunction();
+                copy.getNode(nodeIndex).setFunction(params.getRandomFunction(copy.getFuncSet().size()));
+                newGeneValue = copy.getNode(nodeIndex).getFunction();
                 if ((previousGeneValue != newGeneValue) && (copy.isNodeActive(nodeIndex))) {
                     mutatedActive = true;
                 }

@@ -12,9 +12,11 @@ import genetics.interfaces.CrossoverPolicy;
 import genetics.interfaces.MutationPolicy;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.List;
 
+@Log4j2
 @Setter
 @Getter
 public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
@@ -46,27 +48,26 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
 
         Results results = new Results();
 
-        System.out.print("Run\tFitness\t\tGenerations\tActive nodes\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nRun\tFitness\t\tGenerations\tActive nodes\n");
 
         /* for each run */
         for (int i = 0; i < numRuns; i++) {
-            this.population = new Population<>(chromosomes);
+            this.setPopulation(new Population<>(chromosomes));
             this.evolve(numGens);
-            CGPChromosome best = this.getBestChromosome().orElse(null);
-            if (best != null) {
-                results.add(best);
-            }
-            System.out.printf("%d\t%f\t%d\t\t%d\n", i,
-                    results.bestCGPChromosomes.get(i).getFitness(),
-                    results.bestCGPChromosomes.get(i).getGeneration(),
-                    results.bestCGPChromosomes.get(i).getNumActiveNodes());
+            this.getBestChromosome().ifPresent(results::add);
+            sb.append(String.format("%d\t%f\t%d\t\t%d\n", i,
+                    results.getBestCGPChromosomes().get(i).getFitness(),
+                    results.getBestCGPChromosomes().get(i).getGeneration(),
+                    results.getBestCGPChromosomes().get(i).getNumActiveNodes()));
         }
 
-        System.out.print("----------------------------------------------------\n");
-        System.out.printf("MEAN\t%f\t%f\t%f\n", results.getAverageFitness(), results.getAverageGenerations(), results.getAverageActiveNodes());
-        System.out.printf("MEDIAN\t%f\t%f\t%f\n", results.getMedianFitness(), results.getMedianGenerations(), results.getMedianActiveNodes());
-        System.out.print("----------------------------------------------------\n\n");
+        sb.append("----------------------------------------------------\n")
+                .append(String.format("MEAN\t%f\t%f\t%f\n", results.getAverageFitness(), results.getAverageGenerations(), results.getAverageActiveNodes()))
+                .append(String.format("MEDIAN\t%f\t%f\t%f\n", results.getMedianFitness(), results.getMedianGenerations(), results.getMedianActiveNodes()))
+                .append("----------------------------------------------------\n\n");
 
+        log.info(sb.toString());
         /* restore the original value for the update frequency */
         params.setUpdateFrequency(updateFrequency);
 
@@ -83,15 +84,15 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
             throw new IllegalArgumentException(String.format("%d generations is invalid. The number of generations must be >= 0.", iteration));
         }
 
-        if (data != null && params.getNumInputs() != data.numInputs) {
-            throw new IllegalArgumentException(String.format("The number of inputs specified in the dataSet (%d) does not match the number of inputs specified in the parameters (%d).", data.numInputs, params.getNumInputs()));
+        if (data != null && params.getNumInputs() != data.getNumInputs()) {
+            throw new IllegalArgumentException(String.format("The number of inputs specified in the dataSet (%d) does not match the number of inputs specified in the parameters (%d).", data.getNumInputs(), params.getNumInputs()));
         }
 
-        if (data != null && params.getNumOutputs() != data.numOutputs) {
-            throw new IllegalArgumentException(String.format("The number of outputs specified in the dataSet (%d) does not match the number of outputs specified in the parameters (%d).", data.numOutputs, params.getNumOutputs()));
+        if (data != null && params.getNumOutputs() != data.getNumOutputs()) {
+            throw new IllegalArgumentException(String.format("The number of outputs specified in the dataSet (%d) does not match the number of outputs specified in the parameters (%d).", data.getNumOutputs(), params.getNumOutputs()));
         }
 
-        List<CGPChromosome> result = initializer.generate(params, params.getMu(), params.getLambda(), population);
+        List<CGPChromosome> result = initializer.generate(params, params.getMu(), params.getLambda(), this.getPopulation());
 
         /* initialise parent chromosomes */
         List<CGPChromosome> parents = result.subList(0, params.getMu());
@@ -116,13 +117,13 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
 
         /* set fitness of the parents */
         for (int i = 0; i < params.getMu(); i++) {
-            parents.get(i).updateFitness(((CGPFitness) fitnessCalc).calc(params, parents.get(i), data));
+            parents.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(params, parents.get(i), data));
         }
 
         /* show the user whats going on */
         if (params.getUpdateFrequency() != 0) {
-            System.out.print("\n-- Starting CGP --\n\n");
-            System.out.print("Gen\tfitness\n");
+            log.info("-- Starting CGP --");
+            log.info("Gen\tfitness");
         }
 
         /* for each generation */
@@ -130,7 +131,7 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
 
             /* set fitness of the children of the population */
             for (int i = 0; i < params.getLambda(); i++) {
-                children.get(i).updateFitness(((CGPFitness) fitnessCalc).calc(params, children.get(i), data));
+                children.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(params, children.get(i), data));
             }
 
             getBestChromosome(parents, children, params.getMu(), params.getLambda(), bestChromosome);
@@ -138,14 +139,14 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
             // check termination conditions
             if (bestChromosome.getFitness() <= params.getTargetFitness()) {
                 if (params.getUpdateFrequency() != 0) {
-                    System.out.printf("%d\t%f - Solution Found\n", gen, bestChromosome.getFitness());
+                    log.info("{}\t{} - Solution Found", gen, bestChromosome.getFitness());
                 }
                 break;
             }
 
             // display progress to the user at the update frequency specified
             if (params.getUpdateFrequency() != 0 && (gen % params.getUpdateFrequency() == 0 || gen >= iteration - 1)) {
-                System.out.printf("%d\t%f\n", gen, bestChromosome.getFitness());
+                log.info("{}\t{}", gen, bestChromosome.getFitness());
             }
 
             // Set the chromosomes which will be used by the selection scheme
@@ -173,15 +174,10 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
             }
 
             /* select the parents from the candidateChromos */
-            ((CGPSelection) this.selectionPolicy).select(params, parents, candidates, params.getMu(), numCandidate);
+            ((CGPSelection) this.getSelectionPolicy()).select(params, parents, candidates, params.getMu(), numCandidate);
 
             /* create the children from the parents */
             this.reproduction.reproduce(params, parents, children, params.getMu(), params.getLambda());
-        }
-
-        /* deal with formatting for displaying progress */
-        if (params.getUpdateFrequency() != 0) {
-            System.out.println();
         }
 
         /* copy the best best chromosome */

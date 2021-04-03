@@ -2,6 +2,7 @@ package cgp.program;
 
 import cgp.gp.CGPChromosome;
 import genetics.chromosome.Chromosome;
+import lombok.Getter;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -9,8 +10,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.IntStream;
 
+@Getter
 public class Results {
-    public final MutableList<CGPChromosome> bestCGPChromosomes;
+    private final MutableList<CGPChromosome> bestCGPChromosomes;
 
     public Results() {
         bestCGPChromosomes = Lists.mutable.empty();
@@ -50,7 +52,7 @@ public class Results {
         Arrays.sort(copyArray, 0, length);
 
         return length % 2 == 0 ?
-                (copyArray[(length / 2)] + copyArray[(length / 2) - 1]) / 2 :  /* if even */
+                (copyArray[(length / 2)] + copyArray[(length / 2) - 1]) / 2. :  /* if even */
                 copyArray[(length - 1) / 2];  /* if odd */
     }
 

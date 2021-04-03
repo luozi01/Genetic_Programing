@@ -37,7 +37,7 @@ public class PointANNMutation implements CGPMutation {
 
                 nodeIndex = geneToMutate;
 
-                copy.getNode(nodeIndex).function = params.getRandomFunction(copy.getFuncSet().size());
+                copy.getNode(nodeIndex).setFunction(params.getRandomFunction(copy.getFuncSet().size()));
             }
 
             /* mutate node input gene */

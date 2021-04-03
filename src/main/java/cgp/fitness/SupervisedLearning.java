@@ -14,13 +14,13 @@ public class SupervisedLearning implements CGPFitness {
     @Override
     public double calc(CGPParams params, CGPChromosome chromosome, DataSet dataSet) {
         double error = 0;
-        if (chromosome.getNumInputs() != dataSet.numInputs) {
+        if (chromosome.getNumInputs() != dataSet.getNumInputs()) {
             throw new IllegalArgumentException("The number of chromosome inputs must match the number of inputs specified in the dataSet.");
         }
-        if (chromosome.getNumOutputs() != dataSet.numOutputs) {
+        if (chromosome.getNumOutputs() != dataSet.getNumOutputs()) {
             throw new IllegalArgumentException("The number of chromosome outputs must match the number of outputs specified in the dataSet.");
         }
-        for (int i = 0; i < dataSet.numSamples; i++) {
+        for (int i = 0; i < dataSet.getNumSamples(); i++) {
             chromosome.evaluate(dataSet.getDataSetSampleInputs(i));
             for (int j = 0; j < chromosome.getNumOutputs(); j++) {
                 error += Math.abs(chromosome.getChromosomeOutput(j) - dataSet.getDataSetSampleOutput(i, j));

@@ -19,9 +19,7 @@ public class Population<T extends Chromosome> implements Iterable<T> {
     /**
      * @param initialization initialize function
      */
-    public Population(Initialization<T> initialization) {
-        if (initialization == null)
-            throw new IllegalArgumentException("Initialization method cannot be null");
+    public Population(@NonNull Initialization<T> initialization) {
         List<T> generation = initialization.generate();
         if (generation == null) {
             this.chromosomes = Lists.mutable.empty();

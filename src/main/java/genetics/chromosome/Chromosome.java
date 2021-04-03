@@ -11,8 +11,9 @@ public abstract class Chromosome {
      * @return if current chromosome has smaller fitness than the compared one
      */
     public boolean betterThan(Chromosome another) {
-        if (another == null)
+        if (another == null) {
             throw new IllegalStateException("compare chromosome cannot be null");
+        }
         return Double.compare(fitness, another.fitness) < 0;
     }
 

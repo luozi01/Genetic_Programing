@@ -2,17 +2,14 @@ package genetics.mutation;
 
 import genetics.chromosome.BinaryChromosome;
 import genetics.interfaces.MutationPolicy;
+import lombok.NonNull;
 import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.List;
 import java.util.Random;
 
 public class BinaryMutation<T extends BinaryChromosome> implements MutationPolicy<T> {
-    public T mutate(T original) {
-        if (original == null) {
-            throw new NullPointerException();
-        }
-
+    public T mutate(@NonNull T original) {
         // make sure does not modify the original chromosome
         List<Integer> newRepr = Lists.mutable.ofAll(original.getRepresentation());
 

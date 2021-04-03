@@ -25,25 +25,21 @@ public class GlobalDistributionExecutor<T extends Chromosome> extends Executor<T
     }
 
     @Override
-    public T evaluate(Population<T> population) {
+    public T evaluate(Population<T> population) throws InterruptedException, ExecutionException {
         Collection<Callable<T>> callable = Lists.mutable.ofInitialCapacity(population.size());
         population.forEach(o -> callable.add(() -> {
             o.setFitness(fitnessCalc.calc(o));
             return o;
         }));
         Optional<T> bestChromosome = Optional.empty();
-        try {
-            List<Future<T>> futures = executorService.invokeAll(callable);
-            double bestFitness = Double.MAX_VALUE;
-            for (Future<T> future : futures) {
-                T chromosome = future.get();
-                if (chromosome.getFitness() < bestFitness) {
-                    bestFitness = chromosome.getFitness();
-                    bestChromosome = Optional.of(chromosome);
-                }
+        List<Future<T>> futures = executorService.invokeAll(callable);
+        double bestFitness = Double.MAX_VALUE;
+        for (Future<T> future : futures) {
+            T chromosome = future.get();
+            if (chromosome.getFitness() < bestFitness) {
+                bestFitness = chromosome.getFitness();
+                bestChromosome = Optional.of(chromosome);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
         }
         return bestChromosome.orElse(null);
     }

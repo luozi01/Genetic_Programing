@@ -171,10 +171,10 @@ public class CGPParams {
                 this.setMutationPolicy(new SingleMutation());
                 break;
             default:
-                System.err.printf("\nWarning: mutation type '%s' is invalid. " +
+                throw new IllegalArgumentException(String.format("\nWarning: mutation type '%s' is invalid. " +
                                 "The mutation type must be 'probabilistic' or 'point'. " +
                                 "The mutation type has been left unchanged as '%s'.\n",
-                        mutationType, this.mutationType);
+                        mutationType, this.mutationType));
         }
     }
 
@@ -330,8 +330,7 @@ public class CGPParams {
                 addCustomNodeFunction(wire);
                 break;
             default:
-                System.err.printf("Warning: function '%s' is not known and was not added.\n", functionName);
-                return false;
+                throw new IllegalArgumentException(String.format("Warning: function '%s' is not known which can be custom functions.", functionName));
         }
         return true;
     }
@@ -362,7 +361,7 @@ public class CGPParams {
             sb.append(String.format(" %s", this.functions.get(i)));
         }
         sb.append(String.format(" (%d)\n", this.functions.size()));
-        sb.append("-----------------------------------------------------------\n\n");
+        sb.append("-----------------------------------------------------------\n");
         return sb.toString();
     }
 }

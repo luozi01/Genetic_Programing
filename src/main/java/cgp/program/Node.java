@@ -1,15 +1,27 @@
 package cgp.program;
 
 import cgp.gp.CGPParams;
+import lombok.Getter;
+import lombok.Setter;
 
 public final class Node {
-    public int function;
-    public int[] inputs;
-    public double[] weights;
-    public boolean active;
-    public double output;
-    public int actArity;
-    public int maxArity;
+    @Getter
+    @Setter
+    private int function;
+    @Getter
+    @Setter
+    private boolean active;
+    @Getter
+    @Setter
+    private double output;
+    @Getter
+    @Setter
+    private int actArity;
+    @Getter
+    @Setter
+    private int maxArity;
+    private int[] inputs;
+    private double[] weights;
 
     public static Node initializeNode(CGPParams params, int index) {
         Node node = new Node();
@@ -68,6 +80,10 @@ public final class Node {
         return this.weights[index];
     }
 
+    public double[] getWeights() {
+        return this.weights.clone();
+    }
+
     /**
      * Set connection weight
      */
@@ -75,6 +91,11 @@ public final class Node {
         this.weights[index] = weight;
     }
 
+    /**
+     * Clone method
+     *
+     * @return clone instance
+     */
     public Node copy() {
         Node copy = new Node();
         // copy the node's function

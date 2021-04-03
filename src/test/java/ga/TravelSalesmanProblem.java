@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 public class TravelSalesmanProblem {
@@ -43,7 +44,11 @@ public class TravelSalesmanProblem {
                             }
                         });
                         long start = System.currentTimeMillis();
-                        ga.evolve(2000);
+                        try {
+                            ga.evolve(2000);
+                        } catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         Chromosome best = ga.getBest();
                         System.out.printf("Value: %.2f, Optimal Value: %d, Time: %.2f\n", best.getFitness(), tour.bestKnownSolution, (System.currentTimeMillis() - start) * 1.0 / 1000);
                     });

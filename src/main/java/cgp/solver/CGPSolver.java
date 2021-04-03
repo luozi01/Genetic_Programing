@@ -16,10 +16,11 @@ import cgp.reproduction.MutateRandomParentReproduction;
 import cgp.selection.FittestSelection;
 import genetics.common.Population;
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Optional;
 
-
+@Log4j2
 public class CGPSolver {
     private final CGPParams params;
     private final CGPEvolve model;
@@ -60,12 +61,11 @@ public class CGPSolver {
      * is invalid a warning is displayed and the mu value is left unchanged.
      */
     public void setMu(int mu) {
-        if (mu > 0) {
-            params.setMu(mu);
-        } else {
-            System.err.printf("Mu value '%d' is invalid. Mu value must have a value of one or greater. " +
-                    "Mu value left unchanged as '%d'.\n", mu, params.getMu());
+        if (mu <= 0) {
+            throw new IllegalArgumentException(String.format("Mu value '%d' is invalid. Mu value must have a value of one or greater. " +
+                    "Mu value left unchanged as '%d'.\n", mu, params.getMu()));
         }
+        params.setMu(mu);
     }
 
     /**
@@ -74,12 +74,11 @@ public class CGPSolver {
      * is left unchanged.
      */
     public void setLambda(int lambda) {
-        if (lambda > 0) {
-            params.setLambda(lambda);
-        } else {
-            System.err.printf("Lambda value '%d' is invalid. Lambda value must have a value of one or greater. " +
-                    "Lambda value left unchanged as '%d'.\n", lambda, params.getLambda());
+        if (lambda <= 0) {
+            throw new IllegalArgumentException(String.format("Lambda value '%d' is invalid. Lambda value must have a value of one or greater. " +
+                    "Lambda value left unchanged as '%d'.\n", lambda, params.getLambda()));
         }
+        params.setLambda(lambda);
     }
 
     /**
@@ -87,15 +86,14 @@ public class CGPSolver {
      * If an invalid option is given a warning is displayed and the evolutionary
      * strategy is left unchanged.
      */
-    public void setEvolutionaryStrategy(char evolutionaryStrategy) {
-        if (evolutionaryStrategy == '+' || evolutionaryStrategy == ',') {
-            params.setEvolutionaryStrategy(evolutionaryStrategy);
-        } else {
-            System.err.printf("\nWarning: the evolutionary strategy '%c' is invalid. " +
+    public void setEvolutionaryStrategy(char evolutionaryStrategy) { // Todo strategy to enum
+        if (evolutionaryStrategy != '+' && evolutionaryStrategy != ',') {
+            throw new IllegalArgumentException(String.format("\nWarning: the evolutionary strategy '%c' is invalid. " +
                             "The evolutionary strategy must be '+' or ','. " +
                             "The evolutionary strategy has been left unchanged as '%c'.\n",
-                    evolutionaryStrategy, params.getEvolutionaryStrategy());
+                    evolutionaryStrategy, params.getEvolutionaryStrategy()));
         }
+        params.setEvolutionaryStrategy(evolutionaryStrategy);
     }
 
     /**
@@ -104,13 +102,12 @@ public class CGPSolver {
      * unchanged.
      */
     public void setMutationRate(double mutationRate) {
-        if (mutationRate >= 0 && mutationRate <= 1) {
-            params.setMutationRate(mutationRate);
-        } else {
-            System.err.printf("\nWarning: mutation rate '%f' is invalid. " +
+        if (mutationRate < 0 || mutationRate > 1) {
+            throw new IllegalArgumentException(String.format("\nWarning: mutation rate '%f' is invalid. " +
                     "The mutation rate must be in the range [0,1]. " +
-                    "The mutation rate has been left unchanged as '%f'.\n", mutationRate, params.getMutationRate());
+                    "The mutation rate has been left unchanged as '%f'.\n", mutationRate, params.getMutationRate()));
         }
+        params.setMutationRate(mutationRate);
     }
 
     /**
@@ -118,14 +115,13 @@ public class CGPSolver {
      * value is given a warning is displayed and the value is left	unchanged.
      */
     public void setRecurrentConnectionProbability(double recurrentConnectionProbability) {
-        if (recurrentConnectionProbability >= 0 && recurrentConnectionProbability <= 1) {
-            params.setRecurrentConnectionProbability(recurrentConnectionProbability);
-        } else {
-            System.err.printf("\nWarning: recurrent connection probability '%f' is invalid. " +
+        if (recurrentConnectionProbability < 0 || recurrentConnectionProbability > 1) {
+            throw new IllegalArgumentException(String.format("\nWarning: recurrent connection probability '%f' is invalid. " +
                             "The recurrent connection probability must be in the range [0,1]. " +
                             "The recurrent connection probability has been left unchanged as '%f'.\n",
-                    recurrentConnectionProbability, params.getRecurrentConnectionProbability());
+                    recurrentConnectionProbability, params.getRecurrentConnectionProbability()));
         }
+        params.setRecurrentConnectionProbability(recurrentConnectionProbability);
     }
 
     /**
@@ -141,11 +137,10 @@ public class CGPSolver {
      */
     public void setUpdateFrequency(int updateFrequency) {
         if (updateFrequency < 0) {
-            System.err.printf("Warning: update frequency of %d is invalid. Update frequency must be >= 0. " +
-                    "Update frequency is left unchanged as %d.\n", updateFrequency, params.getUpdateFrequency());
-        } else {
-            params.setUpdateFrequency(updateFrequency);
+            throw new IllegalArgumentException(String.format("Warning: update frequency of %d is invalid. Update frequency must be >= 0. " +
+                    "Update frequency is left unchanged as %d.\n", updateFrequency, params.getUpdateFrequency()));
         }
+        params.setUpdateFrequency(updateFrequency);
     }
 
     /**
@@ -189,21 +184,12 @@ public class CGPSolver {
         params.setMutation(mutationType);
     }
 
-    public void initialiseDataSet(double[][] input, double[][] output, int numSamples, int numInput, int numOutput) {
-        if (input == null || output == null) {
-            throw new NullPointerException("Input or output cannot be null");
-        }
-        DataSet data = new DataSet();
-        data.numInputs = numInput;
-        data.numOutputs = numOutput;
-
-        data.numSamples = numSamples;
-        data.inputData = new double[data.numSamples][];
-        data.outputData = new double[data.numSamples][];
+    public void initialiseDataSet(@NonNull double[][] input, @NonNull double[][] output, int numSamples, int numInput, int numOutput) {
+        DataSet data = new DataSet(numSamples, numInput, numOutput);
 
         for (int i = 0; i < input.length; i++) {
-            data.inputData[i] = input[i].clone();
-            data.outputData[i] = output[i].clone();
+            data.setInputData(i, input[i]);
+            data.setOutputData(i, output[i]);
         }
         this.params.setData(Optional.of(data));
     }
@@ -240,7 +226,7 @@ public class CGPSolver {
     }
 
     public CGPChromosome getChromosome(int index) {
-        return results.map(o -> o.bestCGPChromosomes.get(index)).orElse(null);
+        return results.map(o -> o.getBestCGPChromosomes().get(index)).orElse(null);
     }
 
     /**
@@ -256,7 +242,7 @@ public class CGPSolver {
 
         /* if the function set is empty give warning */
         if (params.getFunctions().isEmpty()) {
-            System.err.print("Warning: No Functions added to function set.\n");
+            log.error("Warning: No Functions added to function set.");
         }
     }
 
@@ -265,6 +251,6 @@ public class CGPSolver {
     }
 
     public void printParams() {
-        System.out.println(params);
+        log.info('\n' + params.toString());
     }
 }

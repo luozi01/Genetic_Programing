@@ -2,6 +2,7 @@ package genetics.mutation;
 
 import genetics.chromosome.AbstractListChromosome;
 import genetics.interfaces.MutationPolicy;
+import lombok.NonNull;
 import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.List;
@@ -13,16 +14,14 @@ public class SwapMutation<T extends AbstractListChromosome<?>> implements Mutati
     private final double ratio;
 
     public SwapMutation(final double ratio) {
-        if (ratio < 0.0d || ratio > 1.0d)
+        if (ratio < 0.0d || ratio > 1.0d) {
             throw new IllegalArgumentException(String.format("Ratio should be [0, 1] but found %f", ratio));
+        }
         this.ratio = ratio;
     }
 
     @Override
-    public T mutate(T original) {
-        if (original == null) {
-            throw new NullPointerException();
-        }
+    public T mutate(@NonNull T original) {
         final List representation = Lists.mutable.ofAll(original.getRepresentation());
         for (int i = 0; i < representation.size(); i++) {
             if (random.nextDouble() < ratio) {

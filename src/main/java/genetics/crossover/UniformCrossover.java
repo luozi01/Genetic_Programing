@@ -2,6 +2,7 @@ package genetics.crossover;
 
 import genetics.chromosome.AbstractListChromosome;
 import genetics.interfaces.CrossoverPolicy;
+import lombok.NonNull;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
@@ -21,8 +22,9 @@ public class UniformCrossover<T extends AbstractListChromosome<?>> implements Cr
      * @param ratio Crossover ratio
      */
     public UniformCrossover(final double ratio) {
-        if (ratio < 0.0d || ratio > 1.0d)
+        if (ratio < 0.0d || ratio > 1.0d) {
             throw new IllegalArgumentException(String.format("Ratio should be [0, 1] but found %f", ratio));
+        }
         this.ratio = ratio;
     }
 
@@ -31,21 +33,7 @@ public class UniformCrossover<T extends AbstractListChromosome<?>> implements Cr
      * @param second second parent
      * @return two children crossover from two parents
      */
-    public Pair<T, T> crossover(final T first, final T second) {
-        if (first == null || second == null) {
-            throw new NullPointerException(); // Todo
-        }
-        return mate(first, second);
-    }
-
-    /**
-     * @param first  first parent
-     * @param second second parent
-     * @return two children crossover from two parents
-     */
-    // Todo handle wildcard
-    private Pair<T, T> mate(final T first,
-                            final T second) {
+    public Pair<T, T> crossover(@NonNull final T first, @NonNull final T second) {
         if (first.length() != second.length()) {
             throw new IllegalArgumentException(String.format("Length for both chromosome should be the same, but chromosome1 has %d, chromosome2 has %d", first.length(), second.length()));
         }
