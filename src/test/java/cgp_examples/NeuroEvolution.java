@@ -2,7 +2,6 @@ package cgp_examples;
 
 import cgp.emum.CGPMutationStrategy;
 import cgp.gp.CGPChromosome;
-import cgp.gp.CGPParams;
 import cgp.interfaces.CGPFitness;
 import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
@@ -61,7 +60,7 @@ public class NeuroEvolution {
 
     static class sinWave implements CGPFitness {
         @Override
-        public double calc(CGPParams params, CGPChromosome chromosome, DataSet data) {
+        public double calc(CGPChromosome chromosome, DataSet data) {
             double error = 0;
             double range = 6;
             double stepSize = 0.5;
