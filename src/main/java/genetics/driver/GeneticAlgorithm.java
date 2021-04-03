@@ -22,21 +22,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+@Getter
+@Setter
 public class GeneticAlgorithm<T extends Chromosome> {
-    protected final FitnessCalc<T> fitnessCalc;
-    protected final CrossoverPolicy<T> crossoverPolicy;
-    private final int populationSize;
-    protected final MutationPolicy<T> mutationPolicy;
-    protected final SelectionPolicy<T> selectionPolicy;
-
+    protected FitnessCalc<T> fitnessCalc;
+    protected CrossoverPolicy<T> crossoverPolicy;
+    protected MutationPolicy<T> mutationPolicy;
+    protected SelectionPolicy<T> selectionPolicy;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    protected Optional<Chromosome> bestChromosome = Optional.empty();
+    protected Optional<T> bestChromosome = Optional.empty();
+    private int populationSize;
     private final List<TerminationCheck<T>> terminationChecks = Lists.mutable.empty();
     private final Random random = new Random(System.currentTimeMillis());
-    @Getter
-    @Setter
     protected Population<T> population;
-    @Getter
     private int generation;
     private Executor<T> executor;
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
@@ -196,7 +194,7 @@ public class GeneticAlgorithm<T extends Chromosome> {
     /**
      * @param chromosome global best chromosome
      */
-    protected void updateGlobal(Chromosome chromosome) {
+    public void updateGlobal(T chromosome) {
         if (!bestChromosome.isPresent() || chromosome.betterThan(bestChromosome.get()))
             bestChromosome = Optional.of(chromosome);
     }

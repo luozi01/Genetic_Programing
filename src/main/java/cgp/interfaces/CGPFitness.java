@@ -1,9 +1,10 @@
 package cgp.interfaces;
 
 import cgp.gp.CGPChromosome;
+import cgp.gp.CGPParams;
 import cgp.program.DataSet;
-import cgp.solver.CartesianGP;
+import genetics.interfaces.FitnessCalc;
 
-public interface CGPFitness {
-    double calc(CartesianGP params, CGPChromosome chromosome, DataSet data);
+public interface CGPFitness extends FitnessCalc<CGPChromosome> {
+    double calc(CGPParams params, CGPChromosome chromosome, DataSet data);
 }

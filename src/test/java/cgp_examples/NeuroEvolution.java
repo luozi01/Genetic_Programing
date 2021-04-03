@@ -1,12 +1,11 @@
 package cgp_examples;
 
+import cgp.emum.CGPMutationStrategy;
 import cgp.gp.CGPChromosome;
+import cgp.gp.CGPParams;
 import cgp.interfaces.CGPFitness;
 import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
-import cgp.solver.CartesianGP;
-
-import static cgp.gp.CGPCore.executeChromosome;
 
 public class NeuroEvolution {
 
@@ -30,7 +29,7 @@ public class NeuroEvolution {
         solver.setCustomFitnessFunction(new sinWave());
 
         solver.addNodeFunction("tanh,softsign");
-        solver.setMutationType("pointANN");
+        solver.setMutationType(CGPMutationStrategy.POINT_ANN);
         solver.printParams();
 
         solver.evolve(numGens);
@@ -62,7 +61,7 @@ public class NeuroEvolution {
 
     static class sinWave implements CGPFitness {
         @Override
-        public double calc(CartesianGP params, CGPChromosome chromosome, DataSet data) {
+        public double calc(CGPParams params, CGPChromosome chromosome, DataSet data) {
             double error = 0;
             double range = 6;
             double stepSize = 0.5;
@@ -73,7 +72,7 @@ public class NeuroEvolution {
 
                 inputs[0] = i;
 
-                executeChromosome(chromosome, inputs);
+                chromosome.evaluate(inputs);
 
                 error += Math.abs(chromosome.getChromosomeOutput(0) - Math.sin(i));
             }
@@ -84,6 +83,11 @@ public class NeuroEvolution {
         @Override
         public String toString() {
             return "sinWave";
+        }
+
+        @Override
+        public double calc(CGPChromosome chromosome) {
+            return 0;
         }
     }
 }

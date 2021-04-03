@@ -7,6 +7,8 @@ import lombok.NonNull;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,7 +22,12 @@ public class Population<T extends Chromosome> implements Iterable<T> {
     public Population(Initialization<T> initialization) {
         if (initialization == null)
             throw new IllegalArgumentException("Initialization method cannot be null");
-        this.chromosomes = Lists.mutable.ofAll(initialization.generate());
+        List<T> generation = initialization.generate();
+        if (generation == null) {
+            this.chromosomes = Lists.mutable.empty();
+        } else {
+            this.chromosomes = Lists.mutable.ofAll(generation);
+        }
     }
 
     /**
@@ -33,8 +40,12 @@ public class Population<T extends Chromosome> implements Iterable<T> {
     /**
      * @param chromosomes collection of chromosomes
      */
-    public Population(List<T> chromosomes) {
+    public Population(Collection<T> chromosomes) {
         this.chromosomes = Lists.mutable.ofAll(chromosomes);
+    }
+
+    public Population(T[] chromosomes) {
+        this.chromosomes = Lists.mutable.ofAll(Arrays.asList(chromosomes));
     }
 
     /**
