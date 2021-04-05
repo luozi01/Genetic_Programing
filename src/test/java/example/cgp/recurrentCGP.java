@@ -1,9 +1,9 @@
-package cgp_examples;
+package example.cgp;
 
 import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 
-import static cgp_examples.AverageBehaviour.initialiseDataSetFromFile;
+import static example.cgp.AverageBehaviour.initialiseDataSetFromFile;
 
 class recurrentCGP {
 

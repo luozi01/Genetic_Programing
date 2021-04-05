@@ -1,4 +1,4 @@
-package ga;
+package example.ga;
 
 import genetics.chromosome.BinaryChromosome;
 import genetics.chromosome.Chromosome;

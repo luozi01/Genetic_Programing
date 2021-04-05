@@ -1,10 +1,9 @@
-package cgp_examples;
+package example.cgp;
 
 import cgp.emum.CGPMutationStrategy;
 import cgp.gp.CGPChromosome;
-import cgp.interfaces.CGPFitness;
-import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
+import genetics.interfaces.FitnessCalc;
 
 public class NeuroEvolution {
 
@@ -58,9 +57,9 @@ public class NeuroEvolution {
         System.out.println(bestGene.toString(true));
     }
 
-    static class sinWave implements CGPFitness {
+    static class sinWave implements FitnessCalc<CGPChromosome> {
         @Override
-        public double calc(CGPChromosome chromosome, DataSet data) {
+        public double calc(CGPChromosome chromosome) {
             double error = 0;
             double range = 6;
             double stepSize = 0.5;
@@ -82,11 +81,6 @@ public class NeuroEvolution {
         @Override
         public String toString() {
             return "sinWave";
-        }
-
-        @Override
-        public double calc(CGPChromosome chromosome) {
-            return 0;
         }
     }
 }

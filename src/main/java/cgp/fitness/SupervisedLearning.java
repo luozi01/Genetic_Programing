@@ -1,29 +1,24 @@
 package cgp.fitness;
 
 import cgp.gp.CGPChromosome;
-import cgp.interfaces.CGPFitness;
+import cgp.gp.CGPParams;
 import cgp.program.DataSet;
+import genetics.interfaces.FitnessCalc;
+import lombok.AllArgsConstructor;
 
-public class SupervisedLearning implements CGPFitness {
-    /***
-     * Not used in CGP
-     * @param chromosome chromosome
-     * @return 0
-     */
-    @Override
-    public double calc(CGPChromosome chromosome) {
-        return 0;
-    }
+@AllArgsConstructor
+public class SupervisedLearning implements FitnessCalc<CGPChromosome> {
+    private final CGPParams params;
 
     /**
      * Compute the fitness based on dataset
      *
      * @param chromosome CGP chromosome
-     * @param dataSet    input dataset
      * @return fitness
      */
     @Override
-    public double calc(CGPChromosome chromosome, DataSet dataSet) {
+    public double calc(CGPChromosome chromosome) {
+        final DataSet dataSet = this.params.getData().orElseThrow();
         double error = 0;
         if (chromosome.getNumInputs() != dataSet.getNumInputs()) {
             throw new IllegalArgumentException("The number of chromosome inputs must match the number of inputs specified in the dataSet.");

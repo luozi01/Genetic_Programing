@@ -1,4 +1,4 @@
-package cgp_examples;
+package example.cgp;
 
 import cgp.gp.CGPChromosome;
 import cgp.program.DataSet;

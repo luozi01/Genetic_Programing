@@ -1,6 +1,5 @@
 package cgp.gp;
 
-import cgp.interfaces.CGPFitness;
 import cgp.interfaces.CGPInitialization;
 import cgp.interfaces.CGPReproduction;
 import cgp.interfaces.CGPSelection;
@@ -9,6 +8,7 @@ import cgp.program.Results;
 import genetics.common.Population;
 import genetics.driver.GeneticAlgorithm;
 import genetics.interfaces.CrossoverPolicy;
+import genetics.interfaces.FitnessCalc;
 import genetics.interfaces.MutationPolicy;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
                      MutationPolicy<CGPChromosome> mutationPolicy,
                      CGPSelection selection,
                      CGPReproduction reproduction,
-                     CGPFitness fitness,
+                     FitnessCalc<CGPChromosome> fitness,
                      CGPParams params) {
         super(initialization, crossoverPolicy, mutationPolicy, selection, fitness);
         this.params = params;
@@ -117,7 +117,7 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
 
         /* set fitness of the parents */
         for (int i = 0; i < params.getMu(); i++) {
-            parents.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(parents.get(i), data));
+            parents.get(i).updateFitness(this.getFitnessCalc().calc(parents.get(i)));
         }
 
         /* show the user whats going on */
@@ -131,7 +131,7 @@ public class CGPEvolve extends GeneticAlgorithm<CGPChromosome> {
 
             /* set fitness of the children of the population */
             for (int i = 0; i < params.getLambda(); i++) {
-                children.get(i).updateFitness(((CGPFitness) this.getFitnessCalc()).calc(children.get(i), data));
+                children.get(i).updateFitness(this.getFitnessCalc().calc(children.get(i)));
             }
 
             getBestChromosome(parents, children, params.getMu(), params.getLambda(), bestChromosome);

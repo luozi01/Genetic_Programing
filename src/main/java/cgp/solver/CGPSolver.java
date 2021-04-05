@@ -6,7 +6,6 @@ import cgp.gp.CGPChromosome;
 import cgp.gp.CGPEvolve;
 import cgp.gp.CGPParams;
 import cgp.initialization.CGPInitializer;
-import cgp.interfaces.CGPFitness;
 import cgp.interfaces.CGPFunction;
 import cgp.interfaces.CGPReproduction;
 import cgp.interfaces.CGPSelection;
@@ -15,6 +14,7 @@ import cgp.program.Results;
 import cgp.reproduction.MutateRandomParentReproduction;
 import cgp.selection.FittestSelection;
 import genetics.common.Population;
+import genetics.interfaces.FitnessCalc;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
@@ -40,7 +40,7 @@ public class CGPSolver {
                 this.params.getMutationPolicy(),
                 new FittestSelection(),
                 new MutateRandomParentReproduction(),
-                new SupervisedLearning(),
+                new SupervisedLearning(this.params),
                 this.params
         );
     }
@@ -154,7 +154,7 @@ public class CGPSolver {
      * sets the fitness function to the fitnessFuction passed. If the fitnessFunction is NULL
      * then the default supervisedLearning fitness function is used.
      */
-    public void setCustomFitnessFunction(@NonNull CGPFitness fitnessFunction) {
+    public void setCustomFitnessFunction(@NonNull FitnessCalc<CGPChromosome> fitnessFunction) {
         this.model.setFitnessCalc(fitnessFunction);
     }
 
