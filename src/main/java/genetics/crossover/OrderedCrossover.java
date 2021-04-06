@@ -2,7 +2,6 @@ package genetics.crossover;
 
 import genetics.chromosome.AbstractListChromosome;
 import genetics.interfaces.CrossoverPolicy;
-import lombok.NonNull;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class OrderedCrossover<T extends AbstractListChromosome<?>> implements CrossoverPolicy<T> {
-    private final Random random = new Random(System.currentTimeMillis());
+    private static final Random RANDOM = new Random(System.currentTimeMillis());
 
     /**
      * Performs order crossover on two parents
@@ -23,7 +22,7 @@ public class OrderedCrossover<T extends AbstractListChromosome<?>> implements Cr
      * @return two new offspring
      */
     @Override
-    public Pair<T, T> crossover(@NonNull T first, @NonNull T second) {
+    public Pair<T, T> crossover(T first, T second) {
         if (first.length() != second.length()) {
             throw new IllegalArgumentException(String.format("Length for both chromosome should be the same, but chromosome1 has %d, chromosome2 has %d", first.length(), second.length()));
         }
@@ -36,10 +35,10 @@ public class OrderedCrossover<T extends AbstractListChromosome<?>> implements Cr
         MutableList child1 = Lists.mutable.withInitialCapacity(length);
         MutableList child2 = Lists.mutable.withInitialCapacity(length);
 
-        int a = random.nextInt(length);
+        int a = RANDOM.nextInt(length);
         int b;
         do {
-            b = random.nextInt(length);
+            b = RANDOM.nextInt(length);
         } while (a == b);
 
         final int start = Math.min(a, b);

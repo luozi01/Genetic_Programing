@@ -5,13 +5,13 @@ import cgp.emum.CGPMutationStrategy;
 import cgp.emum.CGPReproductionStrategy;
 import cgp.emum.CGPSelectionStrategy;
 import cgp.interfaces.CGPFunction;
-import cgp.interfaces.CGPMutation;
 import cgp.mutation.PointANNMutation;
 import cgp.mutation.PointMutation;
 import cgp.mutation.ProbabilisticMutation;
 import cgp.mutation.ProbabilisticOnlyActiveMutation;
 import cgp.mutation.SingleMutation;
 import cgp.program.DataSet;
+import genetics.interfaces.MutationPolicy;
 import lombok.Data;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -76,7 +76,7 @@ public class CGPParams {
     private int updateFrequency;
     private boolean shortcutConnections;
     private CGPMutationStrategy mutationType;
-    private CGPMutation mutationPolicy;
+    private MutationPolicy<CGPChromosome> mutationPolicy;
     private CGPFitnessStrategy fitnessFunction;
     private CGPSelectionStrategy selectionScheme;
     private CGPReproductionStrategy reproductionScheme;
@@ -145,23 +145,23 @@ public class CGPParams {
         switch (strategy) {
             case PROBABILISTIC:
                 this.setMutationType(PROBABILISTIC);
-                this.setMutationPolicy(new ProbabilisticMutation());
+                this.setMutationPolicy(new ProbabilisticMutation(this));
                 break;
             case POINT:
                 this.setMutationType(POINT);
-                this.setMutationPolicy(new PointMutation());
+                this.setMutationPolicy(new PointMutation(this));
                 break;
             case POINT_ANN:
                 this.setMutationType(POINT_ANN);
-                this.setMutationPolicy(new PointANNMutation());
+                this.setMutationPolicy(new PointANNMutation(this));
                 break;
             case PROBABILISTIC_ONLY_ACTIVE:
                 this.setMutationType(PROBABILISTIC_ONLY_ACTIVE);
-                this.setMutationPolicy(new ProbabilisticOnlyActiveMutation());
+                this.setMutationPolicy(new ProbabilisticOnlyActiveMutation(this));
                 break;
             case SINGLE:
                 this.setMutationType(SINGLE);
-                this.setMutationPolicy(new SingleMutation());
+                this.setMutationPolicy(new SingleMutation(this));
                 break;
             default:
                 throw new IllegalArgumentException(String.format("\nWarning: mutation type '%s' is invalid. " +

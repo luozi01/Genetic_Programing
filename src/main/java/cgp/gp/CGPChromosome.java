@@ -273,7 +273,7 @@ public class CGPChromosome extends Chromosome {
     }
 
     public void mutate(CGPParams params) {
-        this.copyChromosome(params.getMutationPolicy().mutate(params, this));
+        this.copyChromosome(params.getMutationPolicy().mutate(this));
         this.setChromosomeActiveNodes();
     }
 

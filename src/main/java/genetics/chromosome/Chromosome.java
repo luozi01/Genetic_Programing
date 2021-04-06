@@ -1,6 +1,7 @@
 package genetics.chromosome;
 
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 public abstract class Chromosome {
@@ -10,10 +11,7 @@ public abstract class Chromosome {
      * @param another chromosome compares to
      * @return if current chromosome has smaller fitness than the compared one
      */
-    public boolean betterThan(Chromosome another) {
-        if (another == null) {
-            throw new IllegalStateException("compare chromosome cannot be null");
-        }
+    public boolean betterThan(@NonNull Chromosome another) {
         return Double.compare(fitness, another.fitness) < 0;
     }
 

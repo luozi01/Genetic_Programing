@@ -2,7 +2,6 @@ package genetics.mutation;
 
 import genetics.chromosome.BinaryChromosome;
 import genetics.interfaces.MutationPolicy;
-import lombok.NonNull;
 import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.List;
@@ -15,7 +14,7 @@ public class BinaryMutation<T extends BinaryChromosome> implements MutationPolic
      * @param original chromosome
      * @return mutated chromosome
      */
-    public T mutate(@NonNull T original) {
+    public T mutate(T original) {
         // make sure does not modify the original chromosome
         List<Integer> newRepr = Lists.mutable.ofAll(original.getRepresentation());
 

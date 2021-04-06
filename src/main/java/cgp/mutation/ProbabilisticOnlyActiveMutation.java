@@ -2,16 +2,15 @@ package cgp.mutation;
 
 import cgp.gp.CGPChromosome;
 import cgp.gp.CGPParams;
-import cgp.interfaces.CGPMutation;
+import genetics.interfaces.MutationPolicy;
+import lombok.AllArgsConstructor;
 
-public class ProbabilisticOnlyActiveMutation implements CGPMutation {
+@AllArgsConstructor
+public class ProbabilisticOnlyActiveMutation implements MutationPolicy<CGPChromosome> {
+    private final CGPParams params;
+
     @Override
     public CGPChromosome mutate(CGPChromosome c) {
-        return null;
-    }
-
-    @Override
-    public CGPChromosome mutate(CGPParams params, CGPChromosome c) {
         CGPChromosome copy = c.copy();
         /* for every active node in the chromosome */
         for (int i = 0; i < copy.getNumActiveNodes(); i++) {

@@ -2,18 +2,17 @@ package cgp.mutation;
 
 import cgp.gp.CGPChromosome;
 import cgp.gp.CGPParams;
-import cgp.interfaces.CGPMutation;
+import genetics.interfaces.MutationPolicy;
+import lombok.AllArgsConstructor;
 
 import static java.lang.Math.round;
 
-public class PointMutation implements CGPMutation {
-    @Override
-    public CGPChromosome mutate(CGPChromosome c) {
-        return null;
-    }
+@AllArgsConstructor
+public class PointMutation implements MutationPolicy<CGPChromosome> {
+    private final CGPParams params;
 
     @Override
-    public CGPChromosome mutate(CGPParams params, CGPChromosome c) {
+    public CGPChromosome mutate(CGPChromosome c) {
         CGPChromosome copy = c.copy();
         int nodeIndex;
         /* get the number of each type of gene */

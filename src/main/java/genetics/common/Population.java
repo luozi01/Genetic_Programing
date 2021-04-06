@@ -20,11 +20,10 @@ public class Population<T extends Chromosome> implements Iterable<T> {
      * @param initializer initialize function
      */
     public Population(@NonNull Initializer<T> initializer) {
+        this.chromosomes = Lists.mutable.empty();
         List<T> generation = initializer.generate();
-        if (generation == null) {
-            this.chromosomes = Lists.mutable.empty();
-        } else {
-            this.chromosomes = Lists.mutable.ofAll(generation);
+        if (generation != null) {
+            this.chromosomes.addAll(generation);
         }
     }
 
@@ -114,7 +113,7 @@ public class Population<T extends Chromosome> implements Iterable<T> {
      * @param length size of the population to be kept
      * @return the best child
      */
-    public Chromosome trim(int length) {
+    public T trim(int length) {
         this.chromosomes = this.chromosomes.sortThisByDouble(Chromosome::getFitness).take(length);
         return chromosomes.get(0);
     }

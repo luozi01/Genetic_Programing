@@ -2,18 +2,21 @@ package cgp.mutation;
 
 import cgp.gp.CGPChromosome;
 import cgp.gp.CGPParams;
-import cgp.interfaces.CGPMutation;
+import genetics.interfaces.MutationPolicy;
+import lombok.AllArgsConstructor;
 
 import static java.lang.Math.round;
 
-public class PointANNMutation implements CGPMutation {
+@AllArgsConstructor
+public class PointANNMutation implements MutationPolicy<CGPChromosome> {
+    private final CGPParams params;
+
     /**
-     * @param params hyper parameters
-     * @param c      chromosome
+     * @param c chromosome
      * @return mutated chromosome
      */
     @Override
-    public CGPChromosome mutate(CGPParams params, CGPChromosome c) {
+    public CGPChromosome mutate(CGPChromosome c) {
         CGPChromosome copy = c.copy();
 
         int nodeIndex;
@@ -69,18 +72,6 @@ public class PointANNMutation implements CGPMutation {
                 copy.setOutputNode(nodeIndex, params.getRandomChromosomeOutput(copy.getNumInputs(), copy.getNumNodes()));
             }
         }
-
         return copy;
-    }
-
-    /**
-     * Not used in CGP
-     *
-     * @param var1 chromosome
-     * @return null
-     */
-    @Override
-    public CGPChromosome mutate(CGPChromosome var1) {
-        return null;
     }
 }

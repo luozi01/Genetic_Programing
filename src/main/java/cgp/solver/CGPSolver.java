@@ -185,7 +185,7 @@ public class CGPSolver {
     /**
      * sets the mutation type in params
      */
-    public void setMutationType(CGPMutationStrategy mutationType) {
+    public void setMutationType(@NonNull CGPMutationStrategy mutationType) {
         params.setMutation(mutationType);
     }
 
@@ -239,7 +239,7 @@ public class CGPSolver {
      * functions must be given in the char array. The function names must
      * be comma separated and contain no spaces i.e. "and,or".
      */
-    public void addNodeFunction(String functionNames) {
+    public void addNodeFunction(@NonNull String functionNames) {
         String[] func = functionNames.split(",");
         for (String aFunc : func) {
             params.addPresetFunctionToFunctionSet(aFunc);
@@ -252,7 +252,7 @@ public class CGPSolver {
         this.model.initialize();
     }
 
-    public void addSelfDefineFunction(CGPFunction function) {
+    public void addSelfDefineFunction(@NonNull CGPFunction function) {
         this.params.addCustomNodeFunction(function);
         this.model.initialize();
     }

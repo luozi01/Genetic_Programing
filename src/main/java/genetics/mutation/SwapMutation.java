@@ -2,7 +2,6 @@ package genetics.mutation;
 
 import genetics.chromosome.AbstractListChromosome;
 import genetics.interfaces.MutationPolicy;
-import lombok.NonNull;
 import org.eclipse.collections.impl.factory.Lists;
 
 import java.util.List;
@@ -27,7 +26,7 @@ public class SwapMutation<T extends AbstractListChromosome<?>> implements Mutati
      * @return mutated chromosome
      */
     @Override
-    public T mutate(@NonNull T original) {
+    public T mutate(T original) {
         final List representation = Lists.mutable.ofAll(original.getRepresentation());
         for (int i = 0; i < representation.size(); i++) {
             if (random.nextDouble() < ratio) {
