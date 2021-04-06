@@ -4,7 +4,7 @@ import genetics.chromosome.Chromosome;
 
 import java.util.List;
 
-public interface Initialization<T extends Chromosome> {
+public interface Initializer<T extends Chromosome> {
     /**
      * Generate chromosome population
      *

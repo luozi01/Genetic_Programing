@@ -4,6 +4,7 @@ import cgp.gp.CGPChromosome;
 import cgp.interfaces.CGPSelection;
 import genetics.chromosome.Chromosome;
 import genetics.common.Population;
+import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.tuple.Pair;
 
 import java.util.Comparator;
@@ -13,16 +14,14 @@ public class FittestSelection implements CGPSelection {
     /**
      * Select the best k children for next generation
      *
-     * @param parents      parent chromosome
-     * @param candidate    candidate chromosome
-     * @param numParents   parent number
-     * @param numCandidate candidate number
+     * @param parents   parent chromosome
+     * @param candidate candidate chromosome
      */
     @Override
-    public void select(List<CGPChromosome> parents, List<CGPChromosome> candidate, int numParents, int numCandidate) {
-        List<CGPChromosome> nextGen = candidate.subList(0, numCandidate);
+    public void select(List<CGPChromosome> parents, List<CGPChromosome> candidate) {
+        List<CGPChromosome> nextGen = Lists.mutable.ofAll(candidate);
         nextGen.sort(Comparator.comparingDouble(Chromosome::getFitness));
-        for (int i = 0; i < numParents; i++) {
+        for (int i = 0; i < parents.size(); i++) {
             parents.get(i).copyChromosome(nextGen.get(i));
         }
     }

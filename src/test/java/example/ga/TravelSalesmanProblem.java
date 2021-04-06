@@ -5,7 +5,7 @@ import genetics.chromosome.IntegerChromosome;
 import genetics.crossover.OrderedCrossover;
 import genetics.driver.GeneticAlgorithm;
 import genetics.interfaces.FitnessCalc;
-import genetics.interfaces.Initialization;
+import genetics.interfaces.Initializer;
 import genetics.mutation.SwapMutation;
 import genetics.selection.TournamentSelection;
 import org.eclipse.collections.api.factory.Lists;
@@ -32,12 +32,17 @@ public class TravelSalesmanProblem {
 
                         int tournament = (int) Math.ceil(tour.citiesSize * .1);
                         int elitism = (int) Math.ceil(tournament * .6);
-                        GeneticAlgorithm<TSPChromosome> ga = new GeneticAlgorithm<>(
-                                new TSPInitialization(500, tour),
-                                new TSPEvaluation(),
-                                new OrderedCrossover<>(), .7,
-                                new SwapMutation<>(0.5), 0.02,
-                                new TournamentSelection<>(), tournament, elitism);
+                        GeneticAlgorithm<TSPChromosome> ga = GeneticAlgorithm.<TSPChromosome>builder()
+                                .initializer(new TSPInitializer(500, tour))
+                                .fitnessCalc(new TSPEvaluation())
+                                .crossoverPolicy(new OrderedCrossover<>())
+                                .uniformRate(.7)
+                                .mutationPolicy(new SwapMutation<>(0.5))
+                                .mutationRate(.02)
+                                .selectionPolicy(new TournamentSelection<>())
+                                .tournamentSize(tournament)
+                                .elitism(elitism)
+                                .build();
                         ga.addTerminateListener(env -> {
                             if (env.getBest().getFitness() == tour.bestKnownSolution) {
                                 env.terminate();
@@ -202,11 +207,11 @@ public class TravelSalesmanProblem {
         }
     }
 
-    static class TSPInitialization implements Initialization<TSPChromosome> {
+    static class TSPInitializer implements Initializer<TSPChromosome> {
         private final Tour tour;
         private final int populationSize;
 
-        public TSPInitialization(int populationSize, Tour tour) {
+        public TSPInitializer(int populationSize, Tour tour) {
             this.populationSize = populationSize;
             this.tour = tour;
         }

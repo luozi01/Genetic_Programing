@@ -8,12 +8,14 @@ import genetics.executor.GlobalDistributionExecutor;
 import genetics.executor.SequentialExecutor;
 import genetics.interfaces.CrossoverPolicy;
 import genetics.interfaces.FitnessCalc;
-import genetics.interfaces.Initialization;
+import genetics.interfaces.Initializer;
 import genetics.interfaces.MutationPolicy;
 import genetics.interfaces.SelectionPolicy;
 import genetics.interfaces.TerminationCheck;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -23,19 +25,20 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 public class GeneticAlgorithm<T extends Chromosome> {
+    private static final Random RANDOM = new Random(System.currentTimeMillis());
+    private final List<TerminationCheck<T>> terminationChecks = Lists.mutable.empty();
+    private Initializer<T> initializer;
     private FitnessCalc<T> fitnessCalc;
     private CrossoverPolicy<T> crossoverPolicy;
     private MutationPolicy<T> mutationPolicy;
     private SelectionPolicy<T> selectionPolicy;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private Optional<T> bestChromosome = Optional.empty();
-    private int populationSize;
-    private final List<TerminationCheck<T>> terminationChecks = Lists.mutable.empty();
-    private final Random random = new Random(System.currentTimeMillis());
     private Population<T> population;
+    private int populationSize;
     private int generation;
     private Executor<T> executor;
     private ExecutionType executionType = ExecutionType.SEQUENTIAL;
@@ -48,7 +51,7 @@ public class GeneticAlgorithm<T extends Chromosome> {
     /**
      * Constructor
      *
-     * @param initialization  initialization function object
+     * @param initializer     initialization function object
      * @param fitnessCalc     fitness function object
      * @param crossoverPolicy crossover function object
      * @param uniformRate     uniform rate for crossover if needed, [0, 1]
@@ -58,15 +61,16 @@ public class GeneticAlgorithm<T extends Chromosome> {
      * @param tournamentSize  tournament size for select function depends on select function
      * @param elitism         number of elites to keep during evolve
      */
-    public GeneticAlgorithm(final Initialization<T> initialization,
-                            final FitnessCalc<T> fitnessCalc,
-                            final CrossoverPolicy<T> crossoverPolicy,
-                            final double uniformRate,
-                            final MutationPolicy<T> mutationPolicy,
-                            final double mutationRate,
-                            final SelectionPolicy<T> selectionPolicy,
-                            final int tournamentSize,
-                            final int elitism) {
+    @Builder
+    GeneticAlgorithm(@NonNull final Initializer<T> initializer,
+                     @NonNull final FitnessCalc<T> fitnessCalc,
+                     @NonNull final CrossoverPolicy<T> crossoverPolicy,
+                     @NonNull final Double uniformRate,
+                     @NonNull final MutationPolicy<T> mutationPolicy,
+                     @NonNull final Double mutationRate,
+                     @NonNull final SelectionPolicy<T> selectionPolicy,
+                     @NonNull final Integer tournamentSize,
+                     @NonNull final Integer elitism) {
         if (uniformRate < 0 || uniformRate > 1) {
             throw new IllegalArgumentException(String.format("Uniform rate should be [0, 1] but %f found", uniformRate));
         }
@@ -74,7 +78,8 @@ public class GeneticAlgorithm<T extends Chromosome> {
             throw new IllegalArgumentException(String.format("Mutation rate should be [0, 1] but %f found", mutationRate));
         }
         // population
-        this.population = new Population<>(initialization);
+        this.initializer = initializer;
+        this.population = new Population<>(initializer);
         this.populationSize = population.size();
         // crossover
         this.crossoverPolicy = crossoverPolicy;
@@ -90,23 +95,14 @@ public class GeneticAlgorithm<T extends Chromosome> {
         this.fitnessCalc = fitnessCalc;
     }
 
-    protected GeneticAlgorithm(final Initialization<T> initialization,
-                               final CrossoverPolicy<T> crossoverPolicy,
-                               final MutationPolicy<T> mutationPolicy,
-                               final SelectionPolicy<T> selectionPolicy,
-                               final FitnessCalc<T> fitnessCalc) {
-        this.population = new Population<>(initialization);
-        this.populationSize = this.population.size();
-        this.crossoverPolicy = crossoverPolicy;
-        this.mutationPolicy = mutationPolicy;
-        this.selectionPolicy = selectionPolicy;
-        this.fitnessCalc = fitnessCalc;
-    }
-
     /**
      * @param iteration fix iteration evolution
      */
     public void evolve(int iteration) throws ExecutionException, InterruptedException {
+        if (iteration <= 0) {
+            throw new IllegalArgumentException(String.format("%d generations is invalid. The number of generations must be > 0.", iteration));
+        }
+
         // reset variable
         initExecutor();
         terminate = false;
@@ -155,11 +151,11 @@ public class GeneticAlgorithm<T extends Chromosome> {
             // tournament selection
             Pair<T, T> pair = selectionPolicy.select(population, tournamentSize);
             // crossover
-            if (random.nextDouble() < uniformRate) {
+            if (RANDOM.nextDouble() < uniformRate) {
                 pair = crossoverPolicy.crossover(pair.getOne(), pair.getTwo());
             }
             // mutation
-            if (random.nextDouble() < mutationRate) {
+            if (RANDOM.nextDouble() < mutationRate) {
                 pair = Tuples.pair(
                         mutationPolicy.mutate(pair.getOne()),
                         mutationPolicy.mutate(pair.getTwo()));
@@ -218,7 +214,7 @@ public class GeneticAlgorithm<T extends Chromosome> {
     /**
      * @return global best chromosome
      */
-    public Chromosome getBest() {
+    public T getBest() {
         return bestChromosome.orElse(null);
     }
 
@@ -227,5 +223,13 @@ public class GeneticAlgorithm<T extends Chromosome> {
      */
     public void runInGlobal() {
         executionType = ExecutionType.GLOBAL_MODEL;
+    }
+
+    /**
+     * re initialize population
+     */
+    public void initialize() {
+        this.population = new Population<>(this.initializer);
+        this.populationSize = this.population.size();
     }
 }

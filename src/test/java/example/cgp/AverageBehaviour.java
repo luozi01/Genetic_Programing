@@ -7,11 +7,11 @@ import cgp.solver.CGPSolver;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 class AverageBehaviour {
 
-    static Optional<DataSet> initialiseDataSetFromFile(String file) {
+    static DataSet initialiseDataSetFromFile(String file) {
         DataSet data = new DataSet();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             int lineNum = -1;
@@ -46,10 +46,10 @@ class AverageBehaviour {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return Optional.of(data);
+        return data;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         int numInputs = 1;
         int numNodes = 15;
         int numOutputs = 1;

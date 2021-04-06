@@ -31,6 +31,6 @@ public class SequentialExecutor<T extends Chromosome> extends Executor<T> {
                 bestChromosome = Optional.of(chromosome);
             }
         }
-        return bestChromosome.orElse(null);
+        return bestChromosome.orElse(population.getChromosome(0));
     }
 }

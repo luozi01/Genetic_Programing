@@ -3,20 +3,24 @@ package cgp.reproduction;
 import cgp.gp.CGPChromosome;
 import cgp.gp.CGPParams;
 import cgp.interfaces.CGPReproduction;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+@AllArgsConstructor
 public class MutateRandomParentReproduction implements CGPReproduction {
+    private final CGPParams params;
+
     @Override
-    public void reproduce(CGPParams params, List<CGPChromosome> parents, List<CGPChromosome> children, int numParents, int numChildren) {
+    public void reproduce(List<CGPChromosome> parents, List<CGPChromosome> children) {
         /* for each child */
-        for (int i = 0; i < numChildren; i++) {
+        for (CGPChromosome child : children) {
 
             /* set child as clone of random parent */
-            children.get(i).copyChromosome(parents.get(params.nextInt(numParents)));
+            child.copyChromosome(parents.get(params.nextInt(parents.size())));
 
             /* mutate newly cloned child */
-            children.get(i).mutate(params);
+            child.mutate(params);
         }
     }
 }

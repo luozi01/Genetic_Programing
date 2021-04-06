@@ -2,7 +2,7 @@ package genetics.common;
 
 
 import genetics.chromosome.Chromosome;
-import genetics.interfaces.Initialization;
+import genetics.interfaces.Initializer;
 import lombok.NonNull;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -17,10 +17,10 @@ public class Population<T extends Chromosome> implements Iterable<T> {
     private MutableList<T> chromosomes;
 
     /**
-     * @param initialization initialize function
+     * @param initializer initialize function
      */
-    public Population(@NonNull Initialization<T> initialization) {
-        List<T> generation = initialization.generate();
+    public Population(@NonNull Initializer<T> initializer) {
+        List<T> generation = initializer.generate();
         if (generation == null) {
             this.chromosomes = Lists.mutable.empty();
         } else {

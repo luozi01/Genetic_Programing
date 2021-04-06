@@ -5,7 +5,7 @@ import genetics.chromosome.Chromosome;
 import genetics.crossover.UniformCrossover;
 import genetics.driver.GeneticAlgorithm;
 import genetics.interfaces.FitnessCalc;
-import genetics.interfaces.Initialization;
+import genetics.interfaces.Initializer;
 import genetics.mutation.BinaryMutation;
 import genetics.selection.TournamentSelection;
 
@@ -74,12 +74,17 @@ public class Knapsack {
 
         final int optimal = knapsack(capacity, itemsWeight, itemsValue);
 
-        GeneticAlgorithm<K> instance = new GeneticAlgorithm<>(
-                new KInitialization(100, itemsWeight, itemsValue, capacity, defaultGeneLength),
-                new KEvaluate(),
-                new UniformCrossover<>(.5), .4,
-                new BinaryMutation<>(), .02,
-                new TournamentSelection<>(), 3, 1);
+        GeneticAlgorithm<K> instance = GeneticAlgorithm.<K>builder()
+                .initializer(new KInitializer(100, itemsWeight, itemsValue, capacity, defaultGeneLength))
+                .fitnessCalc(new KEvaluate())
+                .crossoverPolicy(new UniformCrossover<>(.5))
+                .uniformRate(.4)
+                .mutationPolicy(new BinaryMutation<>())
+                .mutationRate(.02)
+                .selectionPolicy(new TournamentSelection<>())
+                .tournamentSize(3)
+                .elitism(1)
+                .build();
         instance.addTerminateListener(o -> {
             Chromosome best = o.getBest();
             int value = sum((K) best, itemsValue);
@@ -158,7 +163,7 @@ public class Knapsack {
         }
     }
 
-    static class KInitialization implements Initialization<K> {
+    static class KInitializer implements Initializer<K> {
 
         private final int populationSize;
         private final int[] itemsWeight;
@@ -166,7 +171,7 @@ public class Knapsack {
         private final int capacity;
         private final int defaultGeneLength;
 
-        KInitialization(int populationSize, int[] itemsWeight, int[] itemsValue, int capacity, int defaultGeneLength) {
+        KInitializer(int populationSize, int[] itemsWeight, int[] itemsValue, int capacity, int defaultGeneLength) {
             this.populationSize = populationSize;
             this.itemsWeight = itemsWeight;
             this.itemsValue = itemsValue;

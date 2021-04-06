@@ -6,5 +6,5 @@ import genetics.interfaces.SelectionPolicy;
 import java.util.List;
 
 public interface CGPSelection extends SelectionPolicy<CGPChromosome> {
-    void select(List<CGPChromosome> parents, List<CGPChromosome> candidate, int numParents, int numCandidate);
+    void select(List<CGPChromosome> parents, List<CGPChromosome> candidate);
 }

@@ -3,11 +3,13 @@ package example.cgp;
 import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 
+import java.util.concurrent.ExecutionException;
+
 import static example.cgp.AverageBehaviour.initialiseDataSetFromFile;
 
 class recurrentCGP {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         int numInputs = 1;
         int numNodes = 15;
         int numOutputs = 1;

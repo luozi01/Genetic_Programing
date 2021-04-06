@@ -5,9 +5,11 @@ import cgp.gp.CGPChromosome;
 import cgp.solver.CGPSolver;
 import genetics.interfaces.FitnessCalc;
 
+import java.util.concurrent.ExecutionException;
+
 public class NeuroEvolution {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         int numInputs = 1;
         int numNodes = 20;
         int numOutputs = 1;
@@ -46,7 +48,6 @@ public class NeuroEvolution {
         // reconstruct
         //        bestGene = CGPChromosome.deserialization("serialize.txt");
         bestGene = CGPChromosome.reconstruct(serialize);
-        System.out.println(bestGene);
 
         // continues training
         while (bestGene.getFitness() > targetFitness || bestGene.notEvaluated()) {

@@ -86,6 +86,24 @@ public class CGPParams {
     private Optional<DataSet> data = Optional.empty();
 
     public static CGPParams initialiseParameters(int numInputs, int numNodes, int numOutputs, int arity) {
+        if (numInputs <= 0) {
+            throw new IllegalArgumentException(String.format("Number of chromosome inputs cannot be less than one; " +
+                    "%d is invalid.", numInputs));
+        }
+
+        if (numNodes < 0) {
+            throw new IllegalArgumentException(String.format("Number of chromosome nodes cannot be negative; " +
+                    "%d is invalid.\n", numNodes));
+        }
+
+        if (numOutputs < 0) {
+            throw new IllegalArgumentException(String.format("Number of chromosome outputs cannot be less than one; " +
+                    "%d is invalid.", numOutputs));
+        }
+
+        if (arity < 0) {
+            throw new IllegalArgumentException(String.format("Node arity cannot be less than one; %d is invalid.", arity));
+        }
         CGPParams params = new CGPParams();
 
         /* Set default values */
@@ -101,40 +119,15 @@ public class CGPParams {
 
         params.updateFrequency = 1;
 
-        if (numInputs <= 0) {
-            throw new IllegalArgumentException(String.format("Number of chromosome inputs cannot be less than one; " +
-                    "%d is invalid.", numInputs));
-        }
-
         params.numInputs = numInputs;
-
-        if (numNodes < 0) {
-            throw new IllegalArgumentException(String.format("Number of chromosome nodes cannot be negative; " +
-                    "%d is invalid.\n", numNodes));
-        }
-
         params.numNodes = numNodes;
-
-        if (numOutputs < 0) {
-            throw new IllegalArgumentException(String.format("Number of chromosome outputs cannot be less than one; " +
-                    "%d is invalid.", numOutputs));
-        }
-
         params.numOutputs = numOutputs;
-
-        if (arity < 0) {
-            throw new IllegalArgumentException(String.format("Node arity cannot be less than one; %d is invalid.", arity));
-        }
         params.arity = arity;
 
         params.setMutation(PROBABILISTIC);
-
-        params.functions = Lists.mutable.empty();
-
+        params.functions = Lists.mutable.of(add, sub, mul, div);
         params.fitnessFunction = SUPERVISED_LEARNING;
-
         params.selectionScheme = SELECT_FITTEST;
-
         params.reproductionScheme = MUTATE_RANDOM_PARENT;
 
         return params;
@@ -221,7 +214,9 @@ public class CGPParams {
      * Disallows exceeding the function set size.
      */
     public void addCustomNodeFunction(CGPFunction function) {
-        this.functions.add(function);
+        if (!this.functions.contains(function)) {
+            this.functions.add(function);
+        }
     }
 
     /**

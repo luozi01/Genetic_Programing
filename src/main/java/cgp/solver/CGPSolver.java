@@ -13,12 +13,12 @@ import cgp.program.DataSet;
 import cgp.program.Results;
 import cgp.reproduction.MutateRandomParentReproduction;
 import cgp.selection.FittestSelection;
-import genetics.common.Population;
 import genetics.interfaces.FitnessCalc;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Log4j2
 public class CGPSolver {
@@ -35,18 +35,23 @@ public class CGPSolver {
         this.params = CGPParams.initialiseParameters(numInputs, numNodes, numOutputs, nodeArity);
 
         this.model = new CGPEvolve(
-                new CGPInitializer(),
-                null,
-                this.params.getMutationPolicy(),
+                new CGPInitializer(this.params),
                 new FittestSelection(),
-                new MutateRandomParentReproduction(),
+                new MutateRandomParentReproduction(this.params),
                 new SupervisedLearning(this.params),
                 this.params
         );
     }
 
-    public void setData(Optional<DataSet> date) {
-        this.params.setData(date);
+    public void setData(@NonNull DataSet data) {
+        if (params.getNumInputs() != data.getNumInputs()) {
+            throw new IllegalArgumentException(String.format("The number of inputs specified in the dataSet (%d) does not match the number of inputs specified in the parameters (%d).", data.getNumInputs(), params.getNumInputs()));
+        }
+
+        if (params.getNumOutputs() != data.getNumOutputs()) {
+            throw new IllegalArgumentException(String.format("The number of outputs specified in the dataSet (%d) does not match the number of outputs specified in the parameters (%d).", data.getNumOutputs(), params.getNumOutputs()));
+        }
+        this.params.setData(Optional.of(data));
     }
 
     /**
@@ -194,14 +199,14 @@ public class CGPSolver {
         this.params.setData(Optional.of(data));
     }
 
-    public void evolve(int iteration, CGPChromosome... chromosomes) {
+    public void evolve(int iteration, CGPChromosome... chromosomes) throws ExecutionException, InterruptedException {
         if (chromosomes.length > 0) {
-            this.model.setPopulation(new Population<>(chromosomes));
+            this.model.injectPrevPopulation(chromosomes);
         }
         this.model.evolve(iteration);
     }
 
-    public void repeatEvolve(int numGens, int numRuns, CGPChromosome... chromosomes) {
+    public void repeatEvolve(int numGens, int numRuns, CGPChromosome... chromosomes) throws ExecutionException, InterruptedException {
         results = Optional.of(this.model.repeatEvolve(params, numGens, numRuns, chromosomes));
         results.ifPresent(o -> this.model.updateGlobal(o.getBestChromosome()));
     }
@@ -244,10 +249,12 @@ public class CGPSolver {
         if (params.getFunctions().isEmpty()) {
             log.error("Warning: No Functions added to function set.");
         }
+        this.model.initialize();
     }
 
     public void addSelfDefineFunction(CGPFunction function) {
-        params.addCustomNodeFunction(function);
+        this.params.addCustomNodeFunction(function);
+        this.model.initialize();
     }
 
     public void printParams() {
