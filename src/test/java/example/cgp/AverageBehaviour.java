@@ -1,8 +1,8 @@
 package example.cgp;
 
 import cgp.gp.CGPChromosome;
-import cgp.program.DataSet;
 import cgp.solver.CGPSolver;
+import genetics.data.DataSet;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,76 +11,74 @@ import java.util.concurrent.ExecutionException;
 
 class AverageBehaviour {
 
-    static DataSet initialiseDataSetFromFile(String file) {
-        DataSet data = new DataSet();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            int lineNum = -1;
-            String[] dataSet;
-            while (true) {
-                String line = reader.readLine();
-                if (line == null)
-                    break;
+  static DataSet initialiseDataSetFromFile(String file) {
+    DataSet data = new DataSet();
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+      int lineNum = -1;
+      String[] dataSet;
+      while (true) {
+        String line = reader.readLine();
+        if (line == null) break;
 
-                dataSet = line.split(",");
-                if (lineNum == -1) {
+        dataSet = line.split(",");
+        if (lineNum == -1) {
+          int numInputs = Integer.parseInt(dataSet[0]);
+          int numOutputs = Integer.parseInt(dataSet[1]);
+          int numSamples = Integer.parseInt(dataSet[dataSet.length - 1]);
 
-                    int numInputs = Integer.parseInt(dataSet[0]);
-                    int numOutputs = Integer.parseInt(dataSet[1]);
-                    int numSamples = Integer.parseInt(dataSet[dataSet.length - 1]);
+          data = new DataSet(numSamples, numInputs, numOutputs);
+        } else { // the other lines contain input outputNodes pairs
+          // get the first value on the given line
 
-                    data = new DataSet(numSamples, numInputs, numOutputs);
-                } else { //the other lines contain input outputNodes pairs
-                    // get the first value on the given line
-
-                    for (int j = 0; j < dataSet.length; j++) {
-                        if (j < data.getNumInputs()) {
-                            data.setInputData(lineNum, j, Double.parseDouble(dataSet[j]));
-                        } else {
-                            data.setOutputData(lineNum, j - data.getNumInputs(), Double.parseDouble(dataSet[j]));
-                        }
-                    }
-                }
-                // increment the current line index
-                lineNum++;
+          for (int j = 0; j < dataSet.length; j++) {
+            if (j < data.getNumInputs()) {
+              data.setInputData(lineNum, j, Double.parseDouble(dataSet[j]));
+            } else {
+              data.setOutputData(lineNum, j - data.getNumInputs(), Double.parseDouble(dataSet[j]));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+          }
         }
-        return data;
+        // increment the current line index
+        lineNum++;
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+    return data;
+  }
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        int numInputs = 1;
-        int numNodes = 15;
-        int numOutputs = 1;
-        int nodeArity = 2;
+  public static void main(String[] args) throws ExecutionException, InterruptedException {
+    int numInputs = 1;
+    int numNodes = 15;
+    int numOutputs = 1;
+    int nodeArity = 2;
 
-        int numGens = 10000;
-        int numRuns = 10;
+    int numGens = 10000;
+    int numRuns = 10;
 
-        double targetFitness = 0.1;
-        int updateFrequency = 500;
+    double targetFitness = 0.1;
+    int updateFrequency = 500;
 
-        double averageFitness;
+    double averageFitness;
 
-        CGPSolver solver = new CGPSolver(numInputs, numNodes, numOutputs, nodeArity);
+    CGPSolver solver = new CGPSolver(numInputs, numNodes, numOutputs, nodeArity);
 
-        solver.addNodeFunction("add,sub,mul,div,sin");
+    solver.addNodeFunction("add,sub,mul,div,sin");
 
-        solver.setTargetFitness(targetFitness);
+    solver.setTargetFitness(targetFitness);
 
-        solver.setUpdateFrequency(updateFrequency);
+    solver.setUpdateFrequency(updateFrequency);
 
-        solver.setData(initialiseDataSetFromFile("problems/cgp/symbolic.data"));
+    solver.setData(initialiseDataSetFromFile("problems/cgp/symbolic.data"));
 
-        solver.repeatEvolve(numGens, numRuns);
+    solver.repeatEvolve(numGens, numRuns);
 
-        averageFitness = solver.getResults().getAverageFitness();
+    averageFitness = solver.getResults().getAverageFitness();
 
-        System.out.printf("The average chromosome fitness is: %f\n", averageFitness);
+    System.out.printf("The average chromosome fitness is: %f\n", averageFitness);
 
-        CGPChromosome bestGene = solver.getBestGene(true);
-        System.out.println(bestGene.getGeneration());
-        System.out.println(bestGene.toString(false));
-    }
+    CGPChromosome bestGene = solver.getBestGene(true);
+    System.out.println(bestGene.getGeneration());
+    System.out.println(bestGene.toString(false));
+  }
 }

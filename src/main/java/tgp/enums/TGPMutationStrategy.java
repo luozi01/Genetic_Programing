@@ -1,0 +1,9 @@
+package tgp.enums;
+
+public enum TGPMutationStrategy {
+  MUTATION_POINT,
+  MUTATION_SUBTREE,
+  MUTATION_SUBTREE_KINNEAR,
+  MUTATION_HOIST,
+  MUTATION_SHRINK
+}

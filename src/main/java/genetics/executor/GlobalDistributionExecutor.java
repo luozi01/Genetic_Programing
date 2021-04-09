@@ -16,54 +16,55 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class GlobalDistributionExecutor<T extends Chromosome> extends Executor<T> {
-    private final ExecutorService executorService;
-    private final FitnessCalc<T> fitnessCalc;
+  private final ExecutorService executorService;
+  private final FitnessCalc<T> fitnessCalc;
 
-    public GlobalDistributionExecutor(FitnessCalc<T> fitnessCalc) {
-        this.fitnessCalc = fitnessCalc;
-        this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    }
+  public GlobalDistributionExecutor(FitnessCalc<T> fitnessCalc) {
+    this.fitnessCalc = fitnessCalc;
+    this.executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+  }
 
-    /**
-     * Compute fitness for each child in population in parallel
-     *
-     * @param population population
-     * @return best child
-     * @throws InterruptedException interrupted exception
-     * @throws ExecutionException   execution exception
-     */
-    @Override
-    public T evaluate(Population<T> population) throws InterruptedException, ExecutionException {
-        Collection<Callable<T>> callable = Lists.mutable.ofInitialCapacity(population.size());
-        population.forEach(o -> callable.add(() -> {
-            o.setFitness(fitnessCalc.calc(o));
-            return o;
-        }));
-        Optional<T> bestChromosome = Optional.empty();
-        List<Future<T>> futures = executorService.invokeAll(callable);
-        double bestFitness = Double.MAX_VALUE;
-        for (Future<T> future : futures) {
-            T chromosome = future.get();
-            if (chromosome.getFitness() < bestFitness) {
-                bestFitness = chromosome.getFitness();
-                bestChromosome = Optional.of(chromosome);
-            }
-        }
-        return bestChromosome.orElse(population.getChromosome(0));
+  /**
+   * Compute fitness for each child in population in parallel
+   *
+   * @param population population
+   * @return best child
+   * @throws InterruptedException interrupted exception
+   * @throws ExecutionException execution exception
+   */
+  @Override
+  public T evaluate(Population<T> population) throws InterruptedException, ExecutionException {
+    Collection<Callable<T>> callable = Lists.mutable.ofInitialCapacity(population.size());
+    population.forEach(
+        o ->
+            callable.add(
+                () -> {
+                  o.setFitness(fitnessCalc.calc(o));
+                  return o;
+                }));
+    Optional<T> bestChromosome = Optional.empty();
+    List<Future<T>> futures = executorService.invokeAll(callable);
+    double bestFitness = Double.MAX_VALUE;
+    for (Future<T> future : futures) {
+      T chromosome = future.get();
+      if (chromosome.getFitness() < bestFitness) {
+        bestFitness = chromosome.getFitness();
+        bestChromosome = Optional.of(chromosome);
+      }
     }
+    return bestChromosome.orElse(population.getChromosome(0));
+  }
 
-    /**
-     * Shut down the executor service
-     */
-    @Override
-    public void shutDown() {
-        executorService.shutdown();
-        try {
-            if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
-                executorService.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            executorService.shutdownNow();
-        }
+  /** Shut down the executor service */
+  @Override
+  public void shutDown() {
+    executorService.shutdown();
+    try {
+      if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+        executorService.shutdownNow();
+      }
+    } catch (InterruptedException e) {
+      executorService.shutdownNow();
     }
+  }
 }

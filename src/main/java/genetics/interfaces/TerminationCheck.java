@@ -4,5 +4,5 @@ import genetics.chromosome.Chromosome;
 import genetics.driver.GeneticAlgorithm;
 
 public interface TerminationCheck<T extends Chromosome> {
-    void update(GeneticAlgorithm<T> environment);
+  void update(GeneticAlgorithm<T> environment);
 }

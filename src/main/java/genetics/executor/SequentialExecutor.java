@@ -7,30 +7,29 @@ import genetics.interfaces.FitnessCalc;
 import java.util.Optional;
 
 public class SequentialExecutor<T extends Chromosome> extends Executor<T> {
+  private final FitnessCalc<T> fitnessCalc;
 
-    private final FitnessCalc<T> fitnessCalc;
+  public SequentialExecutor(FitnessCalc<T> fitnessCalc) {
+    this.fitnessCalc = fitnessCalc;
+  }
 
-    public SequentialExecutor(FitnessCalc<T> fitnessCalc) {
-        this.fitnessCalc = fitnessCalc;
+  /**
+   * Compute fitness for each child in population in sequential order
+   *
+   * @param population population
+   * @return best child
+   */
+  @Override
+  public T evaluate(Population<T> population) {
+    double bestFitness = Double.MAX_VALUE;
+    Optional<T> bestChromosome = Optional.empty();
+    for (T chromosome : population) {
+      chromosome.setFitness(fitnessCalc.calc(chromosome));
+      if (chromosome.getFitness() < bestFitness) {
+        bestFitness = chromosome.getFitness();
+        bestChromosome = Optional.of(chromosome);
+      }
     }
-
-    /**
-     * Compute fitness for each child in population in sequential order
-     *
-     * @param population population
-     * @return best child
-     */
-    @Override
-    public T evaluate(Population<T> population) {
-        double bestFitness = Double.MAX_VALUE;
-        Optional<T> bestChromosome = Optional.empty();
-        for (T chromosome : population) {
-            chromosome.setFitness(fitnessCalc.calc(chromosome));
-            if (chromosome.getFitness() < bestFitness) {
-                bestFitness = chromosome.getFitness();
-                bestChromosome = Optional.of(chromosome);
-            }
-        }
-        return bestChromosome.orElse(population.getChromosome(0));
-    }
+    return bestChromosome.orElse(population.getChromosome(0));
+  }
 }

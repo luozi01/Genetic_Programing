@@ -8,38 +8,38 @@ import java.util.List;
 import java.util.Random;
 
 public class SwapMutation<T extends AbstractListChromosome<?>> implements MutationPolicy<T> {
+  private final Random random = new Random(System.currentTimeMillis());
+  private final double ratio;
 
-    private final Random random = new Random(System.currentTimeMillis());
-    private final double ratio;
-
-    public SwapMutation(final double ratio) {
-        if (ratio < 0.0d || ratio > 1.0d) {
-            throw new IllegalArgumentException(String.format("Ratio should be [0, 1] but found %f", ratio));
-        }
-        this.ratio = ratio;
+  public SwapMutation(final double ratio) {
+    if (ratio < 0.0d || ratio > 1.0d) {
+      throw new IllegalArgumentException(
+          String.format("Ratio should be [0, 1] but found %f", ratio));
     }
+    this.ratio = ratio;
+  }
 
-    /**
-     * Randomly swap position of two values for each position in the chromosome
-     *
-     * @param original original chromosome
-     * @return mutated chromosome
-     */
-    @Override
-    public T mutate(T original) {
-        final List representation = Lists.mutable.ofAll(original.getRepresentation());
-        for (int i = 0; i < representation.size(); i++) {
-            if (random.nextDouble() < ratio) {
-                int idx;
-                do {
-                    idx = random.nextInt(representation.size());
-                } while (idx == i);
+  /**
+   * Randomly swap position of two values for each position in the chromosome
+   *
+   * @param original original chromosome
+   * @return mutated chromosome
+   */
+  @Override
+  public T mutate(T original) {
+    final List representation = Lists.mutable.ofAll(original.getRepresentation());
+    for (int i = 0; i < representation.size(); i++) {
+      if (random.nextDouble() < ratio) {
+        int idx;
+        do {
+          idx = random.nextInt(representation.size());
+        } while (idx == i);
 
-                Object temp = representation.get(i);
-                representation.set(i, representation.get(idx));
-                representation.set(idx, temp);
-            }
-        }
-        return (T) original.newCopy(representation);
+        Object temp = representation.get(i);
+        representation.set(i, representation.get(idx));
+        representation.set(idx, temp);
+      }
     }
+    return (T) original.newCopy(representation);
+  }
 }
