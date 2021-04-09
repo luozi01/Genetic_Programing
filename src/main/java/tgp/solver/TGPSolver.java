@@ -4,6 +4,7 @@ import genetics.data.DataSet;
 import genetics.driver.GeneticAlgorithm;
 import genetics.selection.TournamentSelection;
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
 import tgp.crossover.TGPCrossover;
 import tgp.fitness.SupervisedLearning;
 import tgp.gp.TGPChromosome;
@@ -14,6 +15,7 @@ import tgp.mutation.TGPMutation;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+@Log4j2
 public class TGPSolver {
   private final GeneticAlgorithm<TGPChromosome> model;
   private final TGPParams params;
@@ -41,12 +43,12 @@ public class TGPSolver {
           double bestFit = bestGene.getFitness();
 
           // log to console
-          System.out.printf("Generation = %s\t fit = %s\t\n", environment.getGeneration(), bestFit);
+          log.info("Generation = {}\t fit = {}\t", environment.getGeneration(), bestFit);
 
           // halt condition
           if (bestFit < this.params.getTargetFitness()) {
             environment.terminate();
-            System.out.printf("Function: %s\n", bestGene);
+            log.info("Function: {}", bestGene);
           }
         });
   }

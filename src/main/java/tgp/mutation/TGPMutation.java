@@ -31,57 +31,74 @@ public class TGPMutation implements MutationPolicy<TGPChromosome> {
         if (node.isTerminal()) {
           Operator terminal = manager.getRandomTerminal();
           int trials = 0;
-          int max_trials = 50;
+          int maxTrials = 50;
           while (node.getOp() == terminal) {
             terminal = manager.getRandomTerminal();
             trials++;
-            if (trials > max_trials) break;
+            if (trials > maxTrials) {
+              break;
+            }
           }
           if (terminal != null) {
             node.setOp(terminal);
-            if (node.isVariable()) node.setVariable(manager.getRandomVar());
-            if (node.isNumber()) node.setValue(manager.uniform());
+            if (node.isVariable()) {
+              node.setVariable(manager.getRandomVar());
+            }
+            if (node.isNumber()) {
+              node.setValue(manager.uniform());
+            }
           }
         } else {
           MutableList<Operator> candidates = Lists.mutable.empty();
           for (Operator op : manager.getNonTerminal()) {
-            if (op != node.getOp() && op.argumentCount() == node.argumentCount())
+            if (op != node.getOp() && op.argumentCount() == node.argumentCount()) {
               candidates.add(op);
+            }
           }
-          if (!candidates.isEmpty()) node.setOp(candidates.get(manager.nextInt(candidates.size())));
+          if (!candidates.isEmpty()) {
+            node.setOp(candidates.get(manager.nextInt(candidates.size())));
+          }
         }
         break;
       case MUTATION_SUBTREE:
-        int node_depth = treeNode.getRoot().depth2Node(node);
+        int nodeDepth = treeNode.getRoot().depth2Node(node);
         int iMaxProgramDepth = this.manager.getMaxProgramDepth();
         node.getChildren().clear();
 
         node.setOp(manager.getRandomOperator());
 
         if (!node.isTerminal()) {
-          int max_depth = iMaxProgramDepth - node_depth;
+          int maxDepth = iMaxProgramDepth - nodeDepth;
           SyntaxTreeUtils.createWithDepth(
-              manager, node, max_depth, TGPInitializationStrategy.INITIALIZATION_METHOD_GROW);
+              manager, node, maxDepth, TGPInitializationStrategy.INITIALIZATION_METHOD_GROW);
         } else {
-          if (node.isVariable()) node.setVariable(manager.getRandomVar());
-          if (node.isNumber()) node.setValue(manager.uniform());
+          if (node.isVariable()) {
+            node.setVariable(manager.getRandomVar());
+          }
+          if (node.isNumber()) {
+            node.setValue(manager.uniform());
+          }
         }
         break;
       case MUTATION_SUBTREE_KINNEAR:
         int depth = treeNode.getRoot().length();
-        int subtree_depth = treeNode.getRoot().depth2Node(node);
-        int current_depth = depth - subtree_depth;
-        int max_depth = (int) (depth * 1.15) - current_depth;
+        int subtreeDepth = treeNode.getRoot().depth2Node(node);
+        int currentDepth = depth - subtreeDepth;
+        int maxDepth = (int) (depth * 1.15) - currentDepth;
 
         node.getChildren().clear();
         node.setOp(manager.getRandomOperator());
 
         if (!node.isTerminal()) {
           SyntaxTreeUtils.createWithDepth(
-              manager, node, max_depth, TGPInitializationStrategy.INITIALIZATION_METHOD_GROW);
+              manager, node, maxDepth, TGPInitializationStrategy.INITIALIZATION_METHOD_GROW);
         } else {
-          if (node.isVariable()) node.setVariable(manager.getRandomVar());
-          if (node.isNumber()) node.setValue(manager.uniform());
+          if (node.isVariable()) {
+            node.setVariable(manager.getRandomVar());
+          }
+          if (node.isNumber()) {
+            node.setValue(manager.uniform());
+          }
         }
         break;
       case MUTATION_HOIST:
@@ -93,8 +110,12 @@ public class TGPMutation implements MutationPolicy<TGPChromosome> {
         node.getChildren().clear();
         node.setOp(manager.getRandomTerminal());
 
-        if (node.isVariable()) node.setVariable(manager.getRandomVar());
-        if (node.isNumber()) node.setValue(manager.uniform());
+        if (node.isVariable()) {
+          node.setVariable(manager.getRandomVar());
+        }
+        if (node.isNumber()) {
+          node.setValue(manager.uniform());
+        }
         break;
       default:
         throw new IllegalArgumentException(

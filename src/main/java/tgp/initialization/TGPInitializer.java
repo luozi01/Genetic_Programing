@@ -44,13 +44,13 @@ public class TGPInitializer implements Initializer<TGPChromosome> {
   private List<TGPChromosome> initializeRampedHalfHalf() {
     final int populationSize = this.params.getPopulationSize();
     int maxDepthForCreation = this.params.getMaxDepthForCreation();
-    int part_count = maxDepthForCreation - 1;
+    int partCount = maxDepthForCreation - 1;
 
-    int interval = populationSize / part_count;
+    int interval = populationSize / partCount;
     int interval2 = interval / 2;
 
     MutableList<TGPChromosome> pop = Lists.mutable.withInitialCapacity(populationSize);
-    for (int i = 0; i < part_count; i++) {
+    for (int i = 0; i < partCount; i++) {
       for (int j = 0; j < interval2; ++j) {
         TreeNode node =
             SyntaxTreeUtils.createWithDepth(
@@ -65,9 +65,9 @@ public class TGPInitializer implements Initializer<TGPChromosome> {
       }
     }
 
-    int pop_count = pop.size();
+    int popCount = pop.size();
 
-    for (int i = pop_count; i < populationSize; ++i) {
+    for (int i = popCount; i < populationSize; ++i) {
       TreeNode node =
           SyntaxTreeUtils.createWithDepth(
               params, i + 2, TGPInitializationStrategy.INITIALIZATION_METHOD_GROW);
@@ -80,9 +80,9 @@ public class TGPInitializer implements Initializer<TGPChromosome> {
     final int populationSize = this.params.getPopulationSize();
     MutableList<TGPChromosome> pop = Lists.mutable.withInitialCapacity(populationSize);
     int maxDepthForCreation = params.getMaxDepthForCreation();
-    int part_count = maxDepthForCreation - 1;
+    int partCount = maxDepthForCreation - 1;
 
-    int interval = populationSize / part_count;
+    int interval = populationSize / partCount;
 
     TGPInitializationStrategy method = params.getPopInitStrategy();
     if (method == TGPInitializationStrategy.INITIALIZATION_METHOD_RAMPED_FULL) {
@@ -91,16 +91,16 @@ public class TGPInitializer implements Initializer<TGPChromosome> {
       method = TGPInitializationStrategy.INITIALIZATION_METHOD_GROW;
     }
 
-    for (int i = 0; i < part_count; i++) {
+    for (int i = 0; i < partCount; i++) {
       for (int j = 0; j < interval; ++j) {
         TreeNode node = SyntaxTreeUtils.createWithDepth(params, i + 1, method);
         pop.add(new TGPChromosome(node));
       }
     }
 
-    int pop_count = pop.size();
+    int popCount = pop.size();
 
-    for (int i = pop_count; i < populationSize; ++i) {
+    for (int i = popCount; i < populationSize; ++i) {
       TreeNode node = SyntaxTreeUtils.createWithDepth(params, maxDepthForCreation, method);
       pop.add(new TGPChromosome(node));
     }

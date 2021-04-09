@@ -40,14 +40,14 @@ public class TGPCrossover implements CrossoverPolicy<TGPChromosome> {
 
     Pair<TreeNode, TreeNode> pCutPoint1, pCutPoint2;
 
-    boolean is_crossover_performed = false;
+    boolean isCrossoverPerformed = false;
     // Suppose that at the beginning both the current tree and the other tree do not violate max
     // depth constraint
     // then try to see whether a crossover can be performed from such a way that after the
     // crossover,
     // both GP still have depth <= max depth
     if (iMaxDepth1 <= iMaxDepthForCrossover && iMaxDepth2 <= iMaxDepthForCrossover) {
-      int max_trials = 50;
+      int maxTrials = 50;
       int trials = 0;
       do {
         pCutPoint1 = chromosome1.getRoot().anyNode(bias);
@@ -62,7 +62,7 @@ public class TGPCrossover implements CrossoverPolicy<TGPChromosome> {
 
           // crossover is successful
           if (iMaxDepth1 <= iMaxDepthForCrossover && iMaxDepth2 <= iMaxDepthForCrossover) {
-            is_crossover_performed = true;
+            isCrossoverPerformed = true;
             break;
           } else {
             Pair<TreeNode, TreeNode> newCutPoint1 = result.getOne();
@@ -74,12 +74,12 @@ public class TGPCrossover implements CrossoverPolicy<TGPChromosome> {
           }
         }
         trials++;
-      } while (trials < max_trials);
+      } while (trials < maxTrials);
     }
 
     // force at least one crossover even if the maximum depth is violated above
     // so that this operator won't end up like a reproduction operator
-    if (!is_crossover_performed) {
+    if (!isCrossoverPerformed) {
       pCutPoint1 = chromosome1.getRoot().anyNode(bias);
       pCutPoint2 = chromosome2.getRoot().anyNode(bias);
 
@@ -122,14 +122,14 @@ public class TGPCrossover implements CrossoverPolicy<TGPChromosome> {
       }
       return Tuples.pair(cutPoint1, cutPoint2);
     } else {
-      int child_index1 = parent1.getChildren().indexOf(point1);
-      int child_index2 = parent2.getChildren().indexOf(point2);
+      int childIndex1 = parent1.getChildren().indexOf(point1);
+      int childIndex2 = parent2.getChildren().indexOf(point2);
 
       TreeNode newChild1 = point2.copy();
       TreeNode newChild2 = point1.copy();
 
-      parent1.getChildren().set(child_index1, newChild1);
-      parent2.getChildren().set(child_index2, newChild2);
+      parent1.getChildren().set(childIndex1, newChild1);
+      parent2.getChildren().set(childIndex2, newChild2);
 
       return Tuples.pair(Tuples.pair(newChild1, parent1), Tuples.pair(newChild2, parent2));
     }

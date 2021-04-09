@@ -228,8 +228,6 @@ public enum Type implements Operator {
     }
   },
   LN {
-    private static final double threshold = 1e-5;
-
     @Override
     public int argumentCount() {
       return 1;
@@ -253,7 +251,7 @@ public enum Type implements Operator {
     @Override
     public double eval(TreeNode treeNode, double[] inputs) {
       double arg = treeNode.getLeft().eval(inputs);
-      return arg < 0 ? Double.MAX_VALUE : Math.log(arg + threshold);
+      return arg < 0 ? Double.MAX_VALUE : Math.log(arg + TOLERANCE);
     }
   },
   SIN {
@@ -342,8 +340,6 @@ public enum Type implements Operator {
   },
 
   AND {
-    private static final double mTolerance = 0.0000001;
-
     @Override
     public int argumentCount() {
       return 2;
@@ -369,10 +365,6 @@ public enum Type implements Operator {
       return (isTrue(treeNode.getLeft().eval(inputs)) && isTrue(treeNode.getRight().eval(inputs)))
           ? 1
           : 0;
-    }
-
-    private boolean isTrue(double x) {
-      return !(x > -mTolerance) || !(x < mTolerance);
     }
   },
 
@@ -435,8 +427,6 @@ public enum Type implements Operator {
   },
 
   NOT {
-    private static final double tolerance = 0.0000001;
-
     @Override
     public int argumentCount() {
       return 1;
@@ -461,15 +451,9 @@ public enum Type implements Operator {
     public double eval(TreeNode treeNode, double[] inputs) {
       return isTrue(treeNode.getLeft().eval(inputs)) ? 1 : 0;
     }
-
-    private boolean isTrue(double x) {
-      return !(x > -tolerance) || !(x < tolerance);
-    }
   },
 
   OR {
-    private static final double mTolerance = 0.0000001;
-
     @Override
     public int argumentCount() {
       return 2;
@@ -496,9 +480,11 @@ public enum Type implements Operator {
           ? 1
           : 0;
     }
+  };
 
-    private boolean isTrue(double x) {
-      return !(x > -mTolerance) || !(x < mTolerance);
-    }
+  private static final double TOLERANCE = 1e-5;
+
+  private static boolean isTrue(double x) {
+    return !(x > -TOLERANCE) || !(x < TOLERANCE);
   }
 }

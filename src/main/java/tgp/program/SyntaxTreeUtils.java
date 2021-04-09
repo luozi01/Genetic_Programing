@@ -17,9 +17,9 @@ public class SyntaxTreeUtils {
    */
   public static void createWithDepth(
       TGPParams context, TreeNode treeNode, int allowableDepth, TGPInitializationStrategy method) {
-    int child_count = treeNode.argumentCount();
+    int childCount = treeNode.argumentCount();
 
-    for (int i = 0; i != child_count; ++i) {
+    for (int i = 0; i != childCount; ++i) {
       Operator op = randomOperator(context, allowableDepth, method);
       TreeNode child = new TreeNode(op, context);
       treeNode.addChildren(child);
@@ -48,12 +48,12 @@ public class SyntaxTreeUtils {
     // IEEE Transactions on Evolutionary Computation, 1(3):209–216, September 1997."
     if (method == TGPInitializationStrategy.INITIALIZATION_METHOD_RANDOM_BRANCH) {
       int s = allowableDepth; // tree size
-      Operator non_terminal = context.anyOperatorWithArityLessThan(s);
-      if (non_terminal == null) {
+      Operator nonTerminal = context.anyOperatorWithArityLessThan(s);
+      if (nonTerminal == null) {
         root = new TreeNode(context.getRandomTerminal(), context);
       } else {
-        root = new TreeNode(non_terminal, context);
-        int b_n = non_terminal.argumentCount();
+        root = new TreeNode(nonTerminal, context);
+        int b_n = nonTerminal.argumentCount();
         s = (int) Math.floor((double) s / b_n);
         randomBranch(context, root, s);
       }
@@ -96,17 +96,17 @@ public class SyntaxTreeUtils {
    * @param s max operator arity
    */
   private static void randomBranch(TGPParams context, TreeNode treeNode, int s) {
-    int child_count = treeNode.argumentCount();
+    int childCount = treeNode.argumentCount();
 
-    for (int i = 0; i != child_count; i++) {
-      Operator non_terminal = context.anyOperatorWithArityLessThan(s);
-      if (non_terminal == null) {
+    for (int i = 0; i != childCount; i++) {
+      Operator nonTerminal = context.anyOperatorWithArityLessThan(s);
+      if (nonTerminal == null) {
         TreeNode child = new TreeNode(context.getRandomTerminal(), context);
         treeNode.getChildren().add(child);
       } else {
-        TreeNode child = new TreeNode(non_terminal, context);
+        TreeNode child = new TreeNode(nonTerminal, context);
         treeNode.getChildren().add(child);
-        int b_n = non_terminal.argumentCount();
+        int b_n = nonTerminal.argumentCount();
         int s_pi = (int) Math.floor((double) s / b_n);
         randomBranch(context, child, s_pi);
       }
@@ -119,14 +119,14 @@ public class SyntaxTreeUtils {
    * Computation, 4(3), 2000b."
    *
    * @param context related data
-   * @param parent_node The node for which the child numNodes are generated from this method
+   * @param parentNode The node for which the child numNodes are generated from this method
    * @param p expected probability
    * @param allowableDepth The maximum tree depth
    */
-  private static void PTC1(TGPParams context, TreeNode parent_node, double p, int allowableDepth) {
-    int child_count = parent_node.argumentCount();
+  private static void PTC1(TGPParams context, TreeNode parentNode, double p, int allowableDepth) {
+    int childCount = parentNode.argumentCount();
 
-    for (int i = 0; i != child_count; i++) {
+    for (int i = 0; i != childCount; i++) {
       Operator data;
       if (allowableDepth == 0) {
         data = context.getRandomTerminal();
@@ -137,7 +137,7 @@ public class SyntaxTreeUtils {
       }
 
       TreeNode child = new TreeNode(data, context);
-      parent_node.getChildren().add(child);
+      parentNode.getChildren().add(child);
 
       if (data.argumentCount() != 0) {
         PTC1(context, child, p, allowableDepth - 1);
@@ -147,13 +147,13 @@ public class SyntaxTreeUtils {
 
   private static Operator randomOperator(
       TGPParams context, int allowableDepth, TGPInitializationStrategy method) {
-    int terminal_count = context.getTerminal().size();
-    int function_count = context.getNonTerminal().size();
+    int terminalCount = context.getTerminal().size();
+    int functionCount = context.getNonTerminal().size();
 
-    double terminal_prob = (double) terminal_count / (terminal_count + function_count);
+    double terminalProb = (double) terminalCount / (terminalCount + functionCount);
     if (allowableDepth <= 0
         || (method == TGPInitializationStrategy.INITIALIZATION_METHOD_GROW
-            && context.uniform() <= terminal_prob)) {
+            && context.uniform() <= terminalProb)) {
       return context.getRandomTerminal();
     } else {
       return context.getRandomNonTerminal();

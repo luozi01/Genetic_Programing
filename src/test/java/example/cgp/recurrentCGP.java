@@ -21,7 +21,6 @@ class recurrentCGP {
     double recurrentConnectionProbability = 0.10;
 
     CGPSolver solver = new CGPSolver(numInputs, numNodes, numOutputs, nodeArity);
-    solver.addNodeFunction("add,sub,mul,div");
     solver.setUpdateFrequency(updateFrequency);
     solver.setRecurrentConnectionProbability(recurrentConnectionProbability);
     solver.printParams();

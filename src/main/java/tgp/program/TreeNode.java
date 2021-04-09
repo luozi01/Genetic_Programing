@@ -10,7 +10,6 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import tgp.gp.TGPParams;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -27,8 +26,12 @@ public class TreeNode implements Serializable {
   TreeNode(Operator op, TGPParams manager) {
     this.op = op;
     this.manager = manager;
-    if (op.isNumber()) value = manager.uniform();
-    if (op.isVariable()) variable = manager.getRandomVar();
+    if (op.isNumber()) {
+      value = manager.uniform();
+    }
+    if (op.isVariable()) {
+      variable = manager.getRandomVar();
+    }
   }
 
   private int depth(TreeNode node, int depthSoFar) {
@@ -111,32 +114,32 @@ public class TreeNode implements Serializable {
    * @return new subtree
    */
   public Pair<TreeNode, TreeNode> anyNode(boolean bias) {
-    List<Pair<TreeNode, TreeNode>> nodes = flattenNodes();
+    MutableList<Pair<TreeNode, TreeNode>> nodes = flattenNodes();
     if (bias) {
       // As specified by Koza, 90% select function node, 10% select terminal node
       if (manager.uniform() <= 0.1) {
-        List<Pair<TreeNode, TreeNode>> terminal_nodes = new ArrayList<>();
+        MutableList<Pair<TreeNode, TreeNode>> terminalNodes = Lists.mutable.empty();
         for (Pair<TreeNode, TreeNode> tuple : nodes) {
           TreeNode node = tuple.getOne();
           if (node.isTerminal()) {
-            terminal_nodes.add(tuple);
+            terminalNodes.add(tuple);
           }
         }
-        if (terminal_nodes.size() > 0) {
-          return terminal_nodes.get(manager.nextInt(terminal_nodes.size()));
+        if (terminalNodes.size() > 0) {
+          return terminalNodes.get(manager.nextInt(terminalNodes.size()));
         } else {
           return nodes.get(manager.nextInt(nodes.size()));
         }
       } else {
-        List<Pair<TreeNode, TreeNode>> function_nodes = new ArrayList<>();
+        MutableList<Pair<TreeNode, TreeNode>> functionNodes = Lists.mutable.empty();
         for (Pair<TreeNode, TreeNode> tuple : nodes) {
           TreeNode node = tuple.getOne();
           if (!node.isTerminal()) {
-            function_nodes.add(tuple);
+            functionNodes.add(tuple);
           }
         }
-        if (function_nodes.size() > 0) {
-          return function_nodes.get(manager.nextInt(function_nodes.size()));
+        if (functionNodes.size() > 0) {
+          return functionNodes.get(manager.nextInt(functionNodes.size()));
         } else {
           return nodes.get(manager.nextInt(nodes.size()));
         }
@@ -151,17 +154,18 @@ public class TreeNode implements Serializable {
    *
    * @return The list of numNodes from the tree
    */
-  private List<Pair<TreeNode, TreeNode>> flattenNodes() {
-    List<Pair<TreeNode, TreeNode>> list = new ArrayList<>();
+  private MutableList<Pair<TreeNode, TreeNode>> flattenNodes() {
+    MutableList<Pair<TreeNode, TreeNode>> list = Lists.mutable.empty();
     collectNodes(this, null, list);
     return list;
   }
 
   private void collectNodes(
-      TreeNode node, TreeNode parent_node, List<Pair<TreeNode, TreeNode>> list) {
-    if (node == null) return;
-    assert parent_node == null || parent_node.getChildren().contains(node);
-    list.add(Tuples.pair(node, parent_node));
+      TreeNode node, TreeNode parentNode, List<Pair<TreeNode, TreeNode>> list) {
+    if (node == null) {
+      return;
+    }
+    list.add(Tuples.pair(node, parentNode));
     for (TreeNode child : node.getChildren()) {
       collectNodes(child, node, list);
     }
@@ -172,13 +176,13 @@ public class TreeNode implements Serializable {
   }
 
   private int depth2Node(@NonNull TreeNode node, @NonNull TreeNode target, int depthSoFar) {
-    if (node == target) {
+    if (node.equals(target)) {
       return depthSoFar;
     }
 
     int maxDepthOfChild = -1;
-    for (TreeNode child_node : node.children) {
-      int d = depth2Node(child_node, target, depthSoFar + 1);
+    for (TreeNode childNode : node.children) {
+      int d = depth2Node(childNode, target, depthSoFar + 1);
       if (d > maxDepthOfChild) {
         maxDepthOfChild = d;
       }
